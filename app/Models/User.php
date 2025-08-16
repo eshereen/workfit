@@ -47,6 +47,26 @@ class User extends Authenticatable
         ];
     }
 
+    public function customer()
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->is_admin;
+    }
+
     /**
      * Get the user's initials
      */
