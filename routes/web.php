@@ -10,6 +10,8 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\Newsletter\VerifyController;
+use App\Http\Controllers\Newsletter\UnsubscribeController;
 
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -45,23 +47,6 @@ Route::get('/thank-you/{order}', [CheckoutController::class, 'thankYou'])->name(
 Route::get('/checkout/test', [CheckoutController::class, 'testCheckout'])->name('checkout.test');
 Route::post('/checkout/debug', [CheckoutController::class, 'debugForm'])->name('checkout.debug');
 
-// Currency test routes
-Route::get('/test/currency/{code}', function($code) {
-    $service = app(\App\Services\CountryCurrencyService::class);
-    $service->setPreferredCurrency($code);
-
-    return response()->json([
-        'success' => true,
-        'currency_set' => $code,
-        'session_data' => [
-            'preferred_currency' => session('preferred_currency'),
-            'currency_initialized' => session('currency_initialized'),
-            'detected_country' => session('detected_country'),
-            'detected_currency' => session('detected_currency'),
-        ]
-    ]);
-})->name('test.currency');
-
 //cart
 Route::prefix('cart')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('cart.index');
@@ -71,6 +56,8 @@ Route::prefix('cart')->group(function () {
     Route::post('/clear', [CartController::class, 'clear'])->name('cart.clear');
     Route::get('/count', [CartController::class, 'count'])->name('cart.count');
 });
+Route::get('/newsletter/verify', VerifyController::class)->name('newsletter.verify');
+Route::get('/newsletter/unsubscribe', UnsubscribeController::class)->name('newsletter.unsubscribe');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

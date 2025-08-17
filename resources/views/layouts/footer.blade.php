@@ -50,6 +50,8 @@
             <div class="animate-on-scroll">
                 <h4 class="font-bold mb-4">JOIN OUR NEWSLETTER</h4>
                 <p class="text-gray-600 mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
+                <livewire:newsletter.subscribe-form />
+
                 <form class="flex">
                     <input type="email" placeholder="Enter your email" class="flex-grow px-4 py-2 border border-gray-300 focus:outline-none focus:border-red-600">
                     <button type="submit" class="bg-red-600 text-white px-4 py-2 hover:bg-red-700 transition-colors">

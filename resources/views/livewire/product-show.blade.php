@@ -153,7 +153,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Quantity:</label>
                     <div class="flex items-center border rounded-md overflow-hidden">
                         <button type="button"
-                                wire:click="decrementQty"
+                                onclick="decrementQuantity()"
                                 wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50 cursor-not-allowed"
                                 class="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors {{ $quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
@@ -168,9 +168,10 @@
                                min="1"
                                max="{{ $selectedVariant ? min($selectedVariant->stock, 10) : min($product->quantity, 10) }}"
                                class="w-16 text-center border-0 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                               id="quantity-input">
+                               id="quantity-input"
+                               onchange="updateQuantityFromInput(this.value)">
                         <button type="button"
-                                wire:click="incrementQty"
+                                onclick="incrementQuantity()"
                                 wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50 cursor-not-allowed"
                                 class="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors {{ $quantity >= ($selectedVariant ? min($selectedVariant->stock, 10) : min($product->quantity, 10)) ? 'opacity-50 cursor-not-allowed' : '' }}"
@@ -222,39 +223,7 @@
                     </span>
                 </button>
 
-                @if(config('app.debug'))
-                <!-- Debug Buttons -->
-                <div class="mt-4 space-y-2">
-                    <button wire:click="testQuantityIncrement"
-                            class="w-full px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600">
-                        Test Quantity Increment
-                    </button>
-                    <button wire:click="testQuantityDecrement"
-                            class="w-full px-4 py-2 bg-green-500 text-white text-sm rounded hover:bg-green-600">
-                        Test Quantity Decrement
-                    </button>
-                    <button wire:click="testAddToCart"
-                            class="w-full px-4 py-2 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600">
-                        Test Add to Cart (Current Qty: {{ $quantity }})
-                    </button>
-                    <button wire:click="setQuantity(5)"
-                            class="w-full px-4 py-2 bg-purple-500 text-white text-sm rounded hover:bg-purple-600">
-                        Set Quantity to 5
-                    </button>
-                    <button wire:click="setQuantity(10)"
-                            class="w-full px-4 py-2 bg-indigo-500 text-white text-sm rounded hover:bg-indigo-600">
-                        Set Quantity to 10
-                    </button>
-                    <button wire:click="refreshComponent"
-                            class="w-full px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600">
-                        Refresh Component
-                    </button>
-                    <button onclick="updateQuantityInput()"
-                            class="w-full px-4 py-2 bg-pink-500 text-white text-sm rounded hover:bg-pink-600">
-                        Force Update Input (JS)
-                    </button>
-                </div>
-                @endif
+
             </div>
 
             <div class="border-t pt-6">
@@ -292,117 +261,75 @@
     @endif
 </div>
 
-@if(config('app.debug'))
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Product show page loaded, setting up debug listeners...');
+    console.log('Product show page loaded, setting up quantity functions...');
+    
+    // Initialize quantity input
+    initializeQuantityInput();
+});
 
-    const quantityInput = document.getElementById('quantity-input');
-    if (quantityInput) {
-        console.log('Quantity input found:', quantityInput);
-        console.log('Initial value:', quantityInput.value);
-
-        // Monitor value changes
-        quantityInput.addEventListener('input', function(e) {
-            console.log('Quantity input changed:', e.target.value);
-        });
-
-        // Monitor Livewire updates
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
-                    console.log('Quantity input value attribute changed:', quantityInput.value);
-                }
-            });
-        });
-
-        observer.observe(quantityInput, {
-            attributes: true,
-            attributeFilter: ['value']
-        });
+// Function to increment quantity
+function incrementQuantity() {
+    const input = document.getElementById('quantity-input');
+    const currentValue = parseInt(input.value) || 1;
+    const maxValue = parseInt(input.max) || 10;
+    
+    if (currentValue < maxValue) {
+        const newValue = currentValue + 1;
+        input.value = newValue;
+        
+        // Update Livewire component
+        @this.set('quantity', newValue);
+        
+        console.log('Quantity incremented to:', newValue);
+    } else {
+        console.log('Cannot increment - at maximum');
     }
+}
 
-    // Listen for Livewire events
-    window.addEventListener('livewire:init', () => {
-        console.log('Livewire initialized on product show');
-    });
-
-    window.addEventListener('livewire:load', () => {
-        console.log('Livewire loaded on product show');
-    });
-
-    // Listen for custom quantity updated event
-    window.addEventListener('quantityUpdated', function(e) {
-        console.log('Quantity updated event received:', e.detail);
-
-        // Manually update the input field     value
-        if (quantityInput && e.detail && e.detail.quantity) {
-            quantityInput.value = e.detail.quantity;
-            console.log('Manually updated input value to:', e.detail.quantity);
-        }
-    });
-
-    // Watch for changes in the debug text and update input accordingly
-    function updateQuantityInput() {
-        const debugSection = document.querySelector('.text-xs.text-gray-500');
-        if (debugSection) {
-            const quantityText = debugSection.querySelector('p:first-child');
-            if (quantityText) {
-                const match = quantityText.textContent.match(/Current Quantity: (\d+)/);
-                if (match) {
-                    const newQuantity = match[1];
-                    const input = document.getElementById('quantity-input');
-                    if (input && input.val    ue !== newQuantity) {
-                        input.value = newQuantity;
-                        console.log('Updated input value to:', newQuantity);
-                    }
-                }
-            }
-        }
+// Function to decrement quantity
+function decrementQuantity() {
+    const input = document.getElementById('quantity-input');
+    const currentValue = parseInt(input.value) || 1;
+    
+    if (currentValue > 1) {
+        const newValue = currentValue - 1;
+        input.value = newValue;
+        
+        // Update Livewire component
+        @this.set('quantity', newValue);
+        
+        console.log('Quantity decremented to:', newValue);
+    } else {
+        console.log('Cannot decrement - at minimum');
     }
+}
 
-    // Set up observer to watch for changes in the debug section
-    const debugObserver = new MutationObserver(function    (mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList' || mutation.type === 'characterData') {
-                updateQuantityInput();
-            }
-        });
-    });
+// Function to update quantity from input change
+function updateQuantityFromInput(value) {
+    const newValue = parseInt(value) || 1;
+    
+    // Update Livewire component
+    @this.set('quantity', newValue);
+    
+    console.log('Quantity updated from input to:', newValue);
+}
 
-    // Start observing the debug section
-    const debugSection = docume    nt.querySelector('.text-xs.text-gray-500');
-    if (debugSection) {
-        debugObserver.observe(debugSection, {
-            childList: true,
-            characterData: true,
-            subtree: true
-        });
+// Function to initialize quantity input
+function initializeQuantityInput() {
+    const input = document.getElementById('quantity-input');
+    if (input) {
+        console.log('Quantity input initialized with value:', input.value);
     }
+}
 
-    // Also update when Livewire processes messages
-    Livewire.hook('message.processed', (message, component) => {
-        if (component.fingerprint.name === 'product-show') {
-            console.log('Product show component updated, checking for quantity changes');
-            setTimeout(updateQuantityInput, 50);
-        }
-    });
+// Listen for Livewire events
+window.addEventListener('livewire:init', () => {
+    console.log('Livewire initialized on product show');
+});
 
-    // Listen for Livewire refresh events
-    window.addEventListener('livewire:load', () => {
-        console.log('Livewire loaded on product show');
-
-        // Set up a listener for when Livewire updates the DOM
-        Livewire.hook('message.processed', (message, component) => {
-            if (component.fingerprint.name === 'product-show') {
-                console.log('Product show component updated, checking quantity input');
-                const updatedInput = document.getElementById('quantity-input');
-                if (updatedInput) {
-                    console.log('Updated input value:', updatedInput.value);
-                }
-            }
-        });
-    });
+window.addEventListener('livewire:load', () => {
+    console.log('Livewire loaded on product show');
 });
 </script>
-@endif

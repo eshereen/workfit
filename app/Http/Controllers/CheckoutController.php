@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\Customer;
 use App\Models\User;
+use App\Models\Order;
 use App\Models\Country;
+use App\Models\Customer;
+use App\Events\OrderPlaced;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\CartService;
-use App\Services\CountryCurrencyService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Services\CountryCurrencyService;
 
 class CheckoutController extends Controller
 {
@@ -117,7 +118,7 @@ class CheckoutController extends Controller
             // Create order
             $order = $this->createOrder($validated, $customer, $user, false);
             Log::info('Order created successfully', ['order_id' => $order->id]);
-
+            event(new OrderPlaced($order));
             // Create order items
             $this->createOrderItems($order, $cart);
             Log::info('Order items created successfully');
@@ -206,7 +207,7 @@ class CheckoutController extends Controller
             // Create order
             $order = $this->createOrder($validated, $customer, null, true);
             Log::info('Order created successfully', ['order_id' => $order->id]);
-
+            event(new OrderPlaced($order));
             // Create order items
             $this->createOrderItems($order, $cart);
             Log::info('Order items created successfully');

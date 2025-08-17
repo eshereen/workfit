@@ -38,6 +38,15 @@ class Order extends Model
         'is_guest',
         'loyalty_points_used'
     ];
+    protected $casts = [
+        'subtotal' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'shipping_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'total_amount' => 'decimal:2',
+        'billing_address' => 'array',
+        'shipping_address' => 'array',
+    ];
 
 
     public function user()

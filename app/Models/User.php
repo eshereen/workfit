@@ -66,6 +66,16 @@ class User extends Authenticatable
     {
         return $this->is_admin;
     }
+       // Loyalty Transactions
+    public function loyaltyTransactions()
+    {
+        return $this->hasMany(LoyaltyTransaction::class);
+    }
+
+    public function loyaltyBalance()
+    {
+        return $this->loyaltyTransactions()->sum('points');
+    }
 
     /**
      * Get the user's initials

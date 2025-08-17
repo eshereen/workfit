@@ -16,11 +16,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('token');
             $table->boolean('verified')->default(false);
-            $table->unsignedBigInteger('country_id')->nullable()->constrained();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('country_id')->references('id')->on('countries');
         });
     }
 

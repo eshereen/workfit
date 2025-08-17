@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 py-12">
+<div class="min-h-screen bg-gray-50 py-40">
     <div class="container mx-auto px-4">
         <div class="max-w-2xl mx-auto text-center">
             <!-- Success Icon -->

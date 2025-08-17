@@ -162,9 +162,6 @@ class ProductShow extends Component
                 'has_variant' => $this->selectedVariant ? 'yes' : 'no'
             ]);
 
-            // Force a re-render
-            $this->dispatch('quantityUpdated', ['quantity' => $this->quantity]);
-            $this->dispatch('$refresh');
         } else {
             Log::info('Cannot increment quantity - at maximum', [
                 'current_quantity' => $this->quantity,
@@ -188,9 +185,6 @@ class ProductShow extends Component
                 'new_quantity' => $this->quantity
             ]);
 
-            // Force a re-render
-            $this->dispatch('quantityUpdated', ['quantity' => $this->quantity]);
-            $this->dispatch('$refresh');
         } else {
             Log::info('Cannot decrement quantity - at minimum', [
                 'current_quantity' => $this->quantity
@@ -198,98 +192,15 @@ class ProductShow extends Component
         }
     }
 
-    // Test methods for debugging
-    public function testQuantityIncrement()
-    {
-        Log::info('Test quantity increment called', [
-            'current_quantity' => $this->quantity,
-            'max_qty' => $this->selectedVariant ? min($this->selectedVariant->stock, 10) : min($this->product->quantity, 10)
-        ]);
 
-        $this->incrementQty();
 
-        $this->dispatch('showNotification', [
-            'message' => "Quantity incremented to: {$this->quantity}",
-            'type' => 'info'
-        ]);
-    }
 
-    public function testQuantityDecrement()
-    {
-        Log::info('Test quantity decrement called', [
-            'current_quantity' => $this->quantity
-        ]);
 
-        $this->decrementQty();
 
-        $this->dispatch('showNotification', [
-            'message' => "Quantity decremented to: {$this->quantity}",
-            'type' => 'info'
-        ]);
-    }
 
-    public function testAddToCart()
-    {
-        Log::info('Test add to cart called', [
-            'current_quantity' => $this->quantity,
-            'product_id' => $this->product->id
-        ]);
 
-        $this->dispatch('showNotification', [
-            'message' => "Testing add to cart with quantity: {$this->quantity}",
-            'type' => 'info'
-        ]);
 
-        // Don't actually add to cart, just show the current state
-    }
 
-        // Method to manually set quantity for testing
-    public function setQuantity($newQuantity)
-    {
-        Log::info('setQuantity method called', [
-            'old_quantity' => $this->quantity,
-            'new_quantity' => $newQuantity
-        ]);
-
-        if ($newQuantity >= 1 && $newQuantity <= 10) {
-            $this->quantity = $newQuantity;
-
-            Log::info('Quantity set successfully', [
-                'new_quantity' => $this->quantity
-            ]);
-
-            $this->dispatch('showNotification', [
-                'message' => "Quantity manually set to: {$this->quantity}",
-                'type' => 'success'
-            ]);
-
-            // Force a re-render
-            $this->dispatch('$refresh');
-        } else {
-            Log::warning('Invalid quantity value', [
-                'requested_quantity' => $newQuantity
-            ]);
-
-            $this->dispatch('showNotification', [
-                'message' => "Invalid quantity: {$newQuantity}. Must be between 1 and 10.",
-                'type' => 'error'
-            ]);
-        }
-    }
-
-    // Method to refresh component state
-    public function refreshComponent()
-    {
-        Log::info('Refreshing component state', [
-            'current_quantity' => $this->quantity,
-            'selected_variant_id' => $this->selectedVariantId
-        ]);
-
-        $this->dispatch('showNotification', [
-            'message' => "Component refreshed. Current quantity: {$this->quantity}",
-            'type' => 'info'
-        ]);
-    }
 
     public function selectVariant($variantId)
     {

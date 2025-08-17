@@ -4,13 +4,16 @@ namespace App\Models;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Newsletter extends Model
 {
     /** @use HasFactory<\Database\Factories\NewsletterFactory> */
-    use HasFactory;
-    protected $fillable = ['email', 'token', 'verified', 'country_id'];
+    use HasFactory,SoftDeletes;
+    protected $fillable = ['email', 'token', 'verified'];
+    protected $casts = ['verified' => 'boolean'];
+
 
        // Relationship to user (optional)
        public function user()
@@ -29,4 +32,6 @@ class Newsletter extends Model
        {
            return $query->where('verified', true);
        }
+
+      
 }
