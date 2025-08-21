@@ -32,11 +32,13 @@ class Order extends Model
         'payment_status',
         'status',
         'billing_address',
+        'billing_building_number',
         'shipping_address',
+        'shipping_building_number',
+        'use_billing_for_shipping',
         'coupon_id',
         'notes',
         'is_guest',
-        'loyalty_points_used'
     ];
     protected $casts = [
         'subtotal' => 'integer',
@@ -44,8 +46,11 @@ class Order extends Model
         'shipping_amount' => 'integer',
         'discount_amount' => 'integer',
         'total_amount' => 'integer',
-        'billing_address' => 'array',
-        'shipping_address' => 'array',
+        'billing_address' => 'string',
+        'shipping_address' => 'string',
+        'billing_building_number' => 'string',
+        'shipping_building_number' => 'string',
+        'use_billing_for_shipping' => 'boolean',
     ];
 
 

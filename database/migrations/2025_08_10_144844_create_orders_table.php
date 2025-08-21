@@ -29,16 +29,17 @@ return new class extends Migration
             $table->integer('discount_amount')->default(0);
             $table->integer('total_amount');
             $table->string('currency', 3)->default('USD');
+            $table->string('billing_address');
+            $table->string('billing_building_number')->nullable();
+            $table->string('shipping_address')->nullable();
+            $table->string('shipping_building_number')->nullable();
+            $table->boolean('use_billing_for_shipping')->default(false);
+            $table->text('notes')->nullable();
+            $table->unsignedBigInteger('coupon_id')->nullable();
+            $table->boolean('is_guest')->default(true);
             $table->string('payment_method');
-
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
             $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])->default('pending');
-            $table->json('billing_address');
-            $table->json('shipping_address');
-            $table->unsignedBigInteger('coupon_id')->nullable();
-            $table->text('notes')->nullable();
-            $table->boolean('is_guest')->default(true);
-            $table->integer('loyalty_points_used')->default(0);
             $table->timestamps();
             $table->softDeletes();
 

@@ -49,67 +49,114 @@ class PaymobGateway implements PaymentGateway
         Log::info('Paymob auth response', ['auth' => $auth]);
 
         if (!isset($auth['token'])) {
-            throw new \RuntimeException('Paymob auth failed: ' . json_encode($auth));
+            $errorMessage = 'Paymob authentication failed';
+            if (isset($auth['detail'])) {
+                $errorMessage .= ': ' . $auth['detail'];
+            } else {
+                $errorMessage .= ': ' . json_encode($auth);
+            }
+            Log::error('Paymob authentication failed', ['response' => $auth]);
+            throw new \RuntimeException($errorMessage);
         }
 
         // 2) order registration
-        $reg = Http::post(config('paymob.order_endpoint'), [
+        $orderRegistrationData = [
             'auth_token' => $auth['token'],
             'delivery_needed' => false,
             'amount_cents' => $payment->amount_minor, // Paymob uses cents
             'currency' => 'EGP',
-            'merchant_order_id' => $payment->id,
+            'merchant_order_id' => $payment->order->order_number . '-' . time(), // Add timestamp to prevent duplicates
             'items' => [],
-        ])->json();
+        ];
+
+        Log::info('Paymob order registration request', [
+            'merchant_order_id' => $payment->order->order_number,
+            'payment_id' => $payment->id,
+            'order_id' => $payment->order->id,
+            'amount_cents' => $payment->amount_minor
+        ]);
+
+        $reg = Http::post(config('paymob.order_endpoint'), $orderRegistrationData)->json();
 
         Log::info('Paymob order registration response', ['reg' => $reg]);
 
         if (!isset($reg['id'])) {
-            throw new \RuntimeException('Paymob order registration failed: ' . json_encode($reg));
+            $errorMessage = 'Paymob order registration failed';
+            if (isset($reg['message'])) {
+                $errorMessage .= ': ' . $reg['message'];
+            } else {
+                $errorMessage .= ': ' . json_encode($reg);
+            }
+            Log::error('Paymob order registration failed', ['response' => $reg]);
+            throw new \RuntimeException($errorMessage);
         }
 
-        // Helper function to safely get address data
-        $getAddressField = function($field) use ($order) {
-            Log::info('Billing address type and content', [
-                'type' => gettype($order->billing_address),
-                'content' => $order->billing_address
-            ]);
-            
-            if (is_string($order->billing_address)) {
-                $decoded = json_decode($order->billing_address, true);
-                return $decoded[$field] ?? '';
-            }
-            return $order->billing_address[$field] ?? '';
-        };
+        // Get billing data from new database structure
+        Log::info('Order billing data', [
+            'billing_address' => $order->billing_address,
+            'state' => $order->state,
+            'city' => $order->city,
+            'billing_building_number' => $order->billing_building_number
+        ]);
 
         // 3) payment key
+        $billingData = [
+            'first_name' => $order->first_name ?: 'Customer',
+            'last_name' => $order->last_name ?: 'Name',
+            'email' => $order->email ?: 'customer@example.com',
+            'phone_number' => $order->phone_number ?: '+201234567890',
+            'street' => $order->billing_address ?: 'Default Street',
+            'building' => $order->billing_building_number ?: '1',
+            'city' => $order->city ?: 'Cairo',
+            'country' => 'EG',
+            'apartment' => 'Apt',
+            'floor' => '1',
+            'postal_code' => '11511', // Default postal code for Cairo
+            'state' => $order->state ?: 'Cairo',
+        ];
+
+        // Ensure all required fields have valid values
+        $billingData = array_map(function($value) {
+            return $value ?: 'N/A';
+        }, $billingData);
+
+        Log::info('Paymob billing data prepared', ['billing_data' => $billingData]);
+
+                        // Build callback URLs - using the new Paymob callback route
+        $successUrl = route('paymob.callback');
+        $failureUrl = route('paymob.callback');
+        
+        Log::info('Paymob callback URLs', [
+            'success_url' => $successUrl,
+            'failure_url' => $failureUrl,
+            'order_id' => $order->id,
+            'note' => 'Using new Paymob callback route: /api/paymob/callback'
+        ]);
+        
         $key = Http::post(config('paymob.payment_key_endpoint'), [
             'auth_token' => $auth['token'],
             'amount_cents' => $payment->amount_minor,
             'expiration' => 3600,
             'order_id' => $reg['id'],
-            'billing_data' => [
-                'first_name' => $order->first_name,
-                'last_name' => $order->last_name,
-                'email' => $order->email,
-                'phone_number' => $order->phone_number,
-                'street' => $getAddressField('address'),
-                'building' => 'Building',
-                'city' => $getAddressField('city'),
-                'country' => 'EG',
-                'apartment' => 'Apt',
-                'floor' => '1',
-                'postal_code' => $getAddressField('postal_code'),
-                'state' => $getAddressField('state'),
-            ],
+            'billing_data' => $billingData,
             'currency' => 'EGP',
             'integration_id' => config('paymob.integration_id_card'),
+            'success_url' => $successUrl,
+            'failure_url' => $failureUrl,
+            'merchant_order_id' => $order->id, // Add this to help identify the order in callbacks
         ])->json();
 
         Log::info('Paymob payment key response', ['key' => $key]);
 
         if (!isset($key['token'])) {
-            throw new \RuntimeException('Paymob payment key failed: ' . json_encode($key));
+            $errorMessage = 'Paymob payment key failed';
+            if (isset($key['billing_data'])) {
+                $errorMessage .= ': ' . json_encode($key['billing_data']);
+            } else {
+                $errorMessage .= ': ' . json_encode($key);
+            }
+            Log::error('Paymob payment key failed', ['response' => $key]);
+            throw new \RuntimeException($errorMessage);
         }
 
         $iframeUrl = sprintf('https://accept.paymob.com/api/acceptance/iframes/441229?payment_token=%s', $key['token']);

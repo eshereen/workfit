@@ -5,6 +5,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Enums\PaymentMethod;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use App\Payments\Gateways\PaypalGateway;
 use App\Payments\Gateways\PaymobGateway;
 use App\Payments\Gateways\CodGateway;
@@ -29,6 +30,15 @@ class PaymentService
         // Pass payment type for PayPal gateway
         if ($method === PaymentMethod::PAYPAL && $gateway instanceof PaypalGateway) {
             $useCreditCard = ($paymentType === 'credit_card');
+
+            // Debug logging
+            Log::info('PaymentService: PayPal payment processing', [
+                'payment_type' => $paymentType,
+                'use_credit_card' => $useCreditCard,
+                'payment_method' => $method->value,
+                'order_id' => $order->id
+            ]);
+
             $result = $gateway->initiate($order, $payment, $useCreditCard);
         } else {
             $result = $gateway->initiate($order, $payment);

@@ -30,6 +30,7 @@
                 <button type="button" onclick="testSimpleAjax()" class="px-2 py-1 bg-emerald-500 text-white rounded text-xs">Simple AJAX</button>
                 <button type="button" onclick="testCountryChange(8, 'Australia')" class="px-2 py-1 bg-teal-500 text-white rounded text-xs">JS Test AU</button>
                 <button type="button" onclick="testAjaxCall(8, 'Australia')" class="px-2 py-1 bg-indigo-500 text-white rounded text-xs">AJAX Test AU</button>
+                <button type="button" wire:click="testPaymentMethodSelection" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Test Payment Selection</button>
             </div>
         </div>
     @endif
@@ -38,10 +39,9 @@
         @foreach($methods as $method)
             <label class="flex items-start p-4 border rounded-lg cursor-pointer hover:border-red-300 transition">
                 <input type="radio"
-                       name="payment_method"
+                       name="payment_method_selector"
                        value="{{ $method }}"
-                       wire:model="selectedMethod"
-                       required
+                       wire:model.live="selectedMethod"
                        class="mt-1 mr-3 text-red-600 focus:ring-red-500 border-gray-300">
                 <div class="flex-1">
                     <div class="flex items-center">
@@ -73,36 +73,11 @@
                     </p>
 
                     @if($method === 'paypal')
-                        <div class="mt-3 space-y-2">
-                            <label class="flex items-center">
-                                <input type="radio"
-                                       name="paypal_payment_type_group"
-                                       wire:model="paypalPaymentType"
-                                       value="paypal_account"
-                                       class="mr-2 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                <span class="text-sm text-gray-700">PayPal Account</span>
-                            </label>
-                            @if($this->isCreditCardAvailable())
-                                <label class="flex items-center">
-                                    <input type="radio"
-                                           name="paypal_payment_type_group"
-                                           wire:model="paypalPaymentType"
-                                           value="credit_card"
-                                           class="mr-2 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <span class="text-sm text-gray-700">Credit/Debit Card (Processed by PayPal)</span>
-                                </label>
-                            @endif
-
-                            <div class="mt-2 text-xs text-gray-500">
-                                @if($paypalPaymentType === 'paypal_account')
-                                    <p>• Pay with your existing PayPal account</p>
-                                    <p>• Quick and secure checkout</p>
-                                    <p>• No need to enter card details</p>
-                                @else
-                                    <p>• Pay with any major credit or debit card</p>
-                                    <p>• No PayPal account required</p>
-                                    <p>• Secure processing by PayPal</p>
-                                @endif
+                        <div class="mt-3">
+                            <div class="text-xs text-gray-500">
+                                <p>• Pay with PayPal account or credit/debit card</p>
+                                <p>• Secure payment processing by PayPal</p>
+                                <p>• Choose payment method on PayPal's secure page</p>
                             </div>
                         </div>
                     @endif
@@ -139,62 +114,8 @@
             }
         });
 
-        // Sync PayPal payment type with main form
-        document.addEventListener('DOMContentLoaded', function() {
-            // Find the hidden inputs in the main form
-            const paypalTypeInput = document.querySelector('#paypal_payment_type_input');
-            const paymentMethodInput = document.querySelector('#payment_method_input');
-
-            if (paypalTypeInput) {
-                console.log('Found PayPal payment type input:', paypalTypeInput.value);
-
-                // Update it when Livewire component changes
-                const radioButtons = document.querySelectorAll('input[name="paypal_payment_type_group"]');
-                radioButtons.forEach(radio => {
-                    radio.addEventListener('change', function() {
-                        console.log('PayPal payment type changed to:', this.value);
-                        paypalTypeInput.value = this.value;
-                        console.log('Updated main form input to:', paypalTypeInput.value);
-
-                        // Update debug display
-                        const debugDisplay = document.querySelector('#form_paypal_type_display');
-                        if (debugDisplay) {
-                            debugDisplay.textContent = this.value;
-                        }
-
-                        // Small delay to ensure form is updated
-                        setTimeout(() => {
-                            console.log('Form input after delay:', paypalTypeInput.value);
-                        }, 100);
-                    });
-                });
-            }
-
-            if (paymentMethodInput) {
-                console.log('Found payment method input:', paymentMethodInput.value);
-
-                // Update it when payment method changes in Livewire
-                const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
-                paymentMethodRadios.forEach(radio => {
-                    radio.addEventListener('change', function() {
-                        console.log('Payment method changed to:', this.value);
-                        paymentMethodInput.value = this.value;
-                        console.log('Updated main form input to:', paymentMethodInput.value);
-
-                        // Small delay to ensure form is updated
-                        setTimeout(() => {
-                            console.log('Payment method input after delay:', paymentMethodInput.value);
-
-                            // Update debug display
-                            const debugDisplay = document.querySelector('#form_payment_method_display');
-                            if (debugDisplay) {
-                                debugDisplay.textContent = paymentMethodInput.value;
-                            }
-                        }, 100);
-                    });
-                });
-            }
-        });
+        // PayPal payment type is now always set to 'credit_card' for simplified flow
+        console.log('PayPal payment type simplified: always credit_card');
 
         // Listen for country changes and update payment methods
         document.addEventListener('DOMContentLoaded', function() {

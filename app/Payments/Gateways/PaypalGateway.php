@@ -44,8 +44,18 @@ class PaypalGateway
             }
 
             if ($useCreditCard) {
+                Log::info('PayPal gateway: Initiating credit card payment', [
+                    'order_id' => $order->id,
+                    'payment_id' => $payment->id,
+                    'use_credit_card' => $useCreditCard
+                ]);
                 return $this->initiateCreditCardPayment($order, $payment);
             } else {
+                Log::info('PayPal gateway: Initiating PayPal account payment', [
+                    'order_id' => $order->id,
+                    'payment_id' => $payment->id,
+                    'use_credit_card' => $useCreditCard
+                ]);
                 return $this->initiatePayPalAccountPayment($order, $payment);
             }
 
@@ -178,7 +188,7 @@ class PaypalGateway
         }
     }
 
-    protected function getAccessToken(): ?string
+    public function getAccessToken(): ?string
     {
         try {
             Log::info('PayPal gateway: Attempting to get access token', [
@@ -467,5 +477,26 @@ class PaypalGateway
             'paypal_order_id' => $paypalOrderId
         ]);
         return $payment;
+    }
+
+    public function testConnectivity(): array
+    {
+        try {
+            $token = $this->getAccessToken();
+            return [
+                'success' => true,
+                'access_token' => $token ? 'Token obtained successfully' : 'No token obtained',
+                'token_length' => $token ? strlen($token) : 0,
+                'gateway_class' => get_class($this),
+                'base_url' => $this->baseUrl,
+                'is_sandbox' => $this->isSandbox
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ];
+        }
     }
 }

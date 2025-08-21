@@ -7,4 +7,9 @@ return [
     'iframe_url' => env('PAYMOB_IFRAME_URL'),
     'integration_id_card' => env('PAYMOB_INTEGRATION_ID_CARD'),
     'hmac' => env('PAYMOB_HMAC_KEY'),
+
+    // Callback URLs
+    'success_url' => env('PAYMOB_SUCCESS_URL'),
+    'failure_url' => env('PAYMOB_FAILURE_URL'),
+    'webhook_url' => env('PAYMOB_WEBHOOK_URL'),
 ];

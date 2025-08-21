@@ -64,6 +64,8 @@
             <!-- Order Items -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-8 text-left">
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">Order Items</h2>
+                
+
 
                 @foreach($order->items as $item)
                 <div class="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">

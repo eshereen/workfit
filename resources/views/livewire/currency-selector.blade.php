@@ -5,15 +5,7 @@
      data-component-id="{{ $this->getId() }}"
      data-component-name="currency-selector">
 
-            @if(config('app.debug'))
-        <div class="text-xs text-gray-500 mb-1">
-            <div>Currency: {{ $currentCurrency }} ({{ $currentSymbol }})</div>
-            <div class="mt-1">
-                <button wire:click="changeCurrency('EUR')" class="px-2 py-1 bg-blue-500 text-white text-xs rounded mr-1">Test EUR (wire:click)</button>
-                <button onclick="alert('Plain click works!')" class="px-2 py-1 bg-gray-500 text-white text-xs rounded">Test Click</button>
-            </div>
-        </div>
-    @endif
+ 
 
     <button @click="open = !open"
             class="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors">

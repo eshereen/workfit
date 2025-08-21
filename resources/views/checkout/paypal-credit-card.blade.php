@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('meta')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+
 @section('title', 'PayPal Credit Card Payment')
 
 @section('content')
@@ -56,7 +60,12 @@
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Pay with Credit Card via PayPal</h3>
                     <p class="text-gray-600 mb-6">Your payment information is secure and encrypted by PayPal.</p>
 
-                    <div id="paypal-button-container" class="mb-6"></div>
+                    <div id="paypal-button-container" class="mb-6">
+                        <div class="text-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            <p class="mt-2 text-blue-600 font-medium">Loading PayPal...</p>
+                        </div>
+                    </div>
 
                     <!-- Manual recovery section -->
                     <div id="manual-recovery-section" class="mb-4" style="display: none;">
@@ -72,16 +81,20 @@
                         </div>
                     </div>
 
-                    <!-- Debug info -->
-                    @if(config('app.debug'))
-                    <div class="mt-4 p-3 bg-gray-100 rounded text-left text-xs">
-                        <p><strong>Debug Info:</strong></p>
-                        <p>Payment ID: {{ $payment->id }}</p>
-                        <p>Order ID: {{ $order->id }}</p>
-                        <p>Amount: {{ $order->currency }} {{ number_format($order->total_amount, 2) }}</p>
-                        <p>Status: {{ $payment->status }}</p>
-                    </div>
-                    @endif
+                                    <!-- Debug info -->
+                @if(config('app.debug'))
+                <div class="mt-4 p-3 bg-gray-100 rounded text-left text-xs">
+                    <p><strong>Debug Info:</strong></p>
+                    <p>Payment ID: {{ $payment->id }}</p>
+                    <p>Order ID: {{ $order->id }}</p>
+                    <p>Amount: {{ $order->currency }} {{ number_format($order->total_amount, 2) }}</p>
+                    <p>Status: {{ $payment->status }}</p>
+                    <p>Provider: {{ $payment->provider }}</p>
+                    <p>Payment Type: {{ $payment->meta['payment_type'] ?? 'N/A' }}</p>
+                    <p>Currency: {{ $order->currency }}</p>
+                    <p>PayPal Client ID: {{ config('paypal.sandbox.client_id') ? 'Set' : 'Not Set' }}</p>
+                </div>
+                @endif
 
                     <div class="text-sm text-gray-500 mt-4">
                         <p>🔒 Your payment information is secure and encrypted</p>
@@ -95,11 +108,49 @@
 </div>
 
 <!-- PayPal SDK -->
+<script>
+console.log('PayPal configuration:', {
+    client_id: '{{ config('paypal.sandbox.client_id') }}',
+    currency: '{{ strtoupper($order->currency) }}',
+    mode: '{{ config('paypal.mode') }}'
+});
+</script>
 <script src="https://www.paypal.com/sdk/js?client-id={{ config('paypal.sandbox.client_id') }}&currency={{ strtoupper($order->currency) }}&intent=capture&components=buttons"></script>
 
 <script>
+// Global error handler
+window.addEventListener('error', function(e) {
+    console.error('Global error caught:', e.error);
+    console.error('Error details:', {
+        message: e.error?.message,
+        stack: e.error?.stack,
+        filename: e.filename,
+        lineno: e.lineno
+    });
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('PayPal SDK loaded, creating buttons...');
+
+    // Set a timeout for PayPal SDK loading
+    setTimeout(function() {
+        if (typeof paypal === 'undefined') {
+            console.error('PayPal SDK failed to load within timeout');
+            document.getElementById('paypal-button-container').innerHTML = `
+                <div class="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-red-600 font-medium">PayPal SDK Failed to Load</p>
+                    <p class="text-red-500 text-sm mt-1">Please check your internet connection and refresh the page.</p>
+                    <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                        Refresh Page
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        console.log('PayPal SDK loaded successfully, proceeding with button creation...');
+        createPayPalButtons();
+    }, 5000); // 5 second timeout
 
     // Check if PayPal SDK loaded correctly
     if (typeof paypal === 'undefined') {
@@ -107,6 +158,11 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('paypal-button-container').innerHTML = '<div class="text-center p-4 bg-red-50 border border-red-200 rounded-lg"><p class="text-red-600">PayPal SDK failed to load. Please refresh the page.</p></div>';
         return;
     }
+
+    createPayPalButtons();
+});
+
+function createPayPalButtons() {
 
     console.log('PayPal SDK loaded successfully');
 
@@ -210,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
             label: 'pay'
         }
     }).render('#paypal-button-container');
-});
+}
 
 // Helper function to submit payment to backend
 function submitPaymentToBackend(orderID) {

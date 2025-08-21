@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\Country;
 use App\Services\PaymentMethodResolver;
 use App\Services\CountryCurrencyService;
@@ -10,24 +11,52 @@ use Illuminate\Support\Facades\Log;
 
 class CheckoutForm extends Component
 {
-    // Address fields
+    // Customer Information
+    public $firstName = '';
+    public $lastName = '';
+    public $email = '';
+    public $phoneNumber = '';
+
+    // Billing Address fields
     public $billingCountry = null;
+    public $billingState = '';
+    public $billingCity = '';
+    public $billingAddress = '';
+    public $billingBuildingNumber = '';
+
+    // Shipping Address fields
     public $shippingCountry = null;
+    public $shippingState = '';
+    public $shippingCity = '';
+    public $shippingAddress = '';
+    public $shippingBuildingNumber = '';
     public $useBillingForShipping = false;
 
     // Payment fields
     public $paymentMethods = [];
     public $selectedPaymentMethod = null;
-    public $paypalPaymentType = 'paypal_account';
+    public $paypalPaymentType = 'credit_card';
     public $creditCardAvailable = false;
 
     // Currency info
     public $currentCurrency = 'USD';
     public $currentSymbol = '$';
 
-    public function mount()
+        public function mount()
     {
+        // Basic debug to see if component is even loading
+        error_log('CheckoutForm: Component mount() called');
+
+        Log::info('CheckoutForm: Component mounting');
         $this->loadInitialData();
+
+        Log::info('CheckoutForm: Mount completed', [
+            'selected_payment_method' => $this->selectedPaymentMethod,
+            'paypal_payment_type' => $this->paypalPaymentType,
+            'current_currency' => $this->currentCurrency
+        ]);
+
+        Log::info('CheckoutForm: Component mounted successfully');
     }
 
     protected function loadInitialData()
@@ -81,7 +110,13 @@ class CheckoutForm extends Component
     public function updatedUseBillingForShipping($value)
     {
         if ($value) {
+            // Copy all billing information to shipping
             $this->shippingCountry = $this->billingCountry;
+            $this->shippingState = $this->billingState;
+            $this->shippingCity = $this->billingCity;
+            $this->shippingAddress = $this->billingAddress;
+            $this->shippingBuildingNumber = $this->billingBuildingNumber;
+
             if ($this->billingCountry) {
                 $this->handleCountryChange($this->billingCountry, 'shipping_from_billing');
             }
@@ -249,14 +284,15 @@ class CheckoutForm extends Component
             $this->paymentMethods = array_map(fn($m) => $m->value, $availableMethods);
             $this->creditCardAvailable = $resolver->isCreditCardAvailableForCountry($countryCode);
 
-            // Set default payment method
-            if (!empty($this->paymentMethods)) {
-                $this->selectedPaymentMethod = $this->paymentMethods[0];
-            }
+            // Don't set default payment method here - let PaymentMethodsSelector handle it
+            // The PaymentMethodsSelector will dispatch an event to set this value
+            Log::info('CheckoutForm: Payment methods loaded, waiting for PaymentMethodsSelector to set selection', [
+                'available_methods' => $this->paymentMethods
+            ]);
 
             // Reset PayPal payment type if credit card not available
             if (!$this->creditCardAvailable) {
-                $this->paypalPaymentType = 'paypal_account';
+                $this->paypalPaymentType = 'credit_card';
             }
 
             Log::info('CheckoutForm: Payment methods updated', [
@@ -274,7 +310,7 @@ class CheckoutForm extends Component
 
             // Fallback to default methods
             $this->paymentMethods = ['paypal'];
-            $this->selectedPaymentMethod = 'paypal';
+            // Don't set selectedPaymentMethod here - let PaymentMethodsSelector handle it
             $this->creditCardAvailable = false;
         }
     }
@@ -320,6 +356,219 @@ class CheckoutForm extends Component
     public function getCountriesProperty()
     {
         return Country::orderBy('name')->get();
+    }
+
+    // Validation rules for all form fields
+    protected $rules = [
+        'firstName' => 'required|string|min:2|max:50',
+        'lastName' => 'required|string|min:2|max:50',
+        'email' => 'required|email|max:255',
+        'phoneNumber' => 'required|string|min:10|max:20',
+
+        'billingCountry' => 'required|exists:countries,id',
+        'billingState' => 'required|string|min:2|max:100',
+        'billingCity' => 'required|string|min:2|max:100',
+        'billingAddress' => 'required|string|min:5|max:255',
+        'billingBuildingNumber' => 'nullable|string|max:50',
+
+        'shippingCountry' => 'required_if:useBillingForShipping,false|exists:countries,id',
+        'shippingState' => 'required_if:useBillingForShipping,false|string|min:2|max:100',
+        'shippingCity' => 'required_if:useBillingForShipping,false|string|min:2|max:100',
+        'shippingAddress' => 'required_if:useBillingForShipping,false|string|min:5|max:255',
+        'shippingBuildingNumber' => 'nullable|string|max:50',
+
+        'selectedPaymentMethod' => 'required|string|in:paypal,paymob,cash_on_delivery',
+    ];
+
+    // Custom validation messages
+    protected $messages = [
+        'firstName.required' => 'First name is required',
+        'lastName.required' => 'Last name is required',
+        'email.required' => 'Email address is required',
+        'email.email' => 'Please enter a valid email address',
+        'phoneNumber.required' => 'Phone number is required',
+        'phoneNumber.min' => 'Phone number must be at least 10 characters',
+
+        'billingCountry.required' => 'Billing country is required',
+        'billingState.required' => 'State/Province is required',
+        'billingCity.required' => 'City is required',
+        'billingAddress.required' => 'Billing address is required',
+
+        'shippingCountry.required_if' => 'Shipping country is required',
+        'shippingState.required_if' => 'State/Province is required',
+        'shippingCity.required_if' => 'City is required',
+        'shippingAddress.required_if' => 'Shipping address is required',
+
+        'selectedPaymentMethod.required' => 'Please select a payment method',
+        'selectedPaymentMethod.in' => 'Please select a valid payment method',
+    ];
+
+    // Real-time validation for specific fields
+    public function updated($propertyName)
+    {
+        $this->validateOnly($propertyName);
+    }
+
+    // Listen for payment method selection from PaymentMethodsSelector
+    #[On('payment-method-selected')]
+    public function handlePaymentMethodSelected($method)
+    {
+        Log::info('CheckoutForm: Received payment-method-selected event', [
+            'method' => $method,
+            'previous_selection' => $this->selectedPaymentMethod,
+            'component_id' => $this->getId()
+        ]);
+
+        $this->selectedPaymentMethod = $method;
+
+        Log::info('CheckoutForm: Payment method updated', [
+            'new_method' => $this->selectedPaymentMethod,
+            'is_cod' => $this->selectedPaymentMethod === 'cash_on_delivery',
+            'is_paymob' => $this->selectedPaymentMethod === 'paymob',
+            'is_paypal' => $this->selectedPaymentMethod === 'paypal'
+        ]);
+    }
+
+    // Listen for PayPal payment type change
+    #[On('paypal-payment-type-changed')]
+    public function handlePayPalPaymentTypeChanged($type)
+    {
+        // Always set to credit card for simplified flow
+        $this->paypalPaymentType = 'credit_card';
+        Log::info('CheckoutForm: PayPal payment type set to credit card (simplified flow)', ['requested_type' => $type, 'actual_type' => $this->paypalPaymentType]);
+    }
+
+    // Method to validate all form data
+    public function validateForm()
+    {
+        return $this->validate();
+    }
+
+    // Method to handle form submission
+    public function submitForm()
+    {
+        Log::info('CheckoutForm: submitForm method called');
+
+        try {
+            // Validate the form
+            Log::info('CheckoutForm: Starting form validation');
+            $this->validate();
+            Log::info('CheckoutForm: Form validation passed');
+
+            // Debug: Log current form values before session storage
+            Log::info('CheckoutForm: Current form values before session storage', [
+                'firstName' => $this->firstName,
+                'lastName' => $this->lastName,
+                'email' => $this->email,
+                'phoneNumber' => $this->phoneNumber,
+                'billingCountry' => $this->billingCountry,
+                'billingState' => $this->billingState,
+                'billingCity' => $this->billingCity,
+                'billingAddress' => $this->billingAddress,
+                'selectedPaymentMethod' => $this->selectedPaymentMethod,
+                'useBillingForShipping' => $this->useBillingForShipping,
+            ]);
+
+            // Store form data in session
+            $sessionData = [
+                'first_name' => $this->firstName,
+                'last_name' => $this->lastName,
+                'email' => $this->email,
+                'phone_number' => $this->phoneNumber,
+                'billing_country_id' => $this->billingCountry,
+                'billing_state' => $this->billingState,
+                'billing_city' => $this->billingCity,
+                'billing_address' => $this->billingAddress,
+                'billing_building_number' => $this->billingBuildingNumber,
+                'shipping_country_id' => $this->useBillingForShipping ? $this->billingCountry : $this->shippingCountry,
+                'shipping_state' => $this->useBillingForShipping ? $this->billingState : $this->shippingState,
+                'shipping_city' => $this->useBillingForShipping ? $this->billingCity : $this->shippingCity,
+                'shipping_address' => $this->useBillingForShipping ? $this->billingAddress : $this->shippingAddress,
+                'shipping_building_number' => $this->useBillingForShipping ? $this->billingBuildingNumber : $this->shippingBuildingNumber,
+                'use_billing_for_shipping' => $this->useBillingForShipping,
+                'payment_method' => $this->selectedPaymentMethod,
+                'paypal_payment_type' => $this->paypalPaymentType,
+                'currency' => $this->currentCurrency,
+            ];
+
+            Log::info('CheckoutForm: Form data being stored in session', [
+                'payment_method' => $this->selectedPaymentMethod,
+                'is_cod' => $this->selectedPaymentMethod === 'cash_on_delivery',
+                'is_paymob' => $this->selectedPaymentMethod === 'paymob',
+                'is_paypal' => $this->selectedPaymentMethod === 'paypal',
+                'session_data' => $sessionData
+            ]);
+
+            Log::info('CheckoutForm: Storing session data', ['session_data' => $sessionData]);
+            session(['checkout_data' => $sessionData]);
+            Log::info('CheckoutForm: Session data stored successfully');
+
+            // Debug: Log the form data being stored
+            Log::info('CheckoutForm: Storing form data in session', [
+                'first_name' => $this->firstName,
+                'last_name' => $this->lastName,
+                'email' => $this->email,
+                'payment_method' => $this->selectedPaymentMethod,
+                'billing_country_id' => $this->billingCountry,
+                'use_billing_for_shipping' => $this->useBillingForShipping,
+                'all_form_data' => [ // Added for debugging
+                    'firstName' => $this->firstName,
+                    'lastName' => $this->lastName,
+                    'email' => $this->email,
+                    'phoneNumber' => $this->phoneNumber,
+                    'billingCountry' => $this->billingCountry,
+                    'billingState' => $this->billingState,
+                    'billingCity' => $this->billingCity,
+                    'billingAddress' => $this->billingAddress,
+                    'billingBuildingNumber' => $this->billingBuildingNumber,
+                    'shippingCountry' => $this->shippingCountry,
+                    'shippingState' => $this->shippingState,
+                    'shippingCity' => $this->shippingCity,
+                    'shippingAddress' => $this->shippingAddress,
+                    'shippingBuildingNumber' => $this->shippingBuildingNumber,
+                    'useBillingForShipping' => $this->useBillingForShipping,
+                    'selectedPaymentMethod' => $this->selectedPaymentMethod,
+                    'paypalPaymentType' => $this->paypalPaymentType,
+                    'currentCurrency' => $this->currentCurrency,
+                ]
+            ]);
+
+            // Debug: Log the form data being stored
+            Log::info('CheckoutForm: Storing form data in session', [
+                'first_name' => $this->firstName,
+                'last_name' => $this->lastName,
+                'email' => $this->email,
+                'payment_method' => $this->selectedPaymentMethod,
+                'billing_country_id' => $this->billingCountry,
+                'use_billing_for_shipping' => $this->useBillingForShipping
+            ]);
+
+            // Clear any previous session data and set new data
+            session(['checkout_data' => $sessionData]);
+
+            // Submit form via JavaScript with session data
+            $this->js('
+                const form = document.createElement("form");
+                form.method = "POST";
+                form.action = "' . route('checkout.process') . '";
+
+                const csrfToken = document.createElement("input");
+                csrfToken.type = "hidden";
+                csrfToken.name = "_token";
+                csrfToken.value = "' . csrf_token() . '";
+                form.appendChild(csrfToken);
+
+                document.body.appendChild(form);
+                form.submit();
+            ');
+
+            Log::info('CheckoutForm: Triggering form submission via JavaScript');
+
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('CheckoutForm submission error: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred while submitting the form. Please try again.');
+        }
     }
 
     public function render()

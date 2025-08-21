@@ -13,13 +13,40 @@ class PaymentMethodsSelector extends Component
 {
     public array $methods = [];
     public ?string $selectedMethod = null;
-    public string $paypalPaymentType = 'paypal_account';
+    public string $paypalPaymentType = 'credit_card';
 
-    public function mount()
+                public function mount()
     {
+        // Basic debug to see if component is even loading
+        error_log('PaymentMethodsSelector: Component mount() called');
+
         try {
             Log::info('PaymentMethodsSelector: Component mounting');
             $this->loadMethods();
+
+            Log::info('PaymentMethodsSelector: Mount completed', [
+                'methods' => $this->methods,
+                'selected_method' => $this->selectedMethod,
+                'paypal_payment_type' => $this->paypalPaymentType
+            ]);
+
+            // Always dispatch initial events after loading methods
+            if ($this->selectedMethod) {
+                Log::info('PaymentMethodsSelector: Dispatching initial payment-method-selected event', [
+                    'method' => $this->selectedMethod
+                ]);
+                $this->dispatch('payment-method-selected', method: $this->selectedMethod);
+            } else {
+                Log::warning('PaymentMethodsSelector: No selected method to dispatch initial event');
+            }
+
+            if ($this->paypalPaymentType) {
+                Log::info('PaymentMethodsSelector: Dispatching initial paypal-payment-type-changed event', [
+                    'type' => $this->paypalPaymentType
+                ]);
+                $this->dispatch('paypal-payment-type-changed', type: $this->paypalPaymentType);
+            }
+
             Log::info('PaymentMethodsSelector: Component mounted successfully');
         } catch (\Exception $e) {
             Log::error('PaymentMethodsSelector: Error during mount', [
@@ -29,10 +56,14 @@ class PaymentMethodsSelector extends Component
             // Set default methods in case of error
             $this->methods = ['paypal'];
             $this->selectedMethod = 'paypal';
+
+            // Dispatch default events even in error case
+            $this->dispatch('payment-method-selected', method: $this->selectedMethod);
+            $this->dispatch('paypal-payment-type-changed', type: $this->paypalPaymentType);
         }
     }
 
-    protected function loadMethods()
+        protected function loadMethods()
     {
         // Get the current country from the checkout form or session
         $countryCode = $this->getCurrentCountryCode();
@@ -40,9 +71,25 @@ class PaymentMethodsSelector extends Component
         $resolver = app(PaymentMethodResolver::class);
         $this->methods = array_map(fn($m) => $m->value, $resolver->availableForCountry($countryCode));
 
-        // Set default selected method
-        if (!empty($this->methods)) {
+        Log::info('PaymentMethodsSelector: loadMethods - before setting selected method', [
+            'country_code' => $countryCode,
+            'methods' => $this->methods,
+            'current_selected_method' => $this->selectedMethod
+        ]);
+
+        // Set default selected method only if none is currently selected
+        if (!empty($this->methods) && empty($this->selectedMethod)) {
             $this->selectedMethod = $this->methods[0];
+            Log::info('PaymentMethodsSelector: Setting default selected method', [
+                'default_method' => $this->selectedMethod
+            ]);
+
+            // Dispatch event to notify CheckoutForm of initial selection
+            $this->dispatch('payment-method-selected', method: $this->selectedMethod);
+        } else {
+            Log::info('PaymentMethodsSelector: Keeping existing selected method', [
+                'existing_method' => $this->selectedMethod
+            ]);
         }
 
         Log::info('PaymentMethodsSelector: loadMethods completed', [
@@ -118,7 +165,23 @@ class PaymentMethodsSelector extends Component
 
     public function updatedSelectedMethod()
     {
+        Log::info('PaymentMethodsSelector: updatedSelectedMethod called', [
+            'selected_method' => $this->selectedMethod,
+            'methods' => $this->methods,
+            'component_id' => $this->getId()
+        ]);
+
         $this->dispatch('payment-method-selected', method: $this->selectedMethod);
+
+        Log::info('PaymentMethodsSelector: payment-method-selected event dispatched', [
+            'method' => $this->selectedMethod,
+            'component_id' => $this->getId()
+        ]);
+
+        // Also try dispatching with a different approach - target the checkout-form component specifically
+        $this->dispatch('payment-method-selected', method: $this->selectedMethod)->to('checkout-form');
+
+        Log::info('PaymentMethodsSelector: Targeted dispatch to checkout-form attempted');
     }
 
     public function updatedPaypalPaymentType()
@@ -163,29 +226,35 @@ class PaymentMethodsSelector extends Component
             $this->methods = array_map(fn($m) => $m->value, $availableMethods);
             Log::info('PaymentMethodsSelector: Methods array updated', ['methods' => $this->methods]);
 
-            // Reset selected method to first available
-            if (!empty($this->methods)) {
+            // Only set selected method if none is currently selected
+            if (!empty($this->methods) && empty($this->selectedMethod)) {
                 $this->selectedMethod = $this->methods[0];
-                Log::info('PaymentMethodsSelector: Selected method updated', ['selected_method' => $this->selectedMethod]);
+                Log::info('PaymentMethodsSelector: Selected method set to first available (none was selected)', ['selected_method' => $this->selectedMethod]);
+            } elseif (!empty($this->methods) && $this->selectedMethod) {
+                // Check if current selection is still valid for this country
+                if (!in_array($this->selectedMethod, $this->methods)) {
+                    $this->selectedMethod = $this->methods[0];
+                    Log::info('PaymentMethodsSelector: Selected method updated (previous selection not available)', ['selected_method' => $this->selectedMethod]);
+                } else {
+                    Log::info('PaymentMethodsSelector: Keeping current selection', ['selected_method' => $this->selectedMethod]);
+                }
             } else {
                 $this->selectedMethod = null;
                 Log::info('PaymentMethodsSelector: No methods available, selected method set to null');
             }
 
-            // Reset PayPal payment type if credit card is not available
-            $creditCardAvailable = $this->isCreditCardAvailable();
-            Log::info('PaymentMethodsSelector: Credit card availability checked', ['credit_card_available' => $creditCardAvailable]);
+            // Always set PayPal payment type to credit card for simplified flow
+            $this->paypalPaymentType = 'credit_card';
+            Log::info('PaymentMethodsSelector: PayPal payment type set to credit card for simplified flow');
 
-            if (!$creditCardAvailable) {
-                $this->paypalPaymentType = 'paypal_account';
-                Log::info('PaymentMethodsSelector: PayPal payment type reset to account');
-            }
+            // Dispatch event to notify CheckoutForm of initial PayPal payment type
+            $this->dispatch('paypal-payment-type-changed', type: $this->paypalPaymentType);
 
             Log::info('PaymentMethodsSelector: Updated for country', [
                 'country_code' => $countryCode,
                 'methods' => $this->methods,
                 'selected_method' => $this->selectedMethod,
-                'credit_card_available' => $creditCardAvailable
+                'paypal_payment_type' => $this->paypalPaymentType
             ]);
         } catch (\Exception $e) {
             Log::error('PaymentMethodsSelector: Error in updateForCountry', [
@@ -358,5 +427,24 @@ class PaymentMethodsSelector extends Component
         } else {
             Log::warning('Country not found for ID', ['countryId' => $countryId]);
         }
+    }
+
+    public function testPaymentMethodSelection()
+    {
+        Log::info('PaymentMethodsSelector: testPaymentMethodSelection called');
+
+        // Test setting COD manually
+        $this->selectedMethod = 'cash_on_delivery';
+        Log::info('PaymentMethodsSelector: Manually set selectedMethod to COD', [
+            'selected_method' => $this->selectedMethod
+        ]);
+
+        // Dispatch the event
+        $this->dispatch('payment-method-selected', method: $this->selectedMethod);
+        Log::info('PaymentMethodsSelector: Dispatched payment-method-selected event for COD');
+
+        // Also try targeted dispatch
+        $this->dispatch('payment-method-selected', method: $this->selectedMethod)->to('checkout-form');
+        Log::info('PaymentMethodsSelector: Targeted dispatch to checkout-form attempted for COD');
     }
 }

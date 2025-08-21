@@ -1,272 +1,313 @@
 <div>
+    <!-- Customer Information -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Customer Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                <input type="text" wire:model.live="firstName" id="first_name" name="customer[first_name]" required
+                       class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                @error('firstName') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div>
+                <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                <input type="text" wire:model.live="lastName" id="last_name" name="customer[last_name]" required
+                       class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                @error('lastName') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                <input type="email" wire:model.live="email" id="email" name="customer[email]" required
+                       class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div>
+                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                <input type="tel" wire:model.live="phoneNumber" id="phone_number" name="customer[phone_number]" required
+                       class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                @error('phoneNumber') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+        </div>
+    </div>
+
     <!-- Billing Address -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">Billing Address</h2>
 
         <div class="mb-4">
             <label class="flex items-center">
-                <input type="checkbox"
-                       wire:model.live="useBillingForShipping"
-                       class="mr-2 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                <input type="checkbox" wire:model.live="useBillingForShipping" class="mr-2 text-red-600 focus:ring-red-500 border-gray-300 rounded">
                 <span class="text-sm text-gray-700">Use billing address for shipping</span>
             </label>
         </div>
 
-        <div class="mb-4">
-            <label for="billing_country" class="block text-sm font-medium text-gray-700 mb-1">Country *</label>
-            <select wire:model.live="billingCountry"
-                    id="billing_country"
-                    name="billing_address[country]"
-                    required
-                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                <option value="">Select a country</option>
-                @foreach($this->countries as $country)
-                    <option value="{{ $country->id }}">{{ $country->name }}</option>
-                @endforeach
-            </select>
-            @error('billingCountry')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+                <label for="billing_country" class="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+                <select wire:model.live="billingCountry" id="billing_country" name="billing_address[country]" required
+                        class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <option value="">Select a country</option>
+                    @foreach($this->countries as $country)
+                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                    @endforeach
+                </select>
+                @error('billingCountry') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div class="md:col-span-2">
+                <label for="billing_address" class="block text-sm font-medium text-gray-700 mb-1">Street Address *</label>
+                <input type="text" wire:model.live="billingAddress" id="billing_address" name="billing_address[address]" required
+                       class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                @error('billingAddress') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div>
+                <label for="billing_state" class="block text-sm font-medium text-gray-700 mb-1">State/Province *</label>
+                <input type="text" wire:model.live="billingState" id="billing_state" name="billing_address[state]" required
+                       class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                @error('billingState') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div>
+                <label for="billing_city" class="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                <input type="text" wire:model.live="billingCity" id="billing_city" name="billing_address[city]" required
+                       class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                @error('billingCity') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div class="md:col-span-2">
+                <label for="billing_building_number" class="block text-sm font-medium text-gray-700 mb-1">Building Number (Optional)</label>
+                <input type="text" wire:model.live="billingBuildingNumber" id="billing_building_number" name="billing_address[building_number]"
+                       class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                @error('billingBuildingNumber') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
         </div>
-
-        <!-- Add other billing address fields here as needed -->
     </div>
 
     <!-- Shipping Address -->
     @if(!$useBillingForShipping)
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Shipping Address</h2>
-
-        <div class="mb-4">
-            <label for="shipping_country" class="block text-sm font-medium text-gray-700 mb-1">Country *</label>
-            <select wire:model.live="shippingCountry"
-                    id="shipping_country"
-                    name="shipping_address[country]"
-                    required
-                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                <option value="">Select a country</option>
-                @foreach($this->countries as $country)
-                    <option value="{{ $country->id }}">{{ $country->name }}</option>
-                @endforeach
-            </select>
-            @error('shippingCountry')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Shipping Address</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label for="shipping_country" class="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+                    <select wire:model.live="shippingCountry" id="shipping_country" name="shipping_address[country]" required
+                            class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        <option value="">Select a country</option>
+                        @foreach($this->countries as $country)
+                            <option value="{{ $country->id }}">{{ $country->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('shippingCountry') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="md:col-span-2">
+                    <label for="shipping_address" class="block text-sm font-medium text-gray-700 mb-1">Street Address *</label>
+                    <input type="text" wire:model.live="shippingAddress" id="shipping_address" name="shipping_address[address]" required
+                           class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    @error('shippingAddress') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="shipping_state" class="block text-sm font-medium text-gray-700 mb-1">State/Province *</label>
+                    <input type="text" wire:model.live="shippingState" id="shipping_state" name="shipping_address[state]" required
+                           class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    @error('shippingState') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="shipping_city" class="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                    <input type="text" wire:model.live="shippingCity" id="shipping_city" name="shipping_address[city]" required
+                           class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    @error('shippingCity') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="md:col-span-2">
+                    <label for="shipping_building_number" class="block text-sm font-medium text-gray-700 mb-1">Building Number (Optional)</label>
+                    <input type="text" wire:model.live="shippingBuildingNumber" id="shipping_building_number" name="shipping_address[building_number]"
+                           class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    @error('shippingBuildingNumber') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
         </div>
-
-        <!-- Add other shipping address fields here as needed -->
-    </div>
     @endif
 
-    <!-- Payment Methods -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Payment Method</h2>
+    <!-- Payment Methods Selector -->
+    @livewire('payment-methods-selector')
 
-        <!-- Debug info in development -->
-        @if(config('app.debug'))
-            <div class="mb-4 p-3 bg-gray-100 rounded text-xs">
-                <p><strong>Debug Info:</strong></p>
-                <p>Available Methods: {{ implode(', ', $paymentMethods) }}</p>
-                <p>Selected: {{ $selectedPaymentMethod }}</p>
-                <p>Credit Card Available: {{ $creditCardAvailable ? 'Yes' : 'No' }}</p>
-                <p>Current Currency: {{ $currentCurrency }} ({{ $currentSymbol }})</p>
-                <p>Billing Country: {{ $billingCountry }}</p>
-                <p>Shipping Country: {{ $shippingCountry }}</p>
-                                       <div class="mt-2">
-                           <button type="button" onclick="testCurrencyUpdate()" class="px-2 py-1 bg-blue-500 text-white rounded text-xs">Test Currency Update</button>
-                           <button type="button" onclick="debugCurrencySelector()" class="px-2 py-1 bg-purple-500 text-white rounded text-xs ml-2">Debug Navbar</button>
-                           <button type="button" onclick="testBrowserEvents()" class="px-2 py-1 bg-green-500 text-white rounded text-xs ml-2">Test Events</button>
-                       </div>
-            </div>
+    <!-- Debug Info (remove in production) -->
+    @if(config('app.debug'))
+        <div class="bg-gray-100 p-4 rounded-lg mb-4">
+            <h3 class="font-semibold mb-2">Debug Info:</h3>
+            <p><strong>Payment Method:</strong> {{ $selectedPaymentMethod ?? 'Not selected' }}</p>
+            <p><strong>PayPal Type:</strong> {{ $paypalPaymentType ?? 'Not set' }}</p>
+            <p><strong>Billing Country:</strong> {{ $billingCountry ?? 'Not set' }}</p>
+            <p><strong>First Name:</strong> {{ $firstName ?? 'Not set' }}</p>
+            <p><strong>Email:</strong> {{ $email ?? 'Not set' }}</p>
+        </div>
 
-            <script>
-                function testCurrencyUpdate() {
-                    console.log('🧪 Testing currency update...');
+        <!-- Form Data Debug -->
+        <div id="debug-info" class="bg-yellow-100 p-4 rounded-lg mb-4">
+            <h3 class="font-semibold mb-2">Form Data to be Submitted:</h3>
+            <p>Click "Place Order" to see the actual form data</p>
+        </div>
+    @endif
 
-                    // Try to find currency selector and call its method
-                    const currencyComponents = document.querySelectorAll('.currency-selector[wire\\:id]');
-                    console.log('Found currency components:', currencyComponents.length);
+        <!-- Submit Button -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <button type="button" wire:click="submitForm" class="w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 transition-colors">
+            {{ Auth::check() ? 'Place Order' : 'Place Order as Guest' }}
+        </button>
+    </div>
 
-                    currencyComponents.forEach((component, index) => {
-                        const wireId = component.getAttribute('wire:id');
-                        console.log(`Currency component ${index}:`, wireId);
+    <!-- Debug: Show current payment method selection -->
+    @if(config('app.debug'))
+        <div class="bg-blue-100 p-4 rounded-lg mb-4">
+            <h3 class="font-semibold mb-2">Current Payment Method Selection:</h3>
+            <p><strong>Selected Method:</strong> {{ $selectedPaymentMethod ?? 'Not set' }}</p>
+            <p><strong>Is COD:</strong> {{ ($selectedPaymentMethod === 'cash_on_delivery') ? 'Yes' : 'No' }}</p>
+            <p><strong>Is Paymob:</strong> {{ ($selectedPaymentMethod === 'paymob') ? 'Yes' : 'No' }}</p>
+        </div>
+    @endif
 
-                        if (window.Livewire && wireId) {
-                            try {
-                                const livewireComponent = window.Livewire.find(wireId);
-                                if (livewireComponent) {
-                                    console.log('📞 Calling updateToCurrency with AUD');
-                                    livewireComponent.call('updateToCurrency', 'AUD');
-                                }
-                            } catch (e) {
-                                console.error('Error:', e);
-                            }
-                        }
+    <!-- Hidden Form for Submission -->
+    <form id="checkout-form" method="POST" action="{{ route('checkout.process') }}" style="display: none;">
+        @csrf
+        <input type="hidden" name="first_name" value="{{ $firstName }}">
+        <input type="hidden" name="last_name" value="{{ $lastName }}">
+        <input type="hidden" name="email" value="{{ $email }}">
+        <input type="hidden" name="phone_number" value="{{ $phoneNumber }}">
+        <input type="hidden" name="billing_country_id" value="{{ $billingCountry }}">
+        <input type="hidden" name="billing_state" value="{{ $billingState }}">
+        <input type="hidden" name="billing_city" value="{{ $billingCity }}">
+        <input type="hidden" name="billing_address" value="{{ $billingAddress }}">
+        <input type="hidden" name="billing_building_number" value="{{ $billingBuildingNumber ?: 'N/A' }}">
+        <input type="hidden" name="shipping_country_id" value="{{ $useBillingForShipping ? $billingCountry : ($shippingCountry ?: $billingCountry) }}">
+        <input type="hidden" name="shipping_state" value="{{ $useBillingForShipping ? $billingState : ($shippingState ?: $billingState) }}">
+        <input type="hidden" name="shipping_city" value="{{ $useBillingForShipping ? $billingCity : ($shippingCity ?: $billingCity) }}">
+        <input type="hidden" name="shipping_address" value="{{ $useBillingForShipping ? $billingAddress : ($shippingAddress ?: $billingAddress) }}">
+        <input type="hidden" name="shipping_building_number" value="{{ $useBillingForShipping ? ($billingBuildingNumber ?: 'N/A') : ($shippingBuildingNumber ?: 'N/A') }}">
+        <input type="hidden" name="use_billing_for_shipping" value="{{ $useBillingForShipping ? '1' : '0' }}">
+        <input type="hidden" name="payment_method" value="{{ $selectedPaymentMethod }}">
+                        <input type="hidden" name="paypal_payment_type" value="credit_card">
+        <input type="hidden" name="currency" value="{{ $currentCurrency }}">
+    </form>
+
+    <!-- Debug: Show hidden form values -->
+    @if(config('app.debug'))
+        <div class="bg-yellow-100 p-4 rounded-lg mb-4">
+            <h3 class="font-semibold mb-2">Hidden Form Values:</h3>
+            <p><strong>Payment Method in Hidden Form:</strong> {{ $selectedPaymentMethod ?? 'Not set' }}</p>
+            <p><strong>PayPal Type in Hidden Form:</strong> {{ $paypalPaymentType ?? 'Not set' }}</p>
+        </div>
+    @endif
+
+    <!-- JavaScript Debug -->
+    <script>
+        console.log('CheckoutForm Livewire component loaded');
+
+        // Listen for Livewire events
+        document.addEventListener('livewire:init', () => {
+            console.log('Livewire initialized');
+
+                        // Debug: Check if components are loaded
+            setTimeout(() => {
+                console.log('🔍 Debug: Checking component state...');
+
+                // Check if PaymentMethodsSelector is loaded
+                const paymentSelector = document.querySelector('[wire\\:id*="payment-methods-selector"]');
+                console.log('PaymentMethodsSelector found:', !!paymentSelector);
+
+                // Check if CheckoutForm is loaded
+                const checkoutForm = document.querySelector('[wire\\:id*="checkout-form"]');
+                console.log('CheckoutForm found:', !!checkoutForm);
+
+                // Log all Livewire components
+                const allComponents = document.querySelectorAll('[wire\\:id]');
+                console.log('All Livewire components:', Array.from(allComponents).map(el => el.getAttribute('wire:id')));
+
+                // Debug: Check for any elements with wire:id that might be our components
+                console.log('🔍 Debug: Checking for component elements...');
+                allComponents.forEach((el, index) => {
+                    const wireId = el.getAttribute('wire:id');
+                    const className = el.className;
+                    const tagName = el.tagName;
+                    console.log(`Component ${index}:`, {
+                        wireId,
+                        className,
+                        tagName,
+                        element: el
                     });
+                });
+
+                // Also check for any divs that might contain our components
+                const allDivs = document.querySelectorAll('div');
+                console.log('🔍 Debug: Total divs found:', allDivs.length);
+
+                // Look for any divs that might be our components
+                allDivs.forEach((div, index) => {
+                    if (div.innerHTML.includes('payment') || div.innerHTML.includes('checkout')) {
+                        console.log(`Potential component div ${index}:`, {
+                            className: div.className,
+                            id: div.id,
+                            innerHTML: div.innerHTML.substring(0, 200) + '...'
+                        });
+                    }
+                });
+            }, 1000);
+        });
+
+        // Listen for form submission
+        document.addEventListener('livewire:submit', () => {
+            console.log('Livewire form submission started');
+        });
+
+        // Listen for form submission errors
+        document.addEventListener('livewire:error', (error) => {
+            console.error('Livewire error:', error);
+        });
+
+        // Listen for redirect event from Livewire
+        document.addEventListener('redirect-to-checkout', (event) => {
+            console.log('Redirecting to checkout process:', event.detail);
+            window.location.href = event.detail;
+        });
+
+        function debugFormData() {
+            console.log('🔍 Debug: Form submission started');
+
+            const form = document.getElementById('checkout-form');
+            if (form) {
+                console.log('✅ Form found:', form);
+
+                const formData = new FormData(form);
+                console.log('📋 Form data entries:');
+
+                for (const [key, value] of formData.entries()) {
+                    console.log(`  ${key}: ${value}`);
                 }
 
-                function debugCurrencySelector() {
-                    console.log('🔍 DEBUGGING CURRENCY SELECTOR IN NAVBAR...');
-
-                    // Check all possible selectors
-                    const selectors = [
-                        '.currency-selector[wire\\:id]',
-                        '[wire\\:id*="currency-selector"]',
-                        '[x-data*="open"][wire\\:id]',
-                        '[wire\\:id]'
-                    ];
-
-                    selectors.forEach((selector, i) => {
-                        const elements = document.querySelectorAll(selector);
-                        console.log(`Selector ${i+1} (${selector}): Found ${elements.length} elements`);
-                        elements.forEach((el, j) => {
-                            const wireId = el.getAttribute('wire:id');
-                            const hasClass = el.classList.contains('currency-selector');
-                            const textContent = el.textContent.includes('Currency') || el.textContent.includes('USD') || el.textContent.includes('$');
-                            console.log(`  Element ${j+1}: wire:id=${wireId}, hasCurrencyClass=${hasClass}, hasPrice=${textContent}`);
-                        });
-                    });
-
-                    // Try to find and test currency selector specifically
-                    const currencyEl = document.querySelector('.currency-selector[wire\\:id]');
-                    if (currencyEl) {
-                        const wireId = currencyEl.getAttribute('wire:id');
-                        console.log('🎯 Found currency selector with ID:', wireId);
-
-                        if (window.Livewire) {
-                            try {
-                                const component = window.Livewire.find(wireId);
-                                console.log('📡 Livewire component:', component ? 'FOUND' : 'NOT FOUND');
-                                if (component) {
-                                    console.log('🧪 Testing updateToCurrency...');
-                                    component.call('updateToCurrency', 'GBP');
-                                }
-                            } catch (e) {
-                                console.error('❌ Error accessing component:', e);
-                            }
-                        }
-                    } else {
-                        console.log('❌ No currency selector found');
+                // Show debug info on page
+                const debugInfo = document.getElementById('debug-info');
+                if (debugInfo) {
+                    debugInfo.innerHTML = '<h3 class="font-semibold mb-2">Form Data Being Submitted:</h3>';
+                    for (const [key, value] of formData.entries()) {
+                        debugInfo.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
                     }
                 }
 
-                function testBrowserEvents() {
-                    console.log('🧪 Testing browser events...');
+                // Submit the form
+                console.log('🚀 Submitting form to:', form.action);
+                form.submit();
 
-                    // Test currency changed event
-                    window.dispatchEvent(new CustomEvent('livewire-currency-changed', {
-                        detail: { currency: 'EUR', symbol: '€' }
-                    }));
+            } else {
+                console.error('❌ Form not found!');
+            }
+        }
 
-                    console.log('📡 Browser event dispatched: livewire-currency-changed with EUR');
-
-                    setTimeout(() => {
-                        // Test country changed event
-                        window.dispatchEvent(new CustomEvent('livewire-country-changed', {
-                            detail: { countryCode: 'FR', currency: 'EUR' }
-                        }));
-                        console.log('📡 Browser event dispatched: livewire-country-changed with FR');
-                    }, 1000);
-                }
-            </script>
-        @endif
-
-        @if(empty($paymentMethods))
-            <div class="text-center py-8">
-                <p class="text-gray-500">Please select a country to see available payment methods.</p>
-            </div>
-        @else
-            <div class="space-y-4">
-                @foreach($paymentMethods as $method)
-                    <label class="flex items-start p-4 border rounded-lg cursor-pointer hover:border-red-300 transition {{ $selectedPaymentMethod === $method ? 'border-red-500 bg-red-50' : '' }}">
-                        <input type="radio"
-                               wire:model.live="selectedPaymentMethod"
-                               name="payment_method"
-                               value="{{ $method }}"
-                               required
-                               class="mt-1 mr-3 text-red-600 focus:ring-red-500 border-gray-300">
-                        <div class="flex-1">
-                            <div class="flex items-center">
-                                @if($method === 'paypal')
-                                    <svg class="w-6 h-6 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M20.067 8.478c.492.315.844.825.844 1.478 0 .653-.352 1.163-.844 1.478-.492.315-1.163.478-1.844.478H17.5v-2.956h.723c.681 0 1.352.163 1.844.478z"/>
-                                    </svg>
-                                @elseif($method === 'paymob')
-                                    <svg class="w-6 h-6 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                    </svg>
-                                @elseif($method === 'cash_on_delivery')
-                                    <svg class="w-6 h-6 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                                    </svg>
-                                @endif
-                                <span class="font-medium text-gray-900">{{ ucfirst(str_replace('_', ' ', $method)) }}</span>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-1">
-                                @if($method === 'paypal')
-                                    Pay with your PayPal account or credit card
-                                @elseif($method === 'paymob')
-                                    Local payment solution for Egypt and MENA region
-                                @elseif($method === 'cash_on_delivery')
-                                    Pay with cash when your order is delivered
-                                @endif
-                            </p>
-
-                            @if($method === 'paypal' && $selectedPaymentMethod === 'paypal')
-                                <div class="mt-3 space-y-2">
-                                    <label class="flex items-center">
-                                        <input type="radio"
-                                               wire:model.live="paypalPaymentType"
-                                               name="paypal_payment_type_group"
-                                               value="paypal_account"
-                                               class="mr-2 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                        <span class="text-sm text-gray-700">PayPal Account</span>
-                                    </label>
-                                    @if($creditCardAvailable)
-                                        <label class="flex items-center">
-                                            <input type="radio"
-                                                   wire:model.live="paypalPaymentType"
-                                                   name="paypal_payment_type_group"
-                                                   value="credit_card"
-                                                   class="mr-2 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                            <span class="text-sm text-gray-700">Credit/Debit Card (Processed by PayPal)</span>
-                                        </label>
-                                    @endif
-
-                                    <div class="mt-2 text-xs text-gray-500">
-                                        @if($paypalPaymentType === 'paypal_account')
-                                            <p>• Pay with your existing PayPal account</p>
-                                            <p>• Quick and secure checkout</p>
-                                        @else
-                                            <p>• Pay with any major credit or debit card</p>
-                                            <p>• No PayPal account required</p>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    </label>
-                @endforeach
-            </div>
-        @endif
-
-        @error('selectedPaymentMethod')
-            <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-        @enderror
-
-        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <p class="text-sm text-gray-600">
-                    Your payment information is secure and encrypted. We never store your payment details.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hidden inputs for form submission -->
-    <input type="hidden" name="payment_method" value="{{ $selectedPaymentMethod }}" id="payment_method_input">
-    <input type="hidden" name="paypal_payment_type" value="{{ $paypalPaymentType }}" id="paypal_payment_type_input">
+        // Also listen for actual form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('checkout-form');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    console.log('🎯 Form submit event triggered');
+                    console.log('Form action:', form.action);
+                    console.log('Form method:', form.method);
+                });
+            }
+        });
+    </script>
 </div>
+

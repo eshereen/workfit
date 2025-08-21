@@ -90,34 +90,93 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Process checkout for authenticated users
+     * Unified checkout method that handles both authenticated and guest users
      */
-    public function processAuthenticatedCheckout(Request $request)
+    public function processCheckout(Request $request)
     {
-        $validated = $request->validate([
-            'shipping_address' => 'required|array',
-            'billing_address' => 'required|array',
-            'payment_method' => 'required|string|in:paypal,paymob,cash_on_delivery',
-            'paypal_payment_type' => 'nullable|string|in:paypal_account,credit_card',
-            'notes' => 'nullable|string|max:500',
-            'coupon_id' => 'nullable|integer|exists:coupons,id',
-            'coupon_discount' => 'nullable|numeric|min:0',
-            'use_billing_for_shipping' => 'boolean',
+        // Check if we have session data from Livewire component
+        $sessionData = session('checkout_data');
+        if ($sessionData && empty($request->input('payment_method'))) {
+            Log::info('Using session data from Livewire component', ['session_data' => $sessionData]);
+
+            // Merge session data into request
+            $request->merge($sessionData);
+
+            // Clear the session data after using it
+            session()->forget('checkout_data');
+        }
+
+        // Debug: Log authentication status
+        Log::info('Unified checkout: Processing request', [
+            'is_authenticated' => Auth::check(),
+            'user_id' => Auth::id(),
+            'request_all' => $request->all(),
+            'has_session_data' => !empty($sessionData),
+            'session_data' => $sessionData
         ]);
 
-        // Log the raw request data to see what's actually being sent
-        Log::info('Raw request data for authenticated checkout', [
-            'all_data' => $request->all(),
-            'shipping_address' => $request->input('shipping_address'),
-            'billing_address' => $request->input('billing_address'),
-            'payment_method' => $request->input('payment_method')
+        // Check if user is authenticated
+        if (Auth::check()) {
+            Log::info('Unified checkout: User is authenticated, calling processAuthenticatedCheckout');
+            return $this->processAuthenticatedCheckout($request);
+        } else {
+            Log::info('Unified checkout: User is guest, calling processGuestCheckout');
+            return $this->processGuestCheckout($request);
+        }
+    }
+
+    /**
+     * Process checkout for authenticated users
+     */
+            public function processAuthenticatedCheckout(Request $request)
+    {
+        // Get data directly from request (traditional form submission) - AUTHENTICATED METHOD
+        $validated = $request->validate([
+            // AUTHENTICATED CHECKOUT VALIDATION RULES START
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone_number' => 'required|string|max:20',
+            'billing_country_id' => 'required|exists:countries,id',
+            'billing_state' => 'required|string|max:255',
+            'billing_city' => 'required|string|max:255',
+            'billing_address' => 'required|string|max:500',
+            'billing_building_number' => 'nullable|string|max:50',
+            'shipping_country_id' => 'required|exists:countries,id',
+            'shipping_state' => 'required|string|max:255',
+            'shipping_city' => 'required|string|max:255',
+            'shipping_address' => 'required|string|max:500',
+            'shipping_building_number' => 'nullable|string|max:50',
+            'use_billing_for_shipping' => 'boolean',
+            'payment_method' => 'required|string|in:paypal,paymob,cash_on_delivery',
+            'paypal_payment_type' => 'nullable|string|in:paypal_account,credit_card',
+            'currency' => 'required|string|max:3',
+        ]);
+
+        // Debug: Log what we're getting from request
+        Log::info('CheckoutController: Request data validated for authenticated checkout', [
+            'validated_data' => $validated,
+            'request_all' => $request->all(),
+            'payment_method' => $validated['payment_method'] ?? 'NOT_SET',
+            'payment_method_type' => gettype($validated['payment_method'] ?? null),
+            'is_cod' => ($validated['payment_method'] ?? '') === 'cash_on_delivery',
+            'is_paymob' => ($validated['payment_method'] ?? '') === 'paymob',
+            'is_paypal' => ($validated['payment_method'] ?? '') === 'paypal'
         ]);
 
         $user = Auth::user();
         $cart = $this->cartService->getCart();
 
+        // Debug: Log cart information
+        Log::info('Checkout: Cart information', [
+            'cart_count' => $cart->count(),
+            'cart_items' => $cart->toArray(),
+            'cart_is_empty' => $cart->isEmpty()
+        ]);
+
         if ($cart->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Your cart is empty');
+            Log::warning('Checkout: Cart is empty, redirecting to cart page');
+            return redirect()->route('cart.index')->with('error', 'Your cart is empty. Please add items before checkout.');
         }
 
         try {
@@ -146,11 +205,27 @@ class CheckoutController extends Controller
 
 
             // Check availability for the selected country
-$country = Country::find($order->country_id);
-$available = $this->methodResolver->availableForCountry($country->code ?? 'EG'); // ensure you store ISO code
-if (!in_array(PaymentMethod::from($validated['payment_method']), $available, true)) {
-    throw new \Exception('Selected payment method is not available in your country.');
-}
+            $country = Country::find($order->country_id);
+            $available = $this->methodResolver->availableForCountry($country->code ?? 'EG'); // ensure you store ISO code
+
+            // Special handling for PayPal credit card - if PayPal is available, credit card should also be available
+            $paymentMethod = PaymentMethod::from($validated['payment_method']);
+            $isPayPalCreditCard = ($validated['payment_method'] === 'paypal' &&
+                                 isset($validated['paypal_payment_type']) &&
+                                 $validated['paypal_payment_type'] === 'credit_card');
+
+            if (!in_array($paymentMethod, $available, true)) {
+                // If it's PayPal credit card and PayPal is available, allow it
+                if ($isPayPalCreditCard && in_array(PaymentMethod::PAYPAL, $available, true)) {
+                    Log::info('PayPal credit card payment allowed - PayPal is available for country', [
+                        'country_code' => $country->code ?? 'EG',
+                        'payment_method' => $validated['payment_method'],
+                        'paypal_payment_type' => $validated['paypal_payment_type'] ?? 'not set'
+                    ]);
+                } else {
+                    throw new \Exception('Selected payment method is not available in your country.');
+                }
+            }
 
 // Initiate payment
 $returnUrl = route('payments.return', ['order' => $order->id]);
@@ -169,32 +244,75 @@ $cancelUrl = route('payments.cancel', ['order' => $order->id]);
                 'use_credit_card' => ($paymentType === 'credit_card')
             ]);
 
-            $result = $this->paymentService->createPayment(
-    $order,
-    PaymentMethod::from($validated['payment_method']),
-    $returnUrl,
-    $cancelUrl,
-    $paymentType
-);
+            // Log payment method before processing
+            Log::info('About to process payment', [
+                'payment_method' => $validated['payment_method'],
+                'order_id' => $order->id,
+                'is_cod' => $validated['payment_method'] === 'cash_on_delivery'
+            ]);
 
-// Create order items AFTER payment row created (your current placement is fine)
-$this->createOrderItems($order, $cart);
+            $result = $this->paymentService->createPayment(
+                $order,
+                PaymentMethod::from($validated['payment_method']),
+                $returnUrl,
+                $cancelUrl,
+                $paymentType
+            );
+
+            Log::info('Payment processing result', [
+                'payment_method' => $validated['payment_method'],
+                'result_keys' => array_keys($result),
+                'has_redirect_url' => !empty($result['redirect_url']),
+                'redirect_url' => $result['redirect_url'] ?? null
+            ]);
+
+// Order items already created above - no need to create them again
 
 // Clear cart
 $this->cartService->clearCart();
 DB::commit();
 
-            // Redirect if gateway needs it (Paymob redirect)
-            if (!empty($result['redirect_url'])) {
+            // Handle different payment methods appropriately
+            Log::info('Authenticated checkout: Processing payment method', [
+                'payment_method' => $validated['payment_method'],
+                'is_cod' => $validated['payment_method'] === 'cash_on_delivery',
+                'result_keys' => array_keys($result),
+                'has_redirect_url' => !empty($result['redirect_url']),
+                'redirect_url' => $result['redirect_url'] ?? null
+            ]);
+
+            if ($validated['payment_method'] === 'cash_on_delivery') {
+                // COD should never redirect - go directly to thank you page
+                Log::info('COD payment completed, redirecting to thank you page', [
+                    'payment_method' => $validated['payment_method'],
+                    'order_id' => $order->id
+                ]);
+                return redirect()->route('thankyou', ['order' => $order->id])
+                    ->with('success', 'Order placed successfully! Payment will be collected on delivery.');
+            } elseif (!empty($result['redirect_url'])) {
+                // Other payment methods (Paymob, PayPal) that need external redirect
+                Log::info('Authenticated checkout: Redirecting to external gateway', [
+                    'payment_method' => $validated['payment_method'],
+                    'redirect_url' => $result['redirect_url']
+                ]);
                 return redirect()->away($result['redirect_url']);
             }
 
             // For PayPal credit card payments, redirect to our custom page
             if (isset($result['requires_frontend_processing']) && $result['requires_frontend_processing']) {
+                Log::info('Redirecting to PayPal credit card page', [
+                    'payment_method' => $validated['payment_method'],
+                    'redirect_url' => $result['redirect_url']
+                ]);
                 return redirect()->to($result['redirect_url']);
             }
 
-            // For other payment methods, redirect to thank you page
+            // If we reach here, something went wrong - redirect to thank you page as fallback
+            Log::warning('No redirect URL found for payment method, redirecting to thank you page as fallback', [
+                'payment_method' => $validated['payment_method'],
+                'result_keys' => array_keys($result),
+                'has_redirect_url' => !empty($result['redirect_url'])
+            ]);
             return redirect()->route('thankyou', ['order' => $order->id])
                 ->with('success', 'Order placed successfully!');
 
@@ -212,49 +330,51 @@ DB::commit();
      */
     public function processGuestCheckout(Request $request)
     {
+        // Get data directly from request (traditional form submission) - GUEST CHECKOUT METHOD
         $validated = $request->validate([
-            'email' => 'required|email|max:255',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
             'phone_number' => 'required|string|max:20',
-            'shipping_address' => 'required|array',
-            'shipping_address.name' => 'required|string|max:255',
-            'shipping_address.email' => 'required|email|max:255',
-            'shipping_address.phone' => 'required|string|max:255',
-            'shipping_address.address' => 'required|string|max:500',
-            'shipping_address.city' => 'required|string|max:255',
-            'shipping_address.state' => 'nullable|string|max:255',
-            'shipping_address.postal_code' => 'nullable|string|max:20',
-            'shipping_address.country' => 'required|string|max:255',
-            'billing_address' => 'required|array',
-            'billing_address.name' => 'required|string|max:255',
-            'billing_address.email' => 'required|email|max:255',
-            'billing_address.phone' => 'required|string|max:255',
-            'billing_address.address' => 'required|string|max:500',
-            'billing_address.city' => 'required|string|max:255',
-            'billing_address.state' => 'nullable|string|max:255',
-            'billing_address.postal_code' => 'nullable|string|max:20',
-            'billing_address.country' => 'required|string|max:255',
-           'payment_method' => 'required|string|in:paypal,paymob,cash_on_delivery',
-            'paypal_payment_type' => 'nullable|string|in:paypal_account,credit_card',
-            'notes' => 'nullable|string|max:500',
-            'coupon_id' => 'nullable|integer|exists:coupons,id',
-            'coupon_discount' => 'nullable|numeric|min:0',
+            'billing_country_id' => 'required|exists:countries,id',
+            'billing_state' => 'required|string|max:255',
+            'billing_city' => 'required|string|max:255',
+            'billing_address' => 'required|string|max:500',
+            'billing_building_number' => 'nullable|string|max:50',
+            'shipping_country_id' => 'required|exists:countries,id',
+            'shipping_state' => 'required|string|max:255',
+            'shipping_city' => 'required|string|max:255',
+            'shipping_address' => 'required|string|max:500',
+            'shipping_building_number' => 'nullable|string|max:50',
             'use_billing_for_shipping' => 'boolean',
+            'payment_method' => 'required|string|in:paypal,paymob,cash_on_delivery',
+            'paypal_payment_type' => 'nullable|string|in:paypal_account,credit_card',
+            'currency' => 'required|string|max:3',
         ]);
 
-        // Log the raw request data to see what's actually being sent
-        Log::info('Raw request data for guest checkout', [
-            'all_data' => $request->all(),
-            'shipping_address' => $request->input('shipping_address'),
-            'billing_address' => $request->input('billing_address'),
-            'payment_method' => $request->input('payment_method')
+        // Debug: Log what we're getting from request - GUEST CHECKOUT
+        Log::info('CheckoutController: Request data validated for guest checkout', [
+            'validated_data' => $validated,
+            'request_all' => $request->all(),
+            'payment_method' => $validated['payment_method'] ?? 'NOT_SET',
+            'payment_method_type' => gettype($validated['payment_method'] ?? null),
+            'is_cod' => ($validated['payment_method'] ?? '') === 'cash_on_delivery',
+            'is_paymob' => ($validated['payment_method'] ?? '') === 'paymob',
+            'is_paypal' => ($validated['payment_method'] ?? '') === 'paypal'
         ]);
 
         $cart = $this->cartService->getCart();
 
+        // Debug: Log cart information
+        Log::info('Checkout: Cart information', [
+            'cart_count' => $cart->count(),
+            'cart_items' => $cart->toArray(),
+            'cart_is_empty' => $cart->isEmpty()
+        ]);
+
         if ($cart->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Your cart is empty');
+            Log::warning('Checkout: Cart is empty, redirecting to cart page');
+            return redirect()->route('cart.index')->with('error', 'Your cart is empty. Please add items before checkout.');
         }
 
         try {
@@ -281,12 +401,28 @@ DB::commit();
             Log::info('Order items created successfully');
 
             // Clear cart
-          // Check availability for the selected country
-$country = Country::find($order->country_id);
-$available = $this->methodResolver->availableForCountry($country->code ?? 'EG'); // ensure you store ISO code
-if (!in_array(PaymentMethod::from($validated['payment_method']), $available, true)) {
-    throw new \Exception('Selected payment method is not available in your country.');
-}
+            // Check availability for the selected country
+            $country = Country::find($order->country_id);
+            $available = $this->methodResolver->availableForCountry($country->code ?? 'EG'); // ensure you store ISO code
+
+            // Special handling for PayPal credit card - if PayPal is available, credit card should also be available
+            $paymentMethod = PaymentMethod::from($validated['payment_method']);
+            $isPayPalCreditCard = ($validated['payment_method'] === 'paypal' &&
+                                 isset($validated['paypal_payment_type']) &&
+                                 $validated['paypal_payment_type'] === 'credit_card');
+
+            if (!in_array($paymentMethod, $available, true)) {
+                // If it's PayPal credit card and PayPal is available, allow it
+                if ($isPayPalCreditCard && in_array(PaymentMethod::PAYPAL, $available, true)) {
+                    Log::info('PayPal credit card payment allowed (guest) - PayPal is available for country', [
+                        'country_code' => $country->code ?? 'EG',
+                        'payment_method' => $validated['payment_method'],
+                        'paypal_payment_type' => $validated['paypal_payment_type'] ?? 'not set'
+                    ]);
+                } else {
+                    throw new \Exception('Selected payment method is not available in your country.');
+                }
+            }
 
 // Initiate payment
 $returnUrl = route('payments.return', ['order' => $order->id]);
@@ -310,23 +446,57 @@ if ($paymentType === 'credit_card') {
     $returnUrl = null;
 }
 
-$result = $this->paymentService->createPayment(
-    $order,
-    PaymentMethod::from($validated['payment_method']),
-    $returnUrl,
-    $cancelUrl,
-    $paymentType
-);
+            // Log payment method before processing
+            Log::info('About to process payment (guest)', [
+                'payment_method' => $validated['payment_method'],
+                'order_id' => $order->id,
+                'is_cod' => $validated['payment_method'] === 'cash_on_delivery'
+            ]);
 
-// Create order items AFTER payment row created (your current placement is fine)
+            $result = $this->paymentService->createPayment(
+                $order,
+                PaymentMethod::from($validated['payment_method']),
+                $returnUrl,
+                $cancelUrl,
+                $paymentType
+            );
 
+            Log::info('Payment processing result (guest)', [
+                'payment_method' => $validated['payment_method'],
+                'result_keys' => array_keys($result),
+                'has_redirect_url' => !empty($result['redirect_url']),
+                'redirect_url' => $result['redirect_url'] ?? null
+            ]);
+
+// Order items already created above - no need to create them again
 
 // Clear cart
 $this->cartService->clearCart();
 DB::commit();
 
-            // Redirect if gateway needs it (Paymob redirect)
-            if (!empty($result['redirect_url'])) {
+            // Handle different payment methods appropriately
+            Log::info('Guest checkout: Processing payment method', [
+                'payment_method' => $validated['payment_method'],
+                'is_cod' => $validated['payment_method'] === 'cash_on_delivery',
+                'result_keys' => array_keys($result),
+                'has_redirect_url' => !empty($result['redirect_url']),
+                'redirect_url' => $result['redirect_url'] ?? null
+            ]);
+
+            if ($validated['payment_method'] === 'cash_on_delivery') {
+                // COD should never redirect - go directly to thank you page
+                Log::info('COD payment completed (guest), redirecting to thank you page', [
+                    'payment_method' => $validated['payment_method'],
+                    'order_id' => $order->id
+                ]);
+                return redirect()->route('thankyou', ['order' => $order->id])
+                    ->with('success', 'Order placed successfully! Payment will be collected on delivery.');
+            } elseif (!empty($result['redirect_url'])) {
+                // Other payment methods (Paymob, PayPal) that need external redirect
+                Log::info('Guest checkout: Redirecting to external gateway', [
+                    'payment_method' => $validated['payment_method'],
+                    'redirect_url' => $result['redirect_url']
+                ]);
                 return redirect()->away($result['redirect_url']);
             }
 
@@ -335,7 +505,12 @@ DB::commit();
                 return redirect()->to($result['redirect_url']);
             }
 
-            // For other payment methods, redirect to thank you page
+            // If we reach here, something went wrong - redirect to thank you page as fallback
+            Log::warning('No redirect URL found for payment method (guest), redirecting to thank you page as fallback', [
+                'payment_method' => $validated['payment_method'],
+                'result_keys' => array_keys($result),
+                'has_redirect_url' => !empty($result['redirect_url'])
+            ]);
             return redirect()->route('thankyou', ['order' => $order->id])
                 ->with('success', 'Order placed successfully!');
 
@@ -354,48 +529,33 @@ DB::commit();
      */
     protected function createOrUpdateCustomer(User $user, array $data)
     {
-        // Get country from shipping address
-        $country = null;
-        $countryData = $data['shipping_address']['country'] ?? null;
+        // Prepare customer data with new database structure
+        $customerData = [
+            'email' => $data['email'],
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'phone_number' => $data['phone_number'],
 
-        if ($countryData) {
-            // First, try to find by ID if it's numeric
-            if (is_numeric($countryData)) {
-                $country = Country::find($countryData);
-            }
+            // Billing address
+            'billing_country_id' => $data['billing_country_id'],
+            'billing_state' => $data['billing_state'],
+            'billing_city' => $data['billing_city'],
+            'billing_address' => $data['billing_address'],
+            'billing_building_number' => $data['billing_building_number'],
 
-            // If not found by ID, try to find by name
-            if (!$country) {
-                $country = Country::where('name', 'LIKE', $countryData)->first();
+            // Shipping address (copy from billing if using billing for shipping)
+            'shipping_country_id' => $data['use_billing_for_shipping'] ? $data['billing_country_id'] : $data['shipping_country_id'],
+            'shipping_state' => $data['use_billing_for_shipping'] ? $data['billing_state'] : $data['shipping_state'],
+            'shipping_city' => $data['use_billing_for_shipping'] ? $data['billing_city'] : $data['shipping_city'],
+            'shipping_address' => $data['use_billing_for_shipping'] ? $data['billing_address'] : $data['shipping_address'],
+            'shipping_building_number' => $data['use_billing_for_shipping'] ? $data['billing_building_number'] : $data['shipping_building_number'],
 
-                if (!$country) {
-                    // Try to find by partial match
-                    $country = Country::where('name', 'LIKE', '%' . $countryData . '%')->first();
-                }
-            }
-        }
-
-        if (!$country) {
-            // Default to user's existing country or Egypt
-            $existingCustomer = Customer::where('user_id', $user->id)->first();
-            $countryId = $existingCustomer?->country_id ?? 1; // Default to first country (usually Egypt)
-        } else {
-            $countryId = $country->id;
-        }
+            'use_billing_for_shipping' => $data['use_billing_for_shipping'],
+        ];
 
         $customer = Customer::updateOrCreate(
             ['user_id' => $user->id],
-            [
-                'email' => $user->email,
-                'first_name' => $user->first_name ?? $data['first_name'] ?? null,
-                'last_name' => $user->last_name ?? $data['last_name'] ?? null,
-                'phone' => $data['phone_number'] ?? $user->phone ?? null,
-                'country_id' => $countryId,
-                'state' => $data['shipping_address']['state'] ?? null,
-                'city' => $data['shipping_address']['city'] ?? null,
-                'address' => $data['shipping_address']['address'] ?? null,
-                //'zip' => $data['shipping_address']['postal_code'] ?? null,
-            ]
+            $customerData
         );
 
         return $customer;
@@ -406,58 +566,31 @@ DB::commit();
      */
     protected function createGuestCustomer(array $data)
     {
-        Log::info('Creating guest customer', [
-            'country_data' => $data['shipping_address']['country'] ?? 'not set',
-            'shipping_address' => $data['shipping_address']
-        ]);
-
-        $country = null;
-        $countryData = $data['shipping_address']['country'];
-
-        // First, try to find by ID if it's numeric
-        if (is_numeric($countryData)) {
-            $country = Country::find($countryData);
-            Log::info('Looking for country by ID', ['country_id' => $countryData, 'found' => $country ? 'yes' : 'no']);
-        }
-
-        // If not found by ID, try to find by name
-        if (!$country) {
-            // Find country by name (case insensitive)
-            $country = Country::where('name', 'LIKE', $countryData)->first();
-
-            if (!$country) {
-                // Try to find by partial match
-                $country = Country::where('name', 'LIKE', '%' . $countryData . '%')->first();
-            }
-
-            Log::info('Looking for country by name', ['country_name' => $countryData, 'found' => $country ? 'yes' : 'no']);
-        }
-
-        if (!$country) {
-            Log::error('Country not found', [
-                'requested_country' => $countryData,
-                'type' => is_numeric($countryData) ? 'ID' : 'Name',
-                'available_countries' => Country::pluck('name')->toArray()
-            ]);
-            throw new \Exception('Selected country "' . $countryData . '" not found. Available countries: ' . implode(', ', Country::pluck('name')->toArray()));
-        }
-
-        Log::info('Country found', [
-            'country_id' => $country->id,
-            'country_name' => $country->name
-        ]);
-
-        return Customer::create([
+        // Prepare customer data with new database structure
+        $customerData = [
             'email' => $data['email'],
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
-            'phone' => $data['phone_number'],
-            'country_id' => $country->id,
-            'state' => $data['shipping_address']['state'] ?? null,
-            'city' => $data['shipping_address']['city'] ?? null,
-            'address' => $data['shipping_address']['address'] ?? null,
-            //'zip' => $data['shipping_address']['postal_code'] ?? null,
-        ]);
+            'phone_number' => $data['phone_number'],
+
+            // Billing address
+            'billing_country_id' => $data['billing_country_id'],
+            'billing_state' => $data['billing_state'],
+            'billing_city' => $data['billing_city'],
+            'billing_address' => $data['billing_address'],
+            'billing_building_number' => $data['billing_building_number'],
+
+            // Shipping address (copy from billing if using billing for shipping)
+            'shipping_country_id' => $data['use_billing_for_shipping'] ? $data['billing_country_id'] : $data['shipping_country_id'],
+            'shipping_state' => $data['use_billing_for_shipping'] ? $data['billing_state'] : $data['shipping_state'],
+            'shipping_city' => $data['use_billing_for_shipping'] ? $data['billing_city'] : $data['shipping_city'],
+            'shipping_address' => $data['use_billing_for_shipping'] ? $data['billing_address'] : $data['shipping_address'],
+            'shipping_building_number' => $data['use_billing_for_shipping'] ? $data['billing_building_number'] : $data['shipping_building_number'],
+
+            'use_billing_for_shipping' => $data['use_billing_for_shipping'],
+        ];
+
+        return Customer::create($customerData);
     }
 
     /**
@@ -465,16 +598,15 @@ DB::commit();
      */
     protected function createOrder(array $data, Customer $customer, ?User $user, bool $isGuest)
     {
-        $shippingAddress = $data['shipping_address'];
-        $billingAddress = $data['billing_address'];
+        // Debug: Log the data being received
+        Log::info('createOrder: Data received', [
+            'data' => $data,
+            'customer_id' => $customer->id,
+            'is_guest' => $isGuest
+        ]);
 
-        // If use billing for shipping is checked, copy billing address
-        if ($data['use_billing_for_shipping'] ?? false) {
-            $shippingAddress = $billingAddress;
-        }
-
-        // Get country and currency information
-        $country = Country::find($customer->country_id);
+        // Get country and currency information from billing country
+        $country = Country::find($data['billing_country_id']);
         $currencyCode = $country ? $country->currency_code : 'USD';
 
         // Convert prices to local currency
@@ -483,7 +615,7 @@ DB::commit();
         $shippingAmount = $this->currencyService->convertFromUSD($this->cartService->getShippingCost(), $currencyCode);
         $totalAmount = $this->currencyService->convertFromUSD($this->cartService->getTotal(), $currencyCode);
 
-        return Order::create([
+        $orderData = [
             'order_number' => $this->generateOrderNumber(),
             'guest_token' => $isGuest ? Str::random(32) : null,
             'user_id' => $user?->id,
@@ -492,9 +624,9 @@ DB::commit();
             'last_name' => $data['last_name'],
             'email' => $data['email'] ?? $user?->email,
             'phone_number' => $data['phone_number'] ?? $user?->phone,
-            'country_id' => $customer->country_id,
-            'state' => $customer->state,
-            'city' => $customer->city,
+            'country_id' => $data['billing_country_id'],
+            'state' => $data['billing_state'],
+            'city' => $data['billing_city'],
             'notes' => $data['notes'] ?? null,
             'coupon_id' => $data['coupon_id'] ?? null,
             'subtotal' => $subtotal,
@@ -507,10 +639,19 @@ DB::commit();
             'payment_status' => 'pending',
             'status' => 'pending',
             'is_guest' => $isGuest,
-            'loyalty_points_used' => 0,
-            'billing_address' => json_encode($billingAddress),
-            'shipping_address' => json_encode($shippingAddress),
+            'use_billing_for_shipping' => $data['use_billing_for_shipping'],
+            'billing_address' => $data['billing_address'],
+            'billing_building_number' => $data['billing_building_number'],
+            'shipping_address' => $data['use_billing_for_shipping'] ? $data['billing_address'] : $data['shipping_address'],
+            'shipping_building_number' => $data['use_billing_for_shipping'] ? $data['billing_building_number'] : $data['shipping_building_number'],
+        ];
+
+        // Debug: Log the order data being inserted
+        Log::info('createOrder: Order data to be inserted', [
+            'order_data' => $orderData
         ]);
+
+        return Order::create($orderData);
     }
 
     /**
@@ -593,7 +734,25 @@ DB::commit();
     protected function generateOrderNumber()
     {
         do {
-            $orderNumber = 'WF-' . date('Y') . '-' . strtoupper(Str::random(8));
+            // Add timestamp to ensure uniqueness
+            $timestamp = microtime(true);
+            $microseconds = sprintf("%06d", ($timestamp - floor($timestamp)) * 1000000);
+
+            // Add more randomness: current timestamp + microseconds + random string + user IP hash
+            $ipHash = substr(md5(request()->ip() . request()->userAgent()), 0, 8);
+            $randomString = strtoupper(Str::random(6));
+
+            $orderNumber = 'WF-' . date('Y-m-d-H-i-s') . '-' . $microseconds . '-' . $randomString . '-' . $ipHash;
+
+            // Log the generated order number for debugging
+            Log::info('Generated order number', [
+                'order_number' => $orderNumber,
+                'timestamp' => $timestamp,
+                'microseconds' => $microseconds,
+                'random_string' => $randomString,
+                'ip_hash' => $ipHash
+            ]);
+
         } while (Order::where('order_number', $orderNumber)->exists());
 
         return $orderNumber;
@@ -630,18 +789,169 @@ DB::commit();
      */
     public function debugForm(Request $request)
     {
+        Log::info('Debug form called', [
+            'method' => $request->method(),
+            'all_data' => $request->all(),
+            'payment_method' => $request->input('payment_method'),
+            'payment_method_type' => gettype($request->input('payment_method')),
+            'is_cod' => $request->input('payment_method') === 'cash_on_delivery',
+            'is_paymob' => $request->input('payment_method') === 'paymob',
+            'is_paypal' => $request->input('payment_method') === 'paypal',
+            'headers' => $request->headers->all()
+        ]);
+
         return response()->json([
             'method' => $request->method(),
             'all_data' => $request->all(),
             'shipping_address' => $request->input('shipping_address'),
             'billing_address' => $request->input('billing_address'),
             'payment_method' => $request->input('payment_method'),
+            'payment_method_type' => gettype($request->input('payment_method')),
+            'is_cod' => $request->input('payment_method') === 'cash_on_delivery',
+            'is_paymob' => $request->input('payment_method') === 'paymob',
+            'is_paypal' => $request->input('payment_method') === 'paypal',
             'email' => $request->input('email'),
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
             'phone_number' => $request->input('phone_number'),
             'headers' => $request->headers->all()
         ]);
+    }
+
+    /**
+     * Simple test to check COD behavior directly
+     */
+    public function testSimpleCod(Request $request)
+    {
+        Log::info('Simple COD test called');
+
+        $paymentMethod = 'cash_on_delivery';
+
+        // Test the exact condition we use in processCheckout
+        $isCod = ($paymentMethod === 'cash_on_delivery');
+
+        Log::info('Simple COD test', [
+            'payment_method' => $paymentMethod,
+            'is_cod' => $isCod,
+            'should_redirect_to_thank_you' => $isCod
+        ]);
+
+        if ($paymentMethod === 'cash_on_delivery') {
+            Log::info('Simple COD test: Redirecting to thank you page');
+            return redirect()->route('thankyou', ['order' => 999])
+                ->with('success', 'COD test successful! This proves COD redirection works.');
+        }
+
+        return response()->json(['error' => 'Should not reach here']);
+    }
+
+    /**
+     * Test COD payment specifically to debug redirection issue
+     */
+    public function testCodPayment(Request $request)
+    {
+        Log::info('Testing COD payment directly');
+
+        try {
+            // Create a minimal test data set for COD
+            $testData = [
+                'first_name' => 'Test',
+                'last_name' => 'User',
+                'email' => 'test@example.com',
+                'phone_number' => '1234567890',
+                'billing_country_id' => 1, // Assuming Egypt is ID 1
+                'billing_state' => 'Cairo',
+                'billing_city' => 'Cairo',
+                'billing_address' => '123 Test St',
+                'billing_building_number' => '1',
+                'shipping_country_id' => 1,
+                'shipping_state' => 'Cairo',
+                'shipping_city' => 'Cairo',
+                'shipping_address' => '123 Test St',
+                'shipping_building_number' => '1',
+                'use_billing_for_shipping' => true,
+                'payment_method' => 'cash_on_delivery',
+                'currency' => 'EGP'
+            ];
+
+            Log::info('Test COD: Creating fake cart');
+            // Add a test item to cart if empty
+            $cart = $this->cartService->getCart();
+            if ($cart->isEmpty()) {
+                Log::info('Test COD: Cart is empty, this would normally fail');
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cart is empty. Add items first.',
+                    'cart_count' => $cart->count()
+                ]);
+            }
+
+            Log::info('Test COD: Processing payment with data', $testData);
+
+            // Test the COD gateway directly
+            $gateway = app(\App\Payments\Gateways\CodGateway::class);
+            Log::info('Test COD: COD gateway created');
+
+            // Create a test payment record
+            $testPayment = new \App\Models\Payment([
+                'provider' => 'cash_on_delivery',
+                'status' => 'initiated',
+                'currency' => 'EGP',
+                'amount_minor' => 10000, // 100 EGP
+            ]);
+
+            // Create a test order
+            $testOrder = new \App\Models\Order([
+                'order_number' => 'TEST-' . time(),
+                'currency' => 'EGP',
+                'total_amount' => 100,
+                'payment_method' => 'cash_on_delivery'
+            ]);
+
+            Log::info('Test COD: Calling gateway initiate method');
+            $result = $gateway->initiate($testOrder, $testPayment);
+
+            Log::info('Test COD: Gateway result', [
+                'result' => $result,
+                'has_redirect_url' => !empty($result['redirect_url']),
+                'redirect_url' => $result['redirect_url'] ?? null
+            ]);
+
+            // Test the payment method check
+            $paymentMethod = $testData['payment_method'];
+            $isCod = ($paymentMethod === 'cash_on_delivery');
+
+            Log::info('Test COD: Payment method check', [
+                'payment_method' => $paymentMethod,
+                'is_cod' => $isCod,
+                'should_redirect' => !$isCod && !empty($result['redirect_url'])
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'test_data' => $testData,
+                'gateway_result' => $result,
+                'payment_method_check' => [
+                    'payment_method' => $paymentMethod,
+                    'is_cod' => $isCod,
+                    'should_redirect' => !$isCod && !empty($result['redirect_url']),
+                    'has_redirect_url' => !empty($result['redirect_url']),
+                    'redirect_url' => $result['redirect_url'] ?? null
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Test COD failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
     }
 
     /**

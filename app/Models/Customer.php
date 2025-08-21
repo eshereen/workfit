@@ -9,7 +9,7 @@ class Customer extends Model
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
     use HasFactory;
-    protected $fillable = ['user_id', 'email', 'first_name', 'last_name', 'phone', 'address', 'city', 'state', 'zip', 'country_id'];
+    protected $guarded = [];
 
     public function orders()
     {
@@ -24,6 +24,16 @@ class Customer extends Model
     public function country()
     {
         return $this->belongsTo(Country::class);
+    }
+
+    public function billingCountry()
+    {
+        return $this->belongsTo(Country::class, 'billing_country_id');
+    }
+
+    public function shippingCountry()
+    {
+        return $this->belongsTo(Country::class, 'shipping_country_id');
     }
 
 
