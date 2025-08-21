@@ -39,11 +39,11 @@ class Order extends Model
         'loyalty_points_used'
     ];
     protected $casts = [
-        'subtotal' => 'decimal:2',
-        'tax_amount' => 'decimal:2',
-        'shipping_amount' => 'decimal:2',
-        'discount_amount' => 'decimal:2',
-        'total_amount' => 'decimal:2',
+        'subtotal' => 'integer',
+        'tax_amount' => 'integer',
+        'shipping_amount' => 'integer',
+        'discount_amount' => 'integer',
+        'total_amount' => 'integer',
         'billing_address' => 'array',
         'shipping_address' => 'array',
     ];
@@ -56,6 +56,16 @@ class Order extends Model
       public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 
     public function items()

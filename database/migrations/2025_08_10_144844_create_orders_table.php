@@ -23,13 +23,13 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->string('email')->nullable(); // For guest orders
             $table->string('phone_number')->nullable(); // For guest orders
-            $table->decimal('subtotal', 10, 2);
-            $table->decimal('tax_amount', 10, 2)->default(0);
-            $table->decimal('shipping_amount', 10, 2)->default(0);
-            $table->decimal('discount_amount', 10, 2)->default(0);
-            $table->decimal('total_amount', 10, 2);
+            $table->integer('subtotal');
+            $table->integer('tax_amount')->default(0);
+            $table->integer('shipping_amount')->default(0);
+            $table->integer('discount_amount')->default(0);
+            $table->integer('total_amount');
             $table->string('currency', 3)->default('USD');
-            $table->enum('payment_method', ['paypal', 'paymob','cash_on_delivery'])->default('cash_on_delivery');
+            $table->string('payment_method');
 
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
             $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])->default('pending');

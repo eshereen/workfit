@@ -12,6 +12,9 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\Newsletter\VerifyController;
 use App\Http\Controllers\Newsletter\UnsubscribeController;
+use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\PaymentReturnController;
+use App\Http\Controllers\PayPalWebhookController;
 
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -39,13 +42,70 @@ Route::prefix('currency')->group(function () {
 
 // Checkout routes
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
+Route::post('/checkout', [CheckoutController::class, 'processAuthenticatedCheckout'])->name('checkout.process');
 Route::post('/checkout/guest', [CheckoutController::class, 'processGuestCheckout'])->name('checkout.guest');
-Route::post('/checkout/authenticated', [CheckoutController::class, 'processAuthenticatedCheckout'])->name('checkout.authenticated');
-Route::get('/checkout/currency', [CurrencyController::class, 'getCheckoutCurrency'])->name('checkout.currency');
+// Route::post('/checkout/currency', [CurrencyController::class, 'updateCheckoutCountry'])->name('checkout.currency.update'); // Removed for Livewire-only approach
 Route::get('/checkout/confirmation/{order}', [CheckoutController::class, 'orderConfirmation'])->name('checkout.confirmation');
 Route::get('/thank-you/{order}', [CheckoutController::class, 'thankYou'])->name('thankyou');
 Route::get('/checkout/test', [CheckoutController::class, 'testCheckout'])->name('checkout.test');
 Route::post('/checkout/debug', [CheckoutController::class, 'debugForm'])->name('checkout.debug');
+
+// PayPal credit card payment route
+Route::get('/checkout/paypal/credit-card/{payment}', [CheckoutController::class, 'showPayPalCreditCard'])->name('checkout.paypal.credit-card');
+Route::post('/checkout/paypal/credit-card/{payment}/capture', [CheckoutController::class, 'capturePayPalCreditCard'])->name('checkout.paypal.credit-card.capture');
+
+// PayPal webhook route
+Route::post('/paypal/webhook', [PayPalWebhookController::class, 'handleWebhook'])->name('paypal.webhook');
+
+// Debug route for PayPal gateway testing
+Route::get('/debug/paypal/{payment}', function(\App\Models\Payment $payment) {
+    try {
+        $gateway = app(\App\Payments\Gateways\PaypalGateway::class);
+
+        // Test access token
+        $tokenTest = $gateway->testAccessToken();
+
+        return response()->json([
+            'success' => true,
+            'payment_id' => $payment->id,
+            'payment_provider' => $payment->provider,
+            'payment_meta' => $payment->meta,
+            'token_test' => $tokenTest,
+            'gateway_class' => get_class($gateway)
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
+})->name('debug.paypal');
+
+// Debug route for payment methods
+Route::get('/debug/payment-methods/{countryCode}', function($countryCode) {
+    $resolver = app(\App\Services\PaymentMethodResolver::class);
+    $methods = $resolver->availableForCountry($countryCode);
+    $creditCardAvailable = $resolver->isCreditCardAvailableForCountry($countryCode);
+
+    return response()->json([
+        'country_code' => $countryCode,
+        'methods' => array_map(fn($m) => $m->value, $methods),
+        'credit_card_available' => $creditCardAvailable,
+        'session_country' => session('checkout_country')
+    ]);
+})->name('debug.payment-methods');
+
+// Payment webhooks
+Route::post('/payments/webhook/{gateway}', [\App\Http\Controllers\PaymentController::class, 'handleWebhook'])->name('webhook.gateway');
+
+// Payment return and cancel
+Route::get('/payments/return/{order}', [\App\Http\Controllers\PaymentController::class, 'handleReturn'])->name('payments.return');
+Route::get('/payments/cancel/{order}', [\App\Http\Controllers\PaymentController::class, 'handleCancel'])->name('payments.cancel');
+
+
+
+
 
 //cart
 Route::prefix('cart')->group(function () {
@@ -58,6 +118,8 @@ Route::prefix('cart')->group(function () {
 });
 Route::get('/newsletter/verify', VerifyController::class)->name('newsletter.verify');
 Route::get('/newsletter/unsubscribe', UnsubscribeController::class)->name('newsletter.unsubscribe');
+Route::get('/terms', [FrontendController::class, 'terms'])->name('terms');
+Route::get('/privacy', [FrontendController::class, 'privacy'])->name('privacy');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

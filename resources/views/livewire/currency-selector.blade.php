@@ -1,11 +1,23 @@
-<div class="relative" x-data="{ open: false }"
-     x-init="$watch('open', value => $wire.set('showDropdown', value))"
+<div class="relative currency-selector" x-data="{ open: false }"
+          x-init="$watch('open', value => $wire?.set('showDropdown', value))"
      @currency-changed.window="open = false"
-     wire:key="currency-selector">
+     wire:key="{{ $this->getId() }}"
+     data-component-id="{{ $this->getId() }}"
+     data-component-name="currency-selector">
+
+            @if(config('app.debug'))
+        <div class="text-xs text-gray-500 mb-1">
+            <div>Currency: {{ $currentCurrency }} ({{ $currentSymbol }})</div>
+            <div class="mt-1">
+                <button wire:click="changeCurrency('EUR')" class="px-2 py-1 bg-blue-500 text-white text-xs rounded mr-1">Test EUR (wire:click)</button>
+                <button onclick="alert('Plain click works!')" class="px-2 py-1 bg-gray-500 text-white text-xs rounded">Test Click</button>
+            </div>
+        </div>
+    @endif
 
     <button @click="open = !open"
             class="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors">
-        <!--<span class="text-lg">{{ $currentSymbol }}</span>-->
+        <span class="text-lg">{{ $currentSymbol }}</span>
         <span class="hidden sm:inline">{{ $currentCurrency }}</span>
         <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -36,7 +48,7 @@
             @endif
 
             <!-- Currency options -->
-            <button type="button" onclick="changeCurrency('USD')" @click="open = false"
+            <button type="button" onclick="changeCurrencyManual('USD')" @click="open = false"
                     class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'USD' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                 <div class="flex items-center justify-between">
                     <span class="flex items-center">
@@ -51,7 +63,7 @@
                 </div>
             </button>
 
-            <button type="button" onclick="changeCurrency('EGP')" @click="open = false"
+            <button type="button" onclick="changeCurrencyManual('EGP')" @click="open = false"
                     class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'EGP' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                 <div class="flex items-center justify-between">
                     <span class="flex items-center">
@@ -66,7 +78,7 @@
                 </div>
             </button>
 
-            <button type="button" onclick="changeCurrency('EUR')" @click="open = false"
+            <button type="button" onclick="changeCurrencyManual('EUR')" @click="open = false"
                     class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'EUR' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                 <div class="flex items-center justify-between">
                     <span class="flex items-center">
@@ -81,7 +93,7 @@
                 </div>
             </button>
 
-            <button type="button" onclick="changeCurrency('GBP')" @click="open = false"
+            <button type="button" onclick="changeCurrencyManual('GBP')" @click="open = false"
                     class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'GBP' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                 <div class="flex items-center justify-between">
                     <span class="flex items-center">
@@ -96,7 +108,7 @@
                 </div>
             </button>
 
-            <button type="button" onclick="changeCurrency('AED')" @click="open = false"
+            <button type="button" onclick="changeCurrencyManual('AED')" @click="open = false"
                     class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'AED' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                 <div class="flex items-center justify-between">
                     <span class="flex items-center">
@@ -111,7 +123,7 @@
                 </div>
             </button>
 
-            <button type="button" onclick="changeCurrency('SAR')" @click="open = false"
+            <button type="button" onclick="changeCurrencyManual('SAR')" @click="open = false"
                     class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'SAR' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                 <div class="flex items-center justify-between">
                     <span class="flex items-center">
@@ -126,7 +138,22 @@
                 </div>
             </button>
 
-            <button type="button" onclick="changeCurrency('CAD')" @click="open = false"
+            <button type="button" onclick="changeCurrencyManual('AUD')" @click="open = false"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'AUD' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
+                <div class="flex items-center justify-between">
+                    <span class="flex items-center">
+                        <span class="text-lg mr-2">A$</span>
+                        <span>AUD - Australian Dollar</span>
+                    </span>
+                    @if($currentCurrency === 'AUD')
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    @endif
+                </div>
+            </button>
+
+            <button type="button" onclick="changeCurrencyManual('CAD')" @click="open = false"
                     class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'CAD' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                 <div class="flex items-center justify-between">
                     <span class="flex items-center">
@@ -134,6 +161,36 @@
                         <span>CAD - Canadian Dollar</span>
                     </span>
                     @if($currentCurrency === 'CAD')
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    @endif
+                </div>
+            </button>
+
+            <button type="button" onclick="changeCurrencyManual('JPY')" @click="open = false"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'JPY' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
+                <div class="flex items-center justify-between">
+                    <span class="flex items-center">
+                        <span class="text-lg mr-2">¥</span>
+                        <span>JPY - Japanese Yen</span>
+                    </span>
+                    @if($currentCurrency === 'JPY')
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    @endif
+                </div>
+            </button>
+
+            <button type="button" onclick="changeCurrencyManual('CHF')" @click="open = false"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === 'CHF' ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
+                <div class="flex items-center justify-between">
+                    <span class="flex items-center">
+                        <span class="text-lg mr-2">CHF</span>
+                        <span>CHF - Swiss Franc</span>
+                    </span>
+                    @if($currentCurrency === 'CHF')
                         <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
@@ -161,26 +218,125 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Make functions globally available
-    window.changeCurrency = function(currencyCode) {
-        console.log('Changing currency to:', currencyCode);
+    // Listen for Livewire events from other components
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('currency-changed', (data) => {
+            console.log('💱 CurrencySelector: Received currency-changed event:', data);
+        });
 
-        // Get CSRF token from meta tag
-        const tokenElement = document.querySelector('meta[name="csrf-token"]');
-        if (!tokenElement) {
-            console.error('CSRF token meta tag not found');
-            // Fallback: reload page anyway
-            setTimeout(() => {
-                window.location.reload(true);
-            }, 1000);
+        Livewire.on('country-changed', (data) => {
+            console.log('🌍 CurrencySelector: Received country-changed event:', data);
+        });
+    });
+
+    // Also listen for global Livewire events
+    window.addEventListener('currency-changed', function(event) {
+        console.log('💱 Global currency-changed event:', event.detail);
+    });
+
+    window.addEventListener('country-changed', function(event) {
+        console.log('🌍 Global country-changed event:', event.detail);
+    });
+
+    // Listen for custom currency update event
+    window.addEventListener('currency-updated', function(event) {
+        console.log('💱 Custom currency-updated event received:', event.detail);
+        const { currency, symbol } = event.detail;
+
+        // Try to call Livewire method directly on CurrencySelector only
+        if (window.Livewire) {
+            const currencySelector = document.querySelector('.currency-selector[wire\\:id]');
+            if (currencySelector) {
+                const wireId = currencySelector.getAttribute('wire:id');
+                console.log('🎯 Found currency selector component, calling updateToCurrency');
+                try {
+                    const livewireComponent = window.Livewire.find(wireId);
+                    if (livewireComponent && livewireComponent.call) {
+                        livewireComponent.call('updateToCurrency', currency);
+                    }
+                } catch (e) {
+                    console.error('Error calling CurrencySelector method:', e);
+                }
+            }
+        }
+    });
+
+    // Listen for browser events from CheckoutForm
+    window.addEventListener('livewire-currency-changed', function(event) {
+        console.log('🌐 Browser livewire-currency-changed event received:', event.detail);
+        const { currency, symbol } = event.detail;
+
+        if (window.Livewire) {
+            const currencySelector = document.querySelector('.currency-selector[wire\\:id]');
+            if (currencySelector) {
+                const wireId = currencySelector.getAttribute('wire:id');
+                console.log('🎯 Updating currency selector from browser event');
+                try {
+                    const livewireComponent = window.Livewire.find(wireId);
+                    if (livewireComponent) {
+                        livewireComponent.call('updateToCurrency', currency);
+                        livewireComponent.$refresh();
+                    }
+                } catch (e) {
+                    console.error('Error calling CurrencySelector from browser event:', e);
+                }
+            }
+        }
+    });
+
+    window.addEventListener('livewire-country-changed', function(event) {
+        console.log('🌍 Browser livewire-country-changed event received:', event.detail);
+        const { countryCode, currency } = event.detail;
+
+        if (window.Livewire) {
+            const currencySelector = document.querySelector('.currency-selector[wire\\:id]');
+            if (currencySelector) {
+                const wireId = currencySelector.getAttribute('wire:id');
+                console.log('🎯 Updating currency selector from country change');
+                try {
+                    const livewireComponent = window.Livewire.find(wireId);
+                    if (livewireComponent) {
+                        livewireComponent.call('handleCountryChanged', countryCode);
+                    }
+                } catch (e) {
+                    console.error('Error calling CurrencySelector from country event:', e);
+                }
+            }
+        }
+    });
+
+    // Global test function for currency update
+    window.testCurrencyFromConsole = function(currency = 'AUD') {
+        console.log('🧪 Testing currency update from console to:', currency);
+
+        const currencySelector = document.querySelector('.currency-selector[wire\\:id]');
+        if (currencySelector && window.Livewire) {
+            const wireId = currencySelector.getAttribute('wire:id');
+            const component = window.Livewire.find(wireId);
+            if (component) {
+                console.log('📞 Calling updateToCurrency on currency selector');
+                component.call('updateToCurrency', currency);
+            } else {
+                console.error('❌ Currency component not found');
+            }
+        } else {
+            console.error('❌ Currency selector element not found');
+        }
+    };
+
+        // Simple JavaScript function to change currency (bypassing Livewire frontend issues)
+    window.changeCurrencyManual = function(currencyCode) {
+        console.log('🔄 Manual currency change to:', currencyCode);
+
+        // Get CSRF token
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (!token) {
+            console.error('❌ CSRF token not found');
             return;
         }
 
-        const token = tokenElement.getAttribute('content');
-        console.log('CSRF token found:', token ? 'Yes' : 'No');
-
-        // Make AJAX request to change currency
-        fetch('{{ route("currency.change") }}', {
+        // Make AJAX call to Laravel route
+        fetch('/currency/change', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -191,88 +347,83 @@ document.addEventListener('DOMContentLoaded', function() {
                 currency: currencyCode
             })
         })
-        .then(response => {
-            console.log('Response status:', response.status);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log('Response data:', data);
+            console.log('✅ Currency change response:', data);
             if (data.success) {
-                console.log('Currency changed to:', currencyCode);
-                // Reload page after 1 second to show new currency
+                // Show success notification
+                if (window.showNotification) {
+                    window.showNotification(`Currency changed to ${currencyCode}`, 'success');
+                }
+                                                // Try Livewire refresh first, fallback to page reload
                 setTimeout(() => {
-                    window.location.reload(true);
-                }, 1000);
+                    console.log('🔄 Refreshing Livewire components...');
+
+                    let refreshSuccess = false;
+
+                    if (window.Livewire) {
+                        try {
+                            // List all Livewire components for debugging
+                            console.log('🔍 All Livewire components:', window.Livewire.all());
+
+                            // Try to refresh all components
+                            const components = window.Livewire.all();
+                            if (components.length > 0) {
+                                                                console.log(`🔄 Attempting to refresh ${components.length} Livewire components...`);
+                                components.forEach((component, index) => {
+                                    try {
+                                        console.log(`📍 Refreshing component ${index}:`, component.el.className || component.el.tagName);
+                                        component.$refresh();
+                                        refreshSuccess = true;
+                                    } catch (e) {
+                                        console.error(`❌ Error refreshing component ${index}:`, e);
+                                    }
+                                });
+
+                                if (refreshSuccess) {
+                                    console.log('✅ Livewire components refreshed successfully');
+
+                                    // Wait a moment for components to refresh, then verify
+                                    setTimeout(() => {
+                                        console.log('🔍 Verifying refresh - checking navbar currency...');
+                                        const navbarCurrency = document.querySelector('.currency-selector .text-lg');
+                                        if (navbarCurrency) {
+                                            console.log('📍 Navbar currency element:', navbarCurrency.textContent);
+                                        }
+                                    }, 500);
+
+                                    return; // Exit early if refresh worked
+                                }
+                            }
+                        } catch (e) {
+                            console.error('❌ Error with Livewire refresh:', e);
+                        }
+                    }
+
+                    // Fallback: reload page if Livewire refresh didn't work
+                    if (!refreshSuccess) {
+                        console.log('⚠️ Livewire refresh failed, falling back to page reload');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 300);
+                    }
+                }, 200);
             } else {
-                console.error('Failed to change currency:', data.message);
-                // Fallback: reload page anyway
-                setTimeout(() => {
-                    window.location.reload(true);
-                }, 1000);
+                console.error('❌ Currency change failed:', data.message);
             }
         })
         .catch(error => {
-            console.error('Error changing currency:', error);
-            // Fallback: reload page anyway
-            setTimeout(() => {
-                window.location.reload(true);
-            }, 1000);
+            console.error('❌ Error changing currency:', error);
         });
     };
 
+    console.log('💱 CurrencySelector: Using manual AJAX approach');
+
+    // Reset function - simplified for Alpine.js approach
     window.resetToDetected = function() {
-        console.log('Resetting to detected currency');
-
-        // Get CSRF token from meta tag
-        const tokenElement = document.querySelector('meta[name="csrf-token"]');
-        if (!tokenElement) {
-            console.error('CSRF token meta tag not found');
-            // Fallback: reload page anyway
-            setTimeout(() => {
+        console.log('🔄 Resetting to detected currency (Alpine.js approach)');
+        // Reload page as simple fallback - can be enhanced with Livewire method later
                 window.location.reload(true);
-            }, 1000);
-            return;
-        }
-
-        const token = tokenElement.getAttribute('content');
-        console.log('CSRF token found:', token ? 'Yes' : 'No');
-
-        // Make AJAX request to reset currency
-        fetch('{{ route("currency.reset") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': token,
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            console.log('Response status:', response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Response data:', data);
-            if (data.success) {
-                console.log('Currency reset to detected');
-                // Reload page after 1 second to show new currency
-                setTimeout(() => {
-                    window.location.reload(true);
-                }, 300);
-            } else {
-                console.error('Failed to reset currency:', data.message);
-                // Fallback: reload page anyway
-                setTimeout(() => {
-                    window.location.reload(true);
-                }, 300);
-            }
-        })
-        .catch(error => {
-            console.error('Error resetting currency:', error);
-            // Fallback: reload page anyway
-            setTimeout(() => {
-                window.location.reload(true);
-            }, 300);
-        });
     };
 });
 </script>

@@ -8,22 +8,34 @@ use App\Models\Country;
 use App\Models\Customer;
 use App\Events\OrderPlaced;
 use Illuminate\Support\Str;
+use App\Enums\PaymentMethod;
 use Illuminate\Http\Request;
 use App\Services\CartService;
+use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Services\PaymentMethodResolver;
 use App\Services\CountryCurrencyService;
+use App\Models\Payment;
 
 class CheckoutController extends Controller
 {
     protected $cartService;
     protected $currencyService;
+    protected $paymentService;
+    protected $methodResolver;
 
-    public function __construct(CartService $cartService, CountryCurrencyService $currencyService)
-    {
+    public function __construct(
+        CartService $cartService,
+        CountryCurrencyService $currencyService,
+        PaymentService $paymentService,
+        PaymentMethodResolver $methodResolver
+    ) {
         $this->cartService = $cartService;
         $this->currencyService = $currencyService;
+        $this->paymentService = $paymentService;
+        $this->methodResolver = $methodResolver;
     }
 
     /**
@@ -42,6 +54,14 @@ class CheckoutController extends Controller
 
         // Get current currency preference (IP detection + user override)
         $currencyInfo = $this->currencyService->getCurrentCurrencyInfo();
+
+        // Set country in session for payment method selection
+        if (request()->has('country_id')) {
+            $country = Country::find(request('country_id'));
+            if ($country) {
+                session(['checkout_country' => $country->code]);
+            }
+        }
 
         // Get base prices in USD
         $baseSubtotal = $this->cartService->getSubtotal();
@@ -78,6 +98,7 @@ class CheckoutController extends Controller
             'shipping_address' => 'required|array',
             'billing_address' => 'required|array',
             'payment_method' => 'required|string|in:paypal,paymob,cash_on_delivery',
+            'paypal_payment_type' => 'nullable|string|in:paypal_account,credit_card',
             'notes' => 'nullable|string|max:500',
             'coupon_id' => 'nullable|integer|exists:coupons,id',
             'coupon_discount' => 'nullable|numeric|min:0',
@@ -123,13 +144,59 @@ class CheckoutController extends Controller
             $this->createOrderItems($order, $cart);
             Log::info('Order items created successfully');
 
-            // Clear cart
-            $this->cartService->clearCart();
 
-            DB::commit();
+            // Check availability for the selected country
+$country = Country::find($order->country_id);
+$available = $this->methodResolver->availableForCountry($country->code ?? 'EG'); // ensure you store ISO code
+if (!in_array(PaymentMethod::from($validated['payment_method']), $available, true)) {
+    throw new \Exception('Selected payment method is not available in your country.');
+}
 
+// Initiate payment
+$returnUrl = route('payments.return', ['order' => $order->id]);
+$cancelUrl = route('payments.cancel', ['order' => $order->id]);
+
+            // Determine payment type for PayPal
+            $paymentType = 'paypal_account'; // default
+            if ($validated['payment_method'] === 'paypal' && isset($validated['paypal_payment_type'])) {
+                $paymentType = $validated['paypal_payment_type'];
+            }
+
+            Log::info('PayPal payment type determined', [
+                'payment_method' => $validated['payment_method'],
+                'paypal_payment_type' => $validated['paypal_payment_type'] ?? 'not set',
+                'final_payment_type' => $paymentType,
+                'use_credit_card' => ($paymentType === 'credit_card')
+            ]);
+
+            $result = $this->paymentService->createPayment(
+    $order,
+    PaymentMethod::from($validated['payment_method']),
+    $returnUrl,
+    $cancelUrl,
+    $paymentType
+);
+
+// Create order items AFTER payment row created (your current placement is fine)
+$this->createOrderItems($order, $cart);
+
+// Clear cart
+$this->cartService->clearCart();
+DB::commit();
+
+            // Redirect if gateway needs it (Paymob redirect)
+            if (!empty($result['redirect_url'])) {
+                return redirect()->away($result['redirect_url']);
+            }
+
+            // For PayPal credit card payments, redirect to our custom page
+            if (isset($result['requires_frontend_processing']) && $result['requires_frontend_processing']) {
+                return redirect()->to($result['redirect_url']);
+            }
+
+            // For other payment methods, redirect to thank you page
             return redirect()->route('thankyou', ['order' => $order->id])
-                           ->with('success', 'Order placed successfully!');
+                ->with('success', 'Order placed successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -168,7 +235,8 @@ class CheckoutController extends Controller
             'billing_address.state' => 'nullable|string|max:255',
             'billing_address.postal_code' => 'nullable|string|max:20',
             'billing_address.country' => 'required|string|max:255',
-            'payment_method' => 'required|string|in:paypal,paymob,cash_on_delivery',
+           'payment_method' => 'required|string|in:paypal,paymob,cash_on_delivery',
+            'paypal_payment_type' => 'nullable|string|in:paypal_account,credit_card',
             'notes' => 'nullable|string|max:500',
             'coupon_id' => 'nullable|integer|exists:coupons,id',
             'coupon_discount' => 'nullable|numeric|min:0',
@@ -213,12 +281,64 @@ class CheckoutController extends Controller
             Log::info('Order items created successfully');
 
             // Clear cart
-            $this->cartService->clearCart();
+          // Check availability for the selected country
+$country = Country::find($order->country_id);
+$available = $this->methodResolver->availableForCountry($country->code ?? 'EG'); // ensure you store ISO code
+if (!in_array(PaymentMethod::from($validated['payment_method']), $available, true)) {
+    throw new \Exception('Selected payment method is not available in your country.');
+}
 
-            DB::commit();
+// Initiate payment
+$returnUrl = route('payments.return', ['order' => $order->id]);
+$cancelUrl = route('payments.cancel', ['order' => $order->id]);
 
+// Determine payment type for PayPal
+$paymentType = 'paypal_account'; // default
+if ($validated['payment_method'] === 'paypal' && isset($validated['paypal_payment_type'])) {
+    $paymentType = $validated['paypal_payment_type'];
+}
+
+Log::info('PayPal payment type determined (guest)', [
+    'payment_method' => $validated['payment_method'],
+    'paypal_payment_type' => $validated['paypal_payment_type'] ?? 'not set',
+    'final_payment_type' => $paymentType,
+    'use_credit_card' => ($paymentType === 'credit_card')
+]);
+
+// For credit card payments, don't set a return URL since they don't redirect back from PayPal
+if ($paymentType === 'credit_card') {
+    $returnUrl = null;
+}
+
+$result = $this->paymentService->createPayment(
+    $order,
+    PaymentMethod::from($validated['payment_method']),
+    $returnUrl,
+    $cancelUrl,
+    $paymentType
+);
+
+// Create order items AFTER payment row created (your current placement is fine)
+
+
+// Clear cart
+$this->cartService->clearCart();
+DB::commit();
+
+            // Redirect if gateway needs it (Paymob redirect)
+            if (!empty($result['redirect_url'])) {
+                return redirect()->away($result['redirect_url']);
+            }
+
+            // For PayPal credit card payments, redirect to our custom page
+            if (isset($result['requires_frontend_processing']) && $result['requires_frontend_processing']) {
+                return redirect()->to($result['redirect_url']);
+            }
+
+            // For other payment methods, redirect to thank you page
             return redirect()->route('thankyou', ['order' => $order->id])
-                           ->with('success', 'Order placed successfully!');
+                ->with('success', 'Order placed successfully!');
+
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -234,6 +354,35 @@ class CheckoutController extends Controller
      */
     protected function createOrUpdateCustomer(User $user, array $data)
     {
+        // Get country from shipping address
+        $country = null;
+        $countryData = $data['shipping_address']['country'] ?? null;
+
+        if ($countryData) {
+            // First, try to find by ID if it's numeric
+            if (is_numeric($countryData)) {
+                $country = Country::find($countryData);
+            }
+
+            // If not found by ID, try to find by name
+            if (!$country) {
+                $country = Country::where('name', 'LIKE', $countryData)->first();
+
+                if (!$country) {
+                    // Try to find by partial match
+                    $country = Country::where('name', 'LIKE', '%' . $countryData . '%')->first();
+                }
+            }
+        }
+
+        if (!$country) {
+            // Default to user's existing country or Egypt
+            $existingCustomer = Customer::where('user_id', $user->id)->first();
+            $countryId = $existingCustomer?->country_id ?? 1; // Default to first country (usually Egypt)
+        } else {
+            $countryId = $country->id;
+        }
+
         $customer = Customer::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -241,9 +390,9 @@ class CheckoutController extends Controller
                 'first_name' => $user->first_name ?? $data['first_name'] ?? null,
                 'last_name' => $user->last_name ?? $data['last_name'] ?? null,
                 'phone' => $data['phone_number'] ?? $user->phone ?? null,
-                'country_id' => $data['country_id'],
-                'state' => $data['state'] ?? null,
-                'city' => $data['city'] ?? null,
+                'country_id' => $countryId,
+                'state' => $data['shipping_address']['state'] ?? null,
+                'city' => $data['shipping_address']['city'] ?? null,
                 'address' => $data['shipping_address']['address'] ?? null,
                 //'zip' => $data['shipping_address']['postal_code'] ?? null,
             ]
@@ -258,24 +407,39 @@ class CheckoutController extends Controller
     protected function createGuestCustomer(array $data)
     {
         Log::info('Creating guest customer', [
-            'country_name' => $data['shipping_address']['country'] ?? 'not set',
+            'country_data' => $data['shipping_address']['country'] ?? 'not set',
             'shipping_address' => $data['shipping_address']
         ]);
 
-        // Find country by name (case insensitive)
-        $country = Country::where('name', 'LIKE', $data['shipping_address']['country'])->first();
+        $country = null;
+        $countryData = $data['shipping_address']['country'];
 
+        // First, try to find by ID if it's numeric
+        if (is_numeric($countryData)) {
+            $country = Country::find($countryData);
+            Log::info('Looking for country by ID', ['country_id' => $countryData, 'found' => $country ? 'yes' : 'no']);
+        }
+
+        // If not found by ID, try to find by name
         if (!$country) {
-            // Try to find by partial match
-            $country = Country::where('name', 'LIKE', '%' . $data['shipping_address']['country'] . '%')->first();
+            // Find country by name (case insensitive)
+            $country = Country::where('name', 'LIKE', $countryData)->first();
+
+            if (!$country) {
+                // Try to find by partial match
+                $country = Country::where('name', 'LIKE', '%' . $countryData . '%')->first();
+            }
+
+            Log::info('Looking for country by name', ['country_name' => $countryData, 'found' => $country ? 'yes' : 'no']);
         }
 
         if (!$country) {
             Log::error('Country not found', [
-                'requested_country' => $data['shipping_address']['country'],
+                'requested_country' => $countryData,
+                'type' => is_numeric($countryData) ? 'ID' : 'Name',
                 'available_countries' => Country::pluck('name')->toArray()
             ]);
-            throw new \Exception('Selected country "' . $data['shipping_address']['country'] . '" not found. Available countries: ' . implode(', ', Country::pluck('name')->toArray()));
+            throw new \Exception('Selected country "' . $countryData . '" not found. Available countries: ' . implode(', ', Country::pluck('name')->toArray()));
         }
 
         Log::info('Country found', [
@@ -621,4 +785,132 @@ class CheckoutController extends Controller
 
         return view('checkout.thank-you', compact('order', 'currencyInfo'));
     }
+
+
+
+    /**
+     * Show PayPal credit card payment page
+     */
+    public function showPayPalCreditCard(Payment $payment)
+    {
+        // Verify this is a PayPal credit card payment
+        if ($payment->provider !== 'paypal' ||
+            ($payment->meta['payment_type'] ?? '') !== 'credit_card') {
+            abort(404);
+        }
+
+        $order = $payment->order;
+
+        return view('checkout.paypal-credit-card', compact('payment', 'order'));
+    }
+
+    /**
+     * Capture PayPal credit card payment
+     */
+    public function capturePayPalCreditCard(Request $request, Payment $payment)
+    {
+        Log::info('PayPal credit card capture initiated', [
+            'payment_id' => $payment->id,
+            'order_id' => $payment->order_id,
+            'provider' => $payment->provider,
+            'payment_type' => $payment->meta['payment_type'] ?? 'unknown',
+            'request_data' => $request->all()
+        ]);
+
+        // Verify this is a PayPal credit card payment
+        if ($payment->provider !== 'paypal' ||
+            ($payment->meta['payment_type'] ?? '') !== 'credit_card') {
+            Log::error('Invalid payment type for capture', [
+                'payment_id' => $payment->id,
+                'provider' => $payment->provider,
+                'payment_type' => $payment->meta['payment_type'] ?? 'unknown'
+            ]);
+            abort(404, 'Invalid payment type');
+        }
+
+        $validated = $request->validate([
+            'paypal_order_id' => 'required|string',
+        ]);
+
+        Log::info('PayPal order ID validated', [
+            'payment_id' => $payment->id,
+            'paypal_order_id' => $validated['paypal_order_id']
+        ]);
+
+        try {
+            // Update payment with PayPal order ID
+            $payment->update([
+                'meta' => array_merge($payment->meta ?? [], [
+                    'paypal_order_id' => $validated['paypal_order_id'],
+                    'capture_attempted_at' => now()->toISOString()
+                ])
+            ]);
+
+            Log::info('Payment meta updated with PayPal order ID', [
+                'payment_id' => $payment->id,
+                'paypal_order_id' => $validated['paypal_order_id']
+            ]);
+
+            // Capture the payment using PayPal gateway
+            $gateway = app(\App\Payments\Gateways\PaypalGateway::class);
+            Log::info('PayPal gateway instance created', [
+                'payment_id' => $payment->id,
+                'gateway_class' => get_class($gateway)
+            ]);
+
+            $result = $gateway->captureOrder($payment, $validated['paypal_order_id']);
+
+            Log::info('PayPal gateway capture result', [
+                'payment_id' => $payment->id,
+                'result' => $result
+            ]);
+
+            if ($result['success']) {
+                // Update payment status
+                $payment->update([
+                    'status' => 'completed',
+                    'meta' => array_merge($payment->meta ?? [], [
+                        'capture_completed_at' => now()->toISOString(),
+                        'capture_result' => $result
+                    ])
+                ]);
+
+                Log::info('Payment completed successfully', [
+                    'payment_id' => $payment->id,
+                    'order_id' => $payment->order_id,
+                    'status' => 'completed'
+                ]);
+
+                // Redirect to thank you page
+                return redirect()->route('thankyou', ['order' => $payment->order_id])
+                    ->with('success', 'Payment completed successfully!');
+            } else {
+                Log::error('PayPal capture failed', [
+                    'payment_id' => $payment->id,
+                    'error_message' => $result['message'] ?? 'Unknown error',
+                    'result' => $result
+                ]);
+
+                return back()->with('error', 'Payment failed: ' . ($result['message'] ?? 'Unknown error'));
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error capturing PayPal credit card payment', [
+                'payment_id' => $payment->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Update payment with error information
+            $payment->update([
+                'meta' => array_merge($payment->meta ?? [], [
+                    'capture_error' => $e->getMessage(),
+                    'capture_error_at' => now()->toISOString()
+                ])
+            ]);
+
+            return back()->with('error', 'An error occurred while processing your payment: ' . $e->getMessage());
+        }
+    }
+
 }

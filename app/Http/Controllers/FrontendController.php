@@ -25,4 +25,16 @@ class FrontendController extends Controller
    }
 
 
+   public function terms()
+   {
+       return view(view: 'terms');
+   }
+
+
+   public function privacy()
+   {
+       return view(view: 'privacy');
+   }
+
+
 }

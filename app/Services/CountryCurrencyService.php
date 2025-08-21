@@ -217,6 +217,12 @@ class CountryCurrencyService
         return $country ? $country->currency_code : 'USD';
     }
 
+    public function getCountryCurrencyByCode($countryCode)
+    {
+        $country = \App\Models\Country::where('code', $countryCode)->first();
+        return $country ? $country->currency_code : 'USD';
+    }
+
     public function convertCartToCurrency($cartData, $countryId = null)
     {
         if ($countryId) {

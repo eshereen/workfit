@@ -1,4 +1,7 @@
-<div class="bg-white rounded-lg shadow-md p-6">
+<!-- Payment methods are now handled by the main checkout-form component -->
+
+<!-- Fallback Payment Methods (if Livewire fails) -->
+<div class="bg-white rounded-lg shadow-md p-6 mt-6" id="fallback-payment-methods" style="display: none;">
     <h2 class="text-xl font-semibold text-gray-900 mb-6">Payment Method</h2>
 
     <div class="space-y-4">
@@ -72,3 +75,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Check if Livewire component loaded successfully, if not show fallback
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            const livewireComponent = document.querySelector('[wire\\:id]');
+            const fallbackMethods = document.getElementById('fallback-payment-methods');
+
+            if (!livewireComponent && fallbackMethods) {
+                fallbackMethods.style.display = 'block';
+                console.log('Livewire component not found, showing fallback payment methods');
+            }
+        }, 2000); // Wait 2 seconds for Livewire to load
+    });
+</script>
