@@ -2,7 +2,7 @@
 return [
     'rules' => [
         'purchase' => [
-            'points' => 1,
+            'points_per_dollar' => 1, // 1 point per $1
             'description' => 'Earned from purchase',
         ],
         'signup' => [
@@ -15,6 +15,7 @@ return [
         ],
     ],
     'redemption' => [
-        'ratio' => 100,
+        'ratio' => 100, // 100 points = $1
+        'minimum_redemption' => 100, // Minimum points to redeem
     ],
 ];

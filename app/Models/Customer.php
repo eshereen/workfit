@@ -41,4 +41,12 @@ class Customer extends Model
     {
         return $this->first_name . ' ' . $this->last_name;
     }
+
+    public function getLoyaltyPointsAttribute()
+    {
+        if ($this->user) {
+            return $this->user->loyaltyBalance();
+        }
+        return 0;
+    }
 }

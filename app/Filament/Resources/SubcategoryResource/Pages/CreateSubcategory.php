@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\SubcategoryResource\Pages;
+namespace App\Filament\Resources\SubCategoryResource\Pages;
 
-use App\Filament\Resources\SubcategoryResource;
+use App\Filament\Resources\SubCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateSubcategory extends CreateRecord
+class CreateSubCategory extends CreateRecord
 {
-    protected static string $resource = SubcategoryResource::class;
+    protected static string $resource = SubCategoryResource::class;
 }

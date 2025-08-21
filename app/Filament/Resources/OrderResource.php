@@ -26,25 +26,41 @@ class OrderResource extends Resource
                 Forms\Components\TextInput::make('order_number')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('customer_id')
-                    ->numeric(),
                 Forms\Components\TextInput::make('user_id')
                     ->numeric(),
+                Forms\Components\TextInput::make('customer_id')
+                    ->numeric(),
+                Forms\Components\TextInput::make('first_name')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('last_name')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('country_id')
+                    ->numeric(),
+                Forms\Components\TextInput::make('state')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('city')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('email')
+                    ->email()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('phone_number')
+                    ->tel()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('subtotal')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('tax_amount')
                     ->required()
                     ->numeric()
-                    ->default(0.00),
+                    ->default(0),
                 Forms\Components\TextInput::make('shipping_amount')
                     ->required()
                     ->numeric()
-                    ->default(0.00),
+                    ->default(0),
                 Forms\Components\TextInput::make('discount_amount')
                     ->required()
                     ->numeric()
-                    ->default(0.00),
+                    ->default(0),
                 Forms\Components\TextInput::make('total_amount')
                     ->required()
                     ->numeric(),
@@ -52,22 +68,33 @@ class OrderResource extends Resource
                     ->required()
                     ->maxLength(3)
                     ->default('USD'),
+                Forms\Components\TextInput::make('billing_address')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('billing_building_number')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('shipping_address')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('shipping_building_number')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Toggle::make('use_billing_for_shipping')
+                    ->required(),
+                Forms\Components\Textarea::make('notes')
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('coupon_id')
+                    ->numeric(),
+                Forms\Components\Toggle::make('is_guest')
+                    ->required(),
+                Forms\Components\TextInput::make('payment_method')
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('payment_status')
                     ->required(),
                 Forms\Components\TextInput::make('status')
                     ->required(),
-                Forms\Components\TextInput::make('billing_address'),
-                Forms\Components\TextInput::make('shipping_address'),
-                Forms\Components\TextInput::make('coupon_code')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('notes')
-                    ->columnSpanFull(),
-                Forms\Components\Toggle::make('is_guest')
-                    ->required(),
-                Forms\Components\TextInput::make('loyalty_points_used')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
             ]);
     }
 
@@ -77,12 +104,27 @@ class OrderResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('order_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customer_id')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('customer_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('first_name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('last_name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('country_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('state')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('city')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('phone_number')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('subtotal')
                     ->numeric()
                     ->sortable(),
@@ -100,15 +142,25 @@ class OrderResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('currency')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('payment_status'),
-                Tables\Columns\TextColumn::make('status'),
-                Tables\Columns\TextColumn::make('coupon_code')
+                Tables\Columns\TextColumn::make('billing_address')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('is_guest')
+                Tables\Columns\TextColumn::make('billing_building_number')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('shipping_address')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('shipping_building_number')
+                    ->searchable(),
+                Tables\Columns\IconColumn::make('use_billing_for_shipping')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('loyalty_points_used')
+                Tables\Columns\TextColumn::make('coupon_id')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\IconColumn::make('is_guest')
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('payment_status'),
+                Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

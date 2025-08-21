@@ -2,18 +2,16 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Product;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ProductResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Models\Product;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductResource extends Resource
 {
@@ -26,33 +24,9 @@ class ProductResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('category_id')
-                    ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('subcategory_id')
-                    ->required()
                     ->numeric(),
-            SpatieMediaLibraryFileUpload::make('main_image')
-                ->collection('main_image')
-                ->label('Main Image')
-                ->image()
-                ->imageEditor()
-                ->required() // Enforce having a main image
-                ->maxSize(2048) // 2MB max
-                ->imageResizeTargetWidth('1200')
-                ->imageResizeTargetHeight('1200')
-                ->helperText('This is the featured image shown in listings and cards'),
-
-            // Gallery images field
-            SpatieMediaLibraryFileUpload::make('product_images')
-                ->collection('product_images')
-                ->label('Product Gallery')
-                ->multiple()
-                ->image()
-                ->imageEditor()
-                ->maxFiles(8)
-                ->reorderable()
-
-                ->helperText('Upload up to 8 additional product images'),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -67,9 +41,6 @@ class ProductResource extends Resource
                     ->prefix('$'),
                 Forms\Components\TextInput::make('compare_price')
                     ->numeric(),
-
-                Forms\Components\TextInput::make('barcode')
-                    ->maxLength(255),
                 Forms\Components\Toggle::make('featured')
                     ->required(),
                 Forms\Components\Toggle::make('active')
@@ -81,34 +52,22 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-              SpatieMediaLibraryImageColumn::make('main_image')
-                ->collection('main_image')
-                ->conversion('thumb') // Which conversion to show
-                ->size(40), // Display size
                 Tables\Columns\TextColumn::make('category_id')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('subcategory_id')
                     ->numeric()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                SpatieMediaLibraryImageColumn::make('product_images')
-                ->collection('product_images')
-                ->conversion('thumb') // Which conversion to show
-                ->size(40), // Display size
                 Tables\Columns\TextColumn::make('price')
                     ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('compare_price')
                     ->numeric()
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('barcode')
-                    ->searchable(),
                 Tables\Columns\IconColumn::make('featured')
                     ->boolean(),
                 Tables\Columns\IconColumn::make('active')

@@ -151,6 +151,8 @@ class CheckoutController extends Controller
             'payment_method' => 'required|string|in:paypal,paymob,cash_on_delivery',
             'paypal_payment_type' => 'nullable|string|in:paypal_account,credit_card',
             'currency' => 'required|string|max:3',
+            'loyalty_discount' => 'nullable|numeric|min:0',
+            'loyalty_points_applied' => 'nullable|integer|min:0',
         ]);
 
         // Debug: Log what we're getting from request
@@ -198,6 +200,31 @@ class CheckoutController extends Controller
             // Create order
             $order = $this->createOrder($validated, $customer, $user, false);
             Log::info('Order created successfully', ['order_id' => $order->id]);
+
+            // Handle loyalty points redemption if applied
+            if (!empty($validated['loyalty_points_applied']) && $validated['loyalty_points_applied'] > 0) {
+                try {
+                    $loyaltyService = app(\App\Services\LoyaltyService::class);
+                    $loyaltyService->redeemPointsForDiscount(
+                        $user,
+                        $validated['loyalty_points_applied'],
+                        $order,
+                        "Order #{$order->order_number} discount"
+                    );
+                    Log::info('Loyalty points redeemed successfully', [
+                        'order_id' => $order->id,
+                        'points_redeemed' => $validated['loyalty_points_applied'],
+                        'discount_amount' => $validated['loyalty_discount'] ?? 0
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to redeem loyalty points', [
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    // Don't fail the entire checkout if loyalty points redemption fails
+                }
+            }
+
             event(new OrderPlaced($order));
             // Create order items
             $this->createOrderItems($order, $cart);
@@ -615,6 +642,20 @@ DB::commit();
         $shippingAmount = $this->currencyService->convertFromUSD($this->cartService->getShippingCost(), $currencyCode);
         $totalAmount = $this->currencyService->convertFromUSD($this->cartService->getTotal(), $currencyCode);
 
+        // Apply loyalty discount if provided - already in local currency
+        $loyaltyDiscountLocal = $data['loyalty_discount'] ?? 0;
+        $finalTotal = max(0, $totalAmount - $loyaltyDiscountLocal);
+
+        // Log loyalty discount application
+        if ($loyaltyDiscountLocal > 0) {
+            Log::info('Loyalty discount applied', [
+                'loyalty_discount_local' => $loyaltyDiscountLocal,
+                'target_currency' => $currencyCode,
+                'original_total' => $totalAmount,
+                'final_total' => $finalTotal
+            ]);
+        }
+
         $orderData = [
             'order_number' => $this->generateOrderNumber(),
             'guest_token' => $isGuest ? Str::random(32) : null,
@@ -632,8 +673,8 @@ DB::commit();
             'subtotal' => $subtotal,
             'tax_amount' => $taxAmount,
             'shipping_amount' => $shippingAmount,
-            'discount_amount' => $data['coupon_discount'] ?? 0,
-            'total_amount' => $totalAmount,
+            'discount_amount' => ($data['coupon_discount'] ?? 0) + $loyaltyDiscountLocal,
+            'total_amount' => $finalTotal,
             'currency' => $currencyCode,
             'payment_method' => $data['payment_method'],
             'payment_status' => 'pending',

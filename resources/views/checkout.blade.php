@@ -32,6 +32,9 @@
                 <!-- Order Summary -->
                 <div class="lg:col-span-1">
                     <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+                        <!-- Loyalty Points Section -->
+                        @livewire('checkout-loyalty-points')
+
                         @livewire('order-summary')
                         <!-- Continue Shopping -->
                         <div class="mt-6">

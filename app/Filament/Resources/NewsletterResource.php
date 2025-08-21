@@ -32,8 +32,6 @@ class NewsletterResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Toggle::make('verified')
                     ->required(),
-                Forms\Components\TextInput::make('country_id')
-                    ->numeric(),
             ]);
     }
 
@@ -47,9 +45,6 @@ class NewsletterResource extends Resource
                     ->searchable(),
                 Tables\Columns\IconColumn::make('verified')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('country_id')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

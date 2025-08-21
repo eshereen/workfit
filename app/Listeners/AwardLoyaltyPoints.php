@@ -18,23 +18,22 @@ class AwardLoyaltyPoints implements ShouldQueue
         $this->loyaltyService = $loyaltyService;
     }
 
-  // app/Listeners/AwardLoyaltyPoints.php
-public function handle(OrderPlaced $event)
-{
-    $order = $event->order;
+    public function handle(OrderPlaced $event)
+    {
+        $order = $event->order;
 
-    // Only award points for paid orders
-    if ($order->payment_status !== 'paid') {
-        return;
+        // Award points immediately when order is placed
+        // This provides better user experience - users see points right away
+
+        // Calculate points based on dollar amount (convert cents to dollars)
+        $dollarAmount = $order->total_amount / 100;
+        $points = $dollarAmount * config('loyalty.rules.purchase.points_per_dollar', 1);
+
+        $this->loyaltyService->addPoints(
+            $order->user,
+            (int) $points,
+            'purchase',
+            $order
+        );
     }
-
-    $points = $order->total_amount * config('loyalty.rules.purchase.points');
-
-    $this->loyaltyService->addPoints(
-        $order->user,
-        $points,
-        'purchase',
-        $order
-    );
-}
 }

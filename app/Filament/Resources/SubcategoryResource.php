@@ -2,22 +2,20 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\SubCategoryResource\Pages;
+use App\Filament\Resources\SubCategoryResource\RelationManagers;
+use App\Models\SubCategory;
 use Filament\Forms;
-use Filament\Tables;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Models\Subcategory;
 use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\SubcategoryResource\Pages;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use App\Filament\Resources\SubcategoryResource\RelationManagers;
 
-class SubcategoryResource extends Resource
+class SubCategoryResource extends Resource
 {
-    protected static ?string $model = Subcategory::class;
+    protected static ?string $model = SubCategory::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -36,16 +34,6 @@ class SubcategoryResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
-                SpatieMediaLibraryFileUpload::make('main_image')
-                    ->collection('main_image')
-                    ->label('Main Image')
-                    ->image()
-                    ->imageEditor()
-                    ->required() // Enforce having a main image
-                    ->maxSize(2048) // 2MB max
-                    ->imageResizeTargetWidth('1200')
-                    ->imageResizeTargetHeight('1200')
-                    ->helperText('This is the featured image shown in listings and cards'),
                 Forms\Components\Toggle::make('featured')
                     ->required(),
                 Forms\Components\Toggle::make('active')
@@ -64,10 +52,6 @@ class SubcategoryResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                SpatieMediaLibraryImageColumn::make('main_image')
-                    ->collection('main_image')
-                    ->conversion('thumb') // Which conversion to show
-                    ->size(40), // Display size
                 Tables\Columns\IconColumn::make('featured')
                     ->boolean(),
                 Tables\Columns\IconColumn::make('active')
@@ -109,10 +93,10 @@ class SubcategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSubcategories::route('/'),
-            'create' => Pages\CreateSubcategory::route('/create'),
-            'view' => Pages\ViewSubcategory::route('/{record}'),
-            'edit' => Pages\EditSubcategory::route('/{record}/edit'),
+            'index' => Pages\ListSubCategories::route('/'),
+            'create' => Pages\CreateSubCategory::route('/create'),
+            'view' => Pages\ViewSubCategory::route('/{record}'),
+            'edit' => Pages\EditSubCategory::route('/{record}/edit'),
         ];
     }
 }

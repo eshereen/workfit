@@ -36,9 +36,12 @@ class CountryResource extends Resource
                 Forms\Components\TextInput::make('currency_code')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('currency_sympol')
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('tax_rate')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->default(0.00),
                 Forms\Components\Toggle::make('active')
                     ->required(),
             ]);
@@ -55,6 +58,8 @@ class CountryResource extends Resource
                 Tables\Columns\TextColumn::make('phone_code')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('currency_code')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('currency_sympol')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tax_rate')
                     ->numeric()

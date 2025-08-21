@@ -37,17 +37,31 @@ class CustomerResource extends Resource
                 Forms\Components\TextInput::make('last_name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('phone')
+                Forms\Components\TextInput::make('phone_number')
                     ->tel()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('address')
+                Forms\Components\TextInput::make('billing_country_id')
+                    ->numeric(),
+                Forms\Components\TextInput::make('billing_state')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('city')
+                Forms\Components\TextInput::make('billing_city')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('state')
+                Forms\Components\Textarea::make('billing_address')
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('billing_building_number')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('zip')
+                Forms\Components\TextInput::make('shipping_country_id')
+                    ->numeric(),
+                Forms\Components\TextInput::make('shipping_state')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('shipping_city')
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('shipping_address')
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('shipping_building_number')
+                    ->maxLength(255),
+                Forms\Components\Toggle::make('use_billing_for_shipping')
+                    ->required(),
             ]);
     }
 
@@ -58,25 +72,45 @@ class CustomerResource extends Resource
                 Tables\Columns\TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('country_id')
-                    ->numeric()
-                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('first_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('last_name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone')
+                Tables\Columns\TextColumn::make('phone_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('address')
+                Tables\Columns\TextColumn::make('loyalty_points')
+                    ->label('Loyalty Points')
+                    ->getStateUsing(function ($record) {
+                        if ($record->user) {
+                            return $record->user->loyaltyBalance();
+                        }
+                        return 0;
+                    })
+                    ->formatStateUsing(fn ($state) => number_format($state ?? 0))
+                    ->sortable(false),
+                Tables\Columns\TextColumn::make('billing_country_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('billing_state')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('city')
+                Tables\Columns\TextColumn::make('billing_city')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('state')
+                Tables\Columns\TextColumn::make('billing_building_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('zip')
+                Tables\Columns\TextColumn::make('shipping_country_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('shipping_state')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('shipping_city')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('shipping_building_number')
+                    ->searchable(),
+                Tables\Columns\IconColumn::make('use_billing_for_shipping')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

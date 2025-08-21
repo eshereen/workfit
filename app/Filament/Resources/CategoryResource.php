@@ -2,18 +2,16 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Category;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\CategoryResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use App\Filament\Resources\CategoryResource\RelationManagers;
+use App\Models\Category;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CategoryResource extends Resource
 {
@@ -29,19 +27,10 @@ class CategoryResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('slug')
+                    ->required()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
-                SpatieMediaLibraryFileUpload::make('main_image')
-                    ->collection('main_image')
-                    ->label('Main Image')
-                    ->image()
-                    ->imageEditor()
-                    ->required() // Enforce having a main image
-                    ->maxSize(2048) // 2MB max
-                    ->imageResizeTargetWidth('1200')
-                    ->imageResizeTargetHeight('1200')
-                    ->helperText('This is the featured image shown in listings and cards'),
                 Forms\Components\TextInput::make('parent_id')
                     ->numeric(),
                 Forms\Components\Toggle::make('featured')
@@ -59,10 +48,6 @@ class CategoryResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-            SpatieMediaLibraryImageColumn::make('main_image')
-                    ->collection('main_image')
-                    ->conversion('thumb') // Which conversion to show
-                    ->size(40), // Display size
                 Tables\Columns\TextColumn::make('parent_id')
                     ->numeric()
                     ->sortable(),

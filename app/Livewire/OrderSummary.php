@@ -18,6 +18,11 @@ class OrderSummary extends Component
     public $currencyCode = 'USD';
     public $currencySymbol = '$';
 
+    // Loyalty points discount properties
+    public $loyaltyDiscount = 0;
+    public $loyaltyPointsApplied = 0;
+    public $finalTotal = 0;
+
     protected $cartService;
     protected $currencyService;
 
@@ -68,6 +73,53 @@ class OrderSummary extends Component
         $this->loadOrderData();
     }
 
+        #[On('loyaltyPointsApplied')]
+    public function handleLoyaltyPointsApplied($data)
+    {
+        Log::info('OrderSummary: Received loyaltyPointsApplied event', $data);
+
+        $this->loyaltyPointsApplied = $data['points'];
+        // Convert loyalty discount from USD to local currency using service container as fallback
+        $loyaltyDiscountUSD = $data['value'];
+        $currencyService = $this->currencyService ?? app(CountryCurrencyService::class);
+        $this->loyaltyDiscount = $currencyService->convertFromUSD($loyaltyDiscountUSD, $this->currencyCode);
+        $this->calculateFinalTotal();
+    }
+
+    #[On('loyaltyPointsRemoved')]
+    public function handleLoyaltyPointsRemoved()
+    {
+        Log::info('OrderSummary: Received loyaltyPointsRemoved event');
+
+        $this->loyaltyPointsApplied = 0;
+        $this->loyaltyDiscount = 0;
+        $this->calculateFinalTotal();
+    }
+
+        #[On('loyaltyPointsUpdated')]
+    public function handleLoyaltyPointsUpdated($data)
+    {
+        Log::info('OrderSummary: Received loyaltyPointsUpdated event', $data);
+
+        // This is just a preview update, don't change the actual applied points
+        // Convert loyalty discount from USD to local currency for preview
+        $loyaltyDiscountUSD = $data['value'];
+        $currencyService = $this->currencyService ?? app(CountryCurrencyService::class);
+        $this->loyaltyDiscount = $currencyService->convertFromUSD($loyaltyDiscountUSD, $this->currencyCode);
+        $this->calculateFinalTotal();
+    }
+
+    protected function calculateFinalTotal()
+    {
+        $this->finalTotal = max(0, $this->total - $this->loyaltyDiscount);
+
+        Log::info('OrderSummary: Final total calculated', [
+            'original_total' => $this->total,
+            'loyalty_discount' => $this->loyaltyDiscount,
+            'final_total' => $this->finalTotal
+        ]);
+    }
+
     protected function loadOrderData()
     {
         try {
@@ -79,6 +131,7 @@ class OrderSummary extends Component
                 $this->taxAmount = 0;
                 $this->shippingAmount = 0;
                 $this->total = 0;
+                $this->finalTotal = 0;
                 return;
             }
 
@@ -108,11 +161,16 @@ class OrderSummary extends Component
                 ]);
             }
 
+            // Calculate final total with any existing loyalty discount
+            $this->calculateFinalTotal();
+
             Log::info('OrderSummary: Data loaded', [
                 'currency' => $this->currencyCode,
                 'symbol' => $this->currencySymbol,
                 'subtotal' => $this->subtotal,
                 'total' => $this->total,
+                'loyalty_discount' => $this->loyaltyDiscount,
+                'final_total' => $this->finalTotal,
                 'item_count' => count($this->cartItems)
             ]);
 

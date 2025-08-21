@@ -38,8 +38,6 @@ class ProductVariantResource extends Resource
                     ->required()
                     ->numeric()
                     ->default(0),
-                Forms\Components\Toggle::make('allow_backorder')
-                    ->required(),
                 Forms\Components\TextInput::make('price')
                     ->numeric()
                     ->prefix('$'),
@@ -69,8 +67,6 @@ class ProductVariantResource extends Resource
                 Tables\Columns\TextColumn::make('stock')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('allow_backorder')
-                    ->boolean(),
                 Tables\Columns\TextColumn::make('price')
                     ->money()
                     ->sortable(),

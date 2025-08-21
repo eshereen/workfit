@@ -42,7 +42,11 @@ class CheckoutForm extends Component
     public $currentCurrency = 'USD';
     public $currentSymbol = '$';
 
-        public function mount()
+        // Loyalty points discount
+    public $loyaltyDiscount = 0;
+    public $loyaltyPointsApplied = 0;
+
+    public function mount()
     {
         // Basic debug to see if component is even loading
         error_log('CheckoutForm: Component mount() called');
@@ -438,6 +442,45 @@ class CheckoutForm extends Component
         Log::info('CheckoutForm: PayPal payment type set to credit card (simplified flow)', ['requested_type' => $type, 'actual_type' => $this->paypalPaymentType]);
     }
 
+    // Listen for loyalty points events
+    #[On('country-changed')]
+    public function handleCountryChanged($countryCode)
+    {
+        Log::info('CheckoutForm: Received country-changed event', ['country_code' => $countryCode]);
+        $this->updatePaymentMethods($countryCode);
+        $this->updateCurrencyInfo($countryCode);
+    }
+
+        #[On('loyaltyPointsApplied')]
+    public function handleLoyaltyPointsApplied($data)
+    {
+        Log::info('CheckoutForm: Received loyaltyPointsApplied event', $data);
+
+        $this->loyaltyPointsApplied = $data['points'];
+        // Convert loyalty discount from USD to local currency using service container
+        $loyaltyDiscountUSD = $data['value'];
+        $currencyService = app(CountryCurrencyService::class);
+        $this->loyaltyDiscount = $currencyService->convertFromUSD($loyaltyDiscountUSD, $this->currentCurrency);
+    }
+
+    #[On('loyaltyPointsRemoved')]
+    public function handleLoyaltyPointsRemoved()
+    {
+        Log::info('CheckoutForm: Received loyaltyPointsRemoved event');
+
+        $this->loyaltyPointsApplied = 0;
+        $this->loyaltyDiscount = 0;
+    }
+
+    #[On('loyaltyPointsUpdated')]
+    public function handleLoyaltyPointsUpdated($data)
+    {
+        Log::info('CheckoutForm: Received loyaltyPointsUpdated event', $data);
+
+        // This is just a preview update, don't change the actual applied points
+        // The discount will be shown in the order summary but not stored until applied
+    }
+
     // Method to validate all form data
     public function validateForm()
     {
@@ -489,6 +532,8 @@ class CheckoutForm extends Component
                 'payment_method' => $this->selectedPaymentMethod,
                 'paypal_payment_type' => $this->paypalPaymentType,
                 'currency' => $this->currentCurrency,
+                'loyalty_discount' => $this->loyaltyDiscount,
+                'loyalty_points_applied' => $this->loyaltyPointsApplied,
             ];
 
             Log::info('CheckoutForm: Form data being stored in session', [
