@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use App\Models\Order;
 use App\Events\OrderPlaced;
@@ -65,7 +66,7 @@ class RetroactiveLoyaltyPoints extends Command
                     $this->info("  ✅ Points awarded successfully (Transaction ID: {$transaction->id})");
                     $processedOrders++;
                     $totalPoints += $points;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $this->error("  ❌ Failed to award points: " . $e->getMessage());
                 }
             } else {

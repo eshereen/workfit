@@ -2,11 +2,24 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\CategoryResource\Pages\ListCategories;
+use App\Filament\Resources\CategoryResource\Pages\CreateCategory;
+use App\Filament\Resources\CategoryResource\Pages\ViewCategory;
+use App\Filament\Resources\CategoryResource\Pages\EditCategory;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,25 +30,25 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('parent_id')
+                TextInput::make('parent_id')
                     ->numeric(),
-                Forms\Components\Toggle::make('featured')
+                Toggle::make('featured')
                     ->required(),
-                Forms\Components\Toggle::make('active')
+                Toggle::make('active')
                     ->required(),
             ]);
     }
@@ -44,22 +57,22 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('parent_id')
+                TextColumn::make('parent_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('featured')
+                IconColumn::make('featured')
                     ->boolean(),
-                Tables\Columns\IconColumn::make('active')
+                IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -67,13 +80,13 @@ class CategoryResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -88,10 +101,10 @@ class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategories::route('/'),
-            'create' => Pages\CreateCategory::route('/create'),
-            'view' => Pages\ViewCategory::route('/{record}'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
+            'index' => ListCategories::route('/'),
+            'create' => CreateCategory::route('/create'),
+            'view' => ViewCategory::route('/{record}'),
+            'edit' => EditCategory::route('/{record}/edit'),
         ];
     }
 }

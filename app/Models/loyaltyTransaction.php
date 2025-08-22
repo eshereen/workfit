@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\LoyaltyTransactionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class LoyaltyTransaction extends Model
 {
-    /** @use HasFactory<\Database\Factories\LoyaltyTransactionFactory> */
+    /** @use HasFactory<LoyaltyTransactionFactory> */
     use HasFactory;
 
     protected $fillable = ['user_id', 'points', 'action', 'description', 'source_type', 'source_id', 'status'];

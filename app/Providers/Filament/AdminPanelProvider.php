@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Pages\Dashboard;
+use Filament\Widgets\AccountWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -33,12 +35,14 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-               
+                AccountWidget::class,
+                \App\Filament\Widgets\StatsOverview::class,
+                \App\Filament\Widgets\RevenueChart::class,
+
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -55,4 +59,5 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
+
 }

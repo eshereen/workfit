@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use Exception;
 use App\Models\User;
 use App\Models\LoyaltyTransaction;
 
@@ -24,12 +25,12 @@ class LoyaltyService
     {
         // Validate points are positive
         if ($points <= 0) {
-            throw new \Exception('Points to redeem must be positive');
+            throw new Exception('Points to redeem must be positive');
         }
 
         // Check if user has sufficient points
         if ($user->loyaltyBalance() < $points) {
-            throw new \Exception('Insufficient points');
+            throw new Exception('Insufficient points');
         }
 
         return $user->loyaltyTransactions()->create([
@@ -56,7 +57,7 @@ class LoyaltyService
     public function redeemPointsForDiscount(User $user, int $points, $source = null, string $description = null)
     {
         if (!$this->canRedeemPoints($user, $points)) {
-            throw new \Exception('Cannot redeem points. Check minimum requirement and balance.');
+            throw new Exception('Cannot redeem points. Check minimum requirement and balance.');
         }
 
         $dollarValue = $this->calculateRedemptionValue($points);

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -48,7 +49,7 @@ class PaymentMethodsSelector extends Component
             }
 
             Log::info('PaymentMethodsSelector: Component mounted successfully');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PaymentMethodsSelector: Error during mount', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -136,7 +137,7 @@ class PaymentMethodsSelector extends Component
         // Check shipping address country
         if ($request->has('shipping_address.country')) {
             $countryName = $request->input('shipping_address.country');
-            $country = \App\Models\Country::where('name', 'LIKE', $countryName)->first();
+            $country = Country::where('name', 'LIKE', $countryName)->first();
             if ($country) {
                 return $country->code;
             }
@@ -145,7 +146,7 @@ class PaymentMethodsSelector extends Component
         // Check billing address country
         if ($request->has('billing_address.country')) {
             $countryName = $request->input('billing_address.country');
-            $country = \App\Models\Country::where('name', 'LIKE', $countryName)->first();
+            $country = Country::where('name', 'LIKE', $countryName)->first();
             if ($country) {
                 return $country->code;
             }
@@ -154,7 +155,7 @@ class PaymentMethodsSelector extends Component
         // Check direct country field
         if ($request->has('country')) {
             $countryName = $request->input('country');
-            $country = \App\Models\Country::where('name', 'LIKE', $countryName)->first();
+            $country = Country::where('name', 'LIKE', $countryName)->first();
             if ($country) {
                 return $country->code;
             }
@@ -256,7 +257,7 @@ class PaymentMethodsSelector extends Component
                 'selected_method' => $this->selectedMethod,
                 'paypal_payment_type' => $this->paypalPaymentType
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PaymentMethodsSelector: Error in updateForCountry', [
                 'country_code' => $countryCode,
                 'error' => $e->getMessage(),
@@ -273,7 +274,7 @@ class PaymentMethodsSelector extends Component
             Log::info('PaymentMethodsSelector: refreshPaymentMethods called');
             $this->loadMethods();
             Log::info('PaymentMethodsSelector: Methods refreshed successfully');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PaymentMethodsSelector: Error in refreshPaymentMethods', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -287,7 +288,7 @@ class PaymentMethodsSelector extends Component
         try {
             Log::info('PaymentMethodsSelector: updatePaymentMethods called via event', ['country_code' => $countryCode]);
             $this->updateForCountry($countryCode);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PaymentMethodsSelector: Error in updatePaymentMethods', [
                 'country_code' => $countryCode,
                 'error' => $e->getMessage(),
@@ -322,7 +323,7 @@ class PaymentMethodsSelector extends Component
             if ($countryCode) {
                 $this->updateForCountry($countryCode);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PaymentMethodsSelector: Error handling country-changed event', [
                 'data' => $data,
                 'error' => $e->getMessage()
@@ -361,7 +362,7 @@ class PaymentMethodsSelector extends Component
             ]);
 
             Log::info('PaymentMethodsSelector: testUpdateMethods completed successfully');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PaymentMethodsSelector: testUpdateMethods failed', [
                 'country_code' => $countryCode,
                 'error' => $e->getMessage(),

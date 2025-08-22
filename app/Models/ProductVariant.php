@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductVariantFactory;
 use App\Traits\HasSku;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductVariant extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductVariantFactory> */
+    /** @use HasFactory<ProductVariantFactory> */
     use HasFactory,HasSku;
     protected $fillable = ['product_id', 'color', 'size', 'sku', 'stock','price', 'weight', 'quantity'];
 

@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\LoyaltyService;
+use Exception;
+use App\Payments\Gateways\CodGateway;
+use App\Payments\Gateways\PaypalGateway;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Country;
@@ -204,7 +208,7 @@ class CheckoutController extends Controller
             // Handle loyalty points redemption if applied
             if (!empty($validated['loyalty_points_applied']) && $validated['loyalty_points_applied'] > 0) {
                 try {
-                    $loyaltyService = app(\App\Services\LoyaltyService::class);
+                    $loyaltyService = app(LoyaltyService::class);
                     $loyaltyService->redeemPointsForDiscount(
                         $user,
                         $validated['loyalty_points_applied'],
@@ -216,7 +220,7 @@ class CheckoutController extends Controller
                         'points_redeemed' => $validated['loyalty_points_applied'],
                         'discount_amount' => $validated['loyalty_discount'] ?? 0
                     ]);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     Log::error('Failed to redeem loyalty points', [
                         'order_id' => $order->id,
                         'error' => $e->getMessage()
@@ -250,7 +254,7 @@ class CheckoutController extends Controller
                         'paypal_payment_type' => $validated['paypal_payment_type'] ?? 'not set'
                     ]);
                 } else {
-                    throw new \Exception('Selected payment method is not available in your country.');
+                    throw new Exception('Selected payment method is not available in your country.');
                 }
             }
 
@@ -343,7 +347,7 @@ DB::commit();
             return redirect()->route('thankyou', ['order' => $order->id])
                 ->with('success', 'Order placed successfully!');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error processing authenticated checkout: ' . $e->getMessage());
 
@@ -447,7 +451,7 @@ DB::commit();
                         'paypal_payment_type' => $validated['paypal_payment_type'] ?? 'not set'
                     ]);
                 } else {
-                    throw new \Exception('Selected payment method is not available in your country.');
+                    throw new Exception('Selected payment method is not available in your country.');
                 }
             }
 
@@ -542,7 +546,7 @@ DB::commit();
                 ->with('success', 'Order placed successfully!');
 
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error processing guest checkout: ' . $e->getMessage());
 
@@ -732,7 +736,7 @@ DB::commit();
 
             // Validate that we have a valid product ID
             if (!$productId || $productId <= 0) {
-                throw new \Exception("Invalid product ID extracted from cart item: {$item['id']}");
+                throw new Exception("Invalid product ID extracted from cart item: {$item['id']}");
             }
 
             try {
@@ -750,7 +754,7 @@ DB::commit();
                     'quantity' => $item['quantity'],
                     'price' => $item['price']
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to create order item', [
                     'order_id' => $order->id,
                     'product_id' => $productId,
@@ -930,11 +934,11 @@ DB::commit();
             Log::info('Test COD: Processing payment with data', $testData);
 
             // Test the COD gateway directly
-            $gateway = app(\App\Payments\Gateways\CodGateway::class);
+            $gateway = app(CodGateway::class);
             Log::info('Test COD: COD gateway created');
 
             // Create a test payment record
-            $testPayment = new \App\Models\Payment([
+            $testPayment = new Payment([
                 'provider' => 'cash_on_delivery',
                 'status' => 'initiated',
                 'currency' => 'EGP',
@@ -942,7 +946,7 @@ DB::commit();
             ]);
 
             // Create a test order
-            $testOrder = new \App\Models\Order([
+            $testOrder = new Order([
                 'order_number' => 'TEST-' . time(),
                 'currency' => 'EGP',
                 'total_amount' => 100,
@@ -981,7 +985,7 @@ DB::commit();
                 ]
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Test COD failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -1042,7 +1046,7 @@ DB::commit();
                 'customer_id' => $customer->id
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Test checkout failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -1113,7 +1117,7 @@ DB::commit();
                 'currency_code' => $validated['currency_code'],
                 'country_id' => $validated['country_id'],
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update currency',
@@ -1203,7 +1207,7 @@ DB::commit();
             ]);
 
             // Capture the payment using PayPal gateway
-            $gateway = app(\App\Payments\Gateways\PaypalGateway::class);
+            $gateway = app(PaypalGateway::class);
             Log::info('PayPal gateway instance created', [
                 'payment_id' => $payment->id,
                 'gateway_class' => get_class($gateway)
@@ -1245,7 +1249,7 @@ DB::commit();
                 return back()->with('error', 'Payment failed: ' . ($result['message'] ?? 'Unknown error'));
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error capturing PayPal credit card payment', [
                 'payment_id' => $payment->id,
                 'error' => $e->getMessage(),

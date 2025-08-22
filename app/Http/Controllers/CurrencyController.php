@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
 use Illuminate\Http\Request;
 use App\Services\CountryCurrencyService;
 use App\Services\CartService;
@@ -73,7 +74,7 @@ class CurrencyController extends Controller
 
         if ($countryName) {
             // Find country by name and set its currency
-            $country = \App\Models\Country::where('name', $countryName)->first();
+            $country = Country::where('name', $countryName)->first();
             if ($country) {
                 $this->currencyService->setPreferredCountry($country->id);
             }
@@ -117,7 +118,7 @@ class CurrencyController extends Controller
         $countryName = $request->input('country_name');
 
         // Find country and set it as preferred
-        $country = \App\Models\Country::find($countryId);
+        $country = Country::find($countryId);
         if ($country) {
             // Set the preferred country
             $this->currencyService->setPreferredCountry($countryId);

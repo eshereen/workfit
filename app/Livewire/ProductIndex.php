@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\CartService;
@@ -69,7 +70,7 @@ class ProductIndex extends Component
         try {
             $this->loadWishlist();
             $this->loadCurrencyInfo();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle wishlist loading error silently
         }
     }
@@ -86,7 +87,7 @@ class ProductIndex extends Component
 
             // Convert product prices to current currency
             $this->convertProductPrices();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Use defaults if currency service fails
         }
     }
@@ -112,7 +113,7 @@ class ProductIndex extends Component
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle conversion error silently
         }
     }
@@ -139,7 +140,7 @@ class ProductIndex extends Component
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle conversion error silently
         }
     }
@@ -189,7 +190,7 @@ class ProductIndex extends Component
                 'type' => 'success'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Log::error('Error in toggleWishlist: ' . $e->getMessage());
             $this->dispatch('showNotification', [
                 'message' => 'An error occurred while updating your wishlist: ' . $e->getMessage(),
@@ -264,7 +265,7 @@ class ProductIndex extends Component
                 'type' => 'success'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('showNotification', [
                 'message' => 'Error adding product to cart: ' . $e->getMessage(),
                 'type' => 'error'
@@ -294,7 +295,7 @@ class ProductIndex extends Component
                 'type' => 'success'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('showNotification', [
                 'message' => 'Error adding product to cart: ' . $e->getMessage(),
                 'type' => 'error'
@@ -357,7 +358,7 @@ class ProductIndex extends Component
                 $this->currencySymbol = $currentInfo['currency_symbol'];
                 $this->isAutoDetected = $currentInfo['is_auto_detected'];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle error silently
         }
     }

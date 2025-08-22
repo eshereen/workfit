@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use Exception;
 use App\Enums\PaymentMethod;
 use App\Payments\Gateways\PaypalGateway;
 use Illuminate\Support\Facades\Log;
@@ -29,7 +30,7 @@ class PaymentMethodResolver
             // Rest of world - PayPal
             Log::info('PaymentMethodResolver: Rest of world, returning PayPal');
             return [PaymentMethod::PAYPAL];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PaymentMethodResolver: Error in availableForCountry', [
                 'countryCode' => $countryCode,
                 'error' => $e->getMessage(),
@@ -61,7 +62,7 @@ class PaymentMethodResolver
             ]);
 
             return $isAvailable;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PaymentMethodResolver: Error in isCreditCardAvailableForCountry', [
                 'countryCode' => $countryCode,
                 'error' => $e->getMessage()

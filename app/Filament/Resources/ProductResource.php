@@ -2,48 +2,71 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Product;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Product;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Filament\Resources\ProductResource\Pages\EditProduct;
+use App\Filament\Resources\ProductResource\Pages\ViewProduct;
+use App\Filament\Resources\ProductResource\Pages\ListProducts;
+use App\Filament\Resources\ProductResource\Pages\CreateProduct;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('category_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('subcategory_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                Select::make('category.name')
+                    ->relationship('category', 'name'),
+                Select::make('subcategory.name')
+                    ->relationship('subcategory', 'name'),
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                SpatieMediaLibraryFileUpload::make('main_image')
+                ->collection('main_image')
+                    ->imageEditor(),
+                  SpatieMediaLibraryFileUpload::make('product_images')
+                    ->collection(collection: 'product_images')
+                    ->multiple()
+                    ->imageEditor(),
+                Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('price')
+                TextInput::make('price')
                     ->required()
                     ->numeric()
                     ->prefix('$'),
-                Forms\Components\TextInput::make('compare_price')
+                TextInput::make('compare_price')
                     ->numeric(),
-                Forms\Components\Toggle::make('featured')
+                Toggle::make('featured')
                     ->required(),
-                Forms\Components\Toggle::make('active')
+                Toggle::make('active')
                     ->required(),
             ]);
     }
@@ -52,35 +75,38 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('category_id')
-                    ->numeric()
+                SpatieMediaLibraryImageColumn::make('main_image')
+
+                ->circular(),
+                TextColumn::make('category.name')
+
                     ->sortable(),
-                Tables\Columns\TextColumn::make('subcategory_id')
-                    ->numeric()
+                TextColumn::make('subcategory.name')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('price')
+
+                TextColumn::make(name: 'price')
                     ->money()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('compare_price')
+                TextColumn::make('compare_price')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('featured')
+                IconColumn::make('featured')
                     ->boolean(),
-                Tables\Columns\IconColumn::make('active')
+                IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -88,13 +114,13 @@ class ProductResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -109,10 +135,10 @@ class ProductResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
-            'create' => Pages\CreateProduct::route('/create'),
-            'view' => Pages\ViewProduct::route('/{record}'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'index' => ListProducts::route('/'),
+            'create' => CreateProduct::route('/create'),
+            'view' => ViewProduct::route('/{record}'),
+            'edit' => EditProduct::route('/{record}/edit'),
         ];
     }
 }

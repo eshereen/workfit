@@ -2,11 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\LoyaltyTransactionResource\Pages\ListLoyaltyTransactions;
+use App\Filament\Resources\LoyaltyTransactionResource\Pages\CreateLoyaltyTransaction;
+use App\Filament\Resources\LoyaltyTransactionResource\Pages\ViewLoyaltyTransaction;
+use App\Filament\Resources\LoyaltyTransactionResource\Pages\EditLoyaltyTransaction;
 use App\Filament\Resources\LoyaltyTransactionResource\Pages;
 use App\Filament\Resources\LoyaltyTransactionResource\RelationManagers;
 use App\Models\LoyaltyTransaction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,26 +27,26 @@ class LoyaltyTransactionResource extends Resource
 {
     protected static ?string $model = LoyaltyTransaction::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('user_id')
+        return $schema
+            ->components([
+                TextInput::make('user_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('points')
+                TextInput::make('points')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('action')
+                TextInput::make('action')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('description')
+                TextInput::make('description')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('source_type')
+                TextInput::make('source_type')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('source_id')
+                TextInput::make('source_id')
                     ->numeric(),
             ]);
     }
@@ -45,26 +55,26 @@ class LoyaltyTransactionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
+                TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('points')
+                TextColumn::make('points')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('action')
+                TextColumn::make('action')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('source_type')
+                TextColumn::make('source_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('source_id')
+                TextColumn::make('source_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -72,13 +82,13 @@ class LoyaltyTransactionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -93,10 +103,10 @@ class LoyaltyTransactionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLoyaltyTransactions::route('/'),
-            'create' => Pages\CreateLoyaltyTransaction::route('/create'),
-            'view' => Pages\ViewLoyaltyTransaction::route('/{record}'),
-            'edit' => Pages\EditLoyaltyTransaction::route('/{record}/edit'),
+            'index' => ListLoyaltyTransactions::route('/'),
+            'create' => CreateLoyaltyTransaction::route('/create'),
+            'view' => ViewLoyaltyTransaction::route('/{record}'),
+            'edit' => EditLoyaltyTransaction::route('/{record}/edit'),
         ];
     }
 }

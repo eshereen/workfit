@@ -2,11 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
+use App\Filament\Resources\ProductVariantResource\Pages\CreateProductVariant;
+use App\Filament\Resources\ProductVariantResource\Pages\ViewProductVariant;
+use App\Filament\Resources\ProductVariantResource\Pages\EditProductVariant;
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Filament\Resources\ProductVariantResource\RelationManagers;
 use App\Models\ProductVariant;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,33 +27,33 @@ class ProductVariantResource extends Resource
 {
     protected static ?string $model = ProductVariant::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('product_id')
+        return $schema
+            ->components([
+                TextInput::make('product_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('color')
+                TextInput::make('color')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('size')
+                TextInput::make('size')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('sku')
+                TextInput::make('sku')
                     ->label('SKU')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('stock')
+                TextInput::make('stock')
                     ->required()
                     ->numeric()
                     ->default(0),
-                Forms\Components\TextInput::make('price')
+                TextInput::make('price')
                     ->numeric()
                     ->prefix('$'),
-                Forms\Components\TextInput::make('weight')
+                TextInput::make('weight')
                     ->numeric(),
-                Forms\Components\TextInput::make('quantity')
+                TextInput::make('quantity')
                     ->required()
                     ->numeric()
                     ->default(0),
@@ -54,37 +64,37 @@ class ProductVariantResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('product_id')
+                TextColumn::make('product_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('color')
+                TextColumn::make('color')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('size')
+                TextColumn::make('size')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('sku')
+                TextColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('stock')
+                TextColumn::make('stock')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('price')
+                TextColumn::make('price')
                     ->money()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('weight')
+                TextColumn::make('weight')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('quantity')
+                TextColumn::make('quantity')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -92,13 +102,13 @@ class ProductVariantResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -113,10 +123,10 @@ class ProductVariantResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductVariants::route('/'),
-            'create' => Pages\CreateProductVariant::route('/create'),
-            'view' => Pages\ViewProductVariant::route('/{record}'),
-            'edit' => Pages\EditProductVariant::route('/{record}/edit'),
+            'index' => ListProductVariants::route('/'),
+            'create' => CreateProductVariant::route('/create'),
+            'view' => ViewProductVariant::route('/{record}'),
+            'edit' => EditProductVariant::route('/{record}/edit'),
         ];
     }
 }

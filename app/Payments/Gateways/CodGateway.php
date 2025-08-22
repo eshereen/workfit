@@ -2,6 +2,7 @@
 
 namespace App\Payments\Gateways;
 
+use Exception;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Log;
@@ -55,7 +56,7 @@ class CodGateway implements PaymentGateway
         return $result;
     }
     public function handleReturn(array $request): Payment {
-        throw new \Exception('COD does not support return handling');
+        throw new Exception('COD does not support return handling');
     }
     public function handleWebhook(array $payload, ?string $signature = null): void { /* no-op */ }
 }

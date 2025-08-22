@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\PaymentService;
@@ -33,7 +34,7 @@ class PaymentController extends Controller
             $payment = $order->payments()->latest()->first();
 
             if (!$payment) {
-                throw new \Exception('Payment not found for this order');
+                throw new Exception('Payment not found for this order');
             }
 
             // Special handling for Paymob payments
@@ -72,7 +73,7 @@ class PaymentController extends Controller
             return redirect()->route('thankyou', ['order' => $order->id])
                            ->with('success', 'Payment completed successfully!');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Payment return error: ' . $e->getMessage());
 
             return redirect()->route('thankyou', ['order' => $order->id])
@@ -110,7 +111,7 @@ class PaymentController extends Controller
             $gatewayInstance->handleWebhook($request->all(), $request->header('Signature'));
 
             return response()->json(['status' => 'success']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Webhook error for {$gateway}: " . $e->getMessage());
             return response()->json(['status' => 'error'], 500);
         }
@@ -268,7 +269,7 @@ class PaymentController extends Controller
                 return redirect()->route('checkout')->with('error', 'Payment failed. Please try again.');
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Paymob callback error: ' . $e->getMessage());
             return redirect()->route('checkout')->with('error', 'Payment verification failed');
         }

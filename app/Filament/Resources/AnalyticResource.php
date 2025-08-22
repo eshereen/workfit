@@ -2,11 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\AnalyticResource\Pages\ListAnalytics;
+use App\Filament\Resources\AnalyticResource\Pages\CreateAnalytic;
+use App\Filament\Resources\AnalyticResource\Pages\ViewAnalytic;
+use App\Filament\Resources\AnalyticResource\Pages\EditAnalytic;
 use App\Filament\Resources\AnalyticResource\Pages;
 use App\Filament\Resources\AnalyticResource\RelationManagers;
 use App\Models\Analytic;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,19 +29,19 @@ class AnalyticResource extends Resource
 {
     protected static ?string $model = Analytic::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('service')
+        return $schema
+            ->components([
+                TextInput::make('service')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('tracking_id')
+                TextInput::make('tracking_id')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Toggle::make('active')
+                Toggle::make('active')
                     ->required(),
             ]);
     }
@@ -38,17 +50,17 @@ class AnalyticResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('service')
+                TextColumn::make('service')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tracking_id')
+                TextColumn::make('tracking_id')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('active')
+                IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -56,13 +68,13 @@ class AnalyticResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -77,10 +89,10 @@ class AnalyticResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAnalytics::route('/'),
-            'create' => Pages\CreateAnalytic::route('/create'),
-            'view' => Pages\ViewAnalytic::route('/{record}'),
-            'edit' => Pages\EditAnalytic::route('/{record}/edit'),
+            'index' => ListAnalytics::route('/'),
+            'create' => CreateAnalytic::route('/create'),
+            'view' => ViewAnalytic::route('/{record}'),
+            'edit' => EditAnalytic::route('/{record}/edit'),
         ];
     }
 }

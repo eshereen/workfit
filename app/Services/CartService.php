@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Auth;
@@ -84,7 +85,7 @@ class CartService
             ]);
 
             return $cart->last();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error adding product to cart', [
                 'product_id' => $product->id,
                 'error' => $e->getMessage(),
@@ -137,7 +138,7 @@ class CartService
             ]);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error updating quantity', [
                 'rowId' => $rowId,
                 'error' => $e->getMessage(),
@@ -179,7 +180,7 @@ class CartService
             Log::info('Item removed successfully', ['rowId' => $rowId]);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error removing item from cart', [
                 'rowId' => $rowId,
                 'error' => $e->getMessage(),
@@ -267,7 +268,7 @@ class CartService
             ]);
 
             return $newItem;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error adding product with variant to cart', [
                 'product_id' => $product->id,
                 'variant_id' => $variant->id,

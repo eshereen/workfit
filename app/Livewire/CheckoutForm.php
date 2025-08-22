@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use App\Models\Country;
@@ -306,7 +307,7 @@ class CheckoutForm extends Component
                 'selected_method' => $this->selectedPaymentMethod
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('CheckoutForm: Error updating payment methods', [
                 'country_code' => $countryCode,
                 'error' => $e->getMessage()
@@ -347,7 +348,7 @@ class CheckoutForm extends Component
                 'currency_symbol' => $this->currentSymbol
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('CheckoutForm: Error updating currency', [
                 'country_code' => $countryCode,
                 'error' => $e->getMessage()
@@ -609,7 +610,7 @@ class CheckoutForm extends Component
 
             Log::info('CheckoutForm: Triggering form submission via JavaScript');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Log the error
             Log::error('CheckoutForm submission error: ' . $e->getMessage());
             session()->flash('error', 'An error occurred while submitting the form. Please try again.');

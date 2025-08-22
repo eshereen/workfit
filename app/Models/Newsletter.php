@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\NewsletterFactory;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Newsletter extends Model
 {
-    /** @use HasFactory<\Database\Factories\NewsletterFactory> */
+    /** @use HasFactory<NewsletterFactory> */
     use HasFactory,SoftDeletes;
     protected $fillable = ['email', 'token', 'verified'];
     protected $casts = ['verified' => 'boolean'];

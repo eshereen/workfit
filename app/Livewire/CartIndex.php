@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
 use Livewire\Component;
@@ -28,7 +29,7 @@ class CartIndex extends Component
             $this->loadCurrencyInfo();
             $this->loadCart();
             Log::info('CartIndex component mounted - Cart and currency loaded successfully');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('CartIndex component mounted - Error loading cart or currency', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -51,7 +52,7 @@ class CartIndex extends Component
                 'currencySymbol' => $this->currencySymbol,
                 'isAutoDetected' => $this->isAutoDetected
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error loading currency info', [
                 'error' => $e->getMessage()
             ]);
@@ -101,7 +102,7 @@ class CartIndex extends Component
                 'currencyCode' => $this->currencyCode,
                 'currencySymbol' => $this->currencySymbol
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error loading cart', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -181,7 +182,7 @@ class CartIndex extends Component
                 'subtotal' => $this->subtotal,
                 'total' => $this->total
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error converting prices to currency', [
                 'error' => $e->getMessage()
             ]);
@@ -243,7 +244,7 @@ class CartIndex extends Component
             $cartService = app(CartService::class);
 
             if (!$cartService) {
-                throw new \Exception('CartService could not be resolved');
+                throw new Exception('CartService could not be resolved');
             }
 
             Log::info('CartService resolved successfully', [
@@ -284,7 +285,7 @@ class CartIndex extends Component
                     'type' => 'error'
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error updating quantity', [
                 'rowId' => $rowId,
                 'error' => $e->getMessage(),
@@ -415,7 +416,7 @@ class CartIndex extends Component
                     'type' => 'error'
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error removing item from cart', [
                 'rowId' => $rowId,
                 'error' => $e->getMessage(),
@@ -440,7 +441,7 @@ class CartIndex extends Component
                 'message' => 'Cart cleared successfully!',
                 'type' => 'success'
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('showNotification', [
                 'message' => 'Error clearing cart: ' . $e->getMessage(),
                 'type' => 'error'

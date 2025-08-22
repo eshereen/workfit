@@ -2,11 +2,24 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\CollectionResource\Pages\ListCollections;
+use App\Filament\Resources\CollectionResource\Pages\CreateCollection;
+use App\Filament\Resources\CollectionResource\Pages\ViewCollection;
+use App\Filament\Resources\CollectionResource\Pages\EditCollection;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Filament\Resources\CollectionResource\RelationManagers;
 use App\Models\Collection;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,21 +30,21 @@ class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('active')
+                Toggle::make('active')
                     ->required(),
             ]);
     }
@@ -40,17 +53,17 @@ class CollectionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('active')
+                IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -58,13 +71,13 @@ class CollectionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -79,10 +92,10 @@ class CollectionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCollections::route('/'),
-            'create' => Pages\CreateCollection::route('/create'),
-            'view' => Pages\ViewCollection::route('/{record}'),
-            'edit' => Pages\EditCollection::route('/{record}/edit'),
+            'index' => ListCollections::route('/'),
+            'create' => CreateCollection::route('/create'),
+            'view' => ViewCollection::route('/{record}'),
+            'edit' => EditCollection::route('/{record}/edit'),
         ];
     }
 }

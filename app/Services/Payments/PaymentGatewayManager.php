@@ -18,9 +18,9 @@ class PaymentGatewayManager
         $cod = null
     ) {
         $this->gateways = [
-            'paymob' => $paymob ?? app(\App\Payments\Gateways\PaymobGateway::class),
-            'paypal' => $paypal ?? app(\App\Payments\Gateways\PaypalGateway::class),
-            'cod'    => $cod ?? app(\App\Payments\Gateways\CodGateway::class),
+            'paymob' => $paymob ?? app(PaymobGateway::class),
+            'paypal' => $paypal ?? app(PaypalGateway::class),
+            'cod'    => $cod ?? app(CodGateway::class),
         ];
     }
 

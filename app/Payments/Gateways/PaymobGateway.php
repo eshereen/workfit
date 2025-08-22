@@ -2,6 +2,7 @@
 
 namespace App\Payments\Gateways;
 
+use RuntimeException;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
@@ -38,7 +39,7 @@ class PaymobGateway implements PaymentGateway
     {
         // Ensure EGP
         if (strtoupper($order->currency) !== 'EGP') {
-            throw new \RuntimeException('Paymob requires EGP (Egypt).');
+            throw new RuntimeException('Paymob requires EGP (Egypt).');
         }
 
         // 1) auth token
@@ -56,7 +57,7 @@ class PaymobGateway implements PaymentGateway
                 $errorMessage .= ': ' . json_encode($auth);
             }
             Log::error('Paymob authentication failed', ['response' => $auth]);
-            throw new \RuntimeException($errorMessage);
+            throw new RuntimeException($errorMessage);
         }
 
         // 2) order registration
@@ -88,7 +89,7 @@ class PaymobGateway implements PaymentGateway
                 $errorMessage .= ': ' . json_encode($reg);
             }
             Log::error('Paymob order registration failed', ['response' => $reg]);
-            throw new \RuntimeException($errorMessage);
+            throw new RuntimeException($errorMessage);
         }
 
         // Get billing data from new database structure
@@ -156,7 +157,7 @@ class PaymobGateway implements PaymentGateway
                 $errorMessage .= ': ' . json_encode($key);
             }
             Log::error('Paymob payment key failed', ['response' => $key]);
-            throw new \RuntimeException($errorMessage);
+            throw new RuntimeException($errorMessage);
         }
 
         $iframeUrl = sprintf('https://accept.paymob.com/api/acceptance/iframes/441229?payment_token=%s', $key['token']);

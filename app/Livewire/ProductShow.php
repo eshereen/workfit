@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use App\Models\Product;
 use Livewire\Component;
 use App\Models\Wishlist;
@@ -61,7 +62,7 @@ class ProductShow extends Component
 
             // Convert product prices to current currency
             $this->convertProductPrices();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Use defaults if currency service fails
         }
     }
@@ -93,7 +94,7 @@ class ProductShow extends Component
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle conversion error silently
         }
     }
@@ -307,7 +308,7 @@ class ProductShow extends Component
             // Redirect to cart page after successful add to cart
             return redirect()->route('cart.index')->with('success', 'Product added to cart successfully!');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error adding product to cart', [
                 'product_id' => $this->product->id,
                 'error' => $e->getMessage(),
@@ -365,7 +366,7 @@ class ProductShow extends Component
                 'type' => 'success'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('showNotification', [
                 'message' => 'An error occurred while updating your wishlist.',
                 'type' => 'error'
@@ -405,7 +406,7 @@ class ProductShow extends Component
                     $product->converted_price = $currencyService->convertFromUSD($product->price, $this->currencyCode);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle conversion error silently
         }
     }

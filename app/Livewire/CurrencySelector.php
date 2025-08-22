@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use App\Services\CountryCurrencyService;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -32,7 +33,7 @@ class CurrencySelector extends Component
             $this->currentSymbol = $currencyInfo['currency_symbol'];
             $this->isAutoDetected = $currencyInfo['is_auto_detected'];
             $this->detectedCountry = Session::get('detected_country', '');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Use defaults if currency service fails
         }
     }
@@ -89,7 +90,7 @@ class CurrencySelector extends Component
                 console.log('✅ Currency changed to: {$this->currentCurrency} ({$this->currentSymbol}) via Alpine.js');
             ");
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('showNotification', [
                 'message' => 'Failed to change currency',
                 'type' => 'error'
@@ -139,7 +140,7 @@ class CurrencySelector extends Component
                 'type' => 'success'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('showNotification', [
                 'message' => 'Failed to reset currency',
                 'type' => 'error'
@@ -196,7 +197,7 @@ class CurrencySelector extends Component
                     'current_currency' => $this->currentCurrency
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('CurrencySelector: Error updating currency for country', [
                 'country_code' => $countryCode,
                 'error' => $e->getMessage()
@@ -239,7 +240,7 @@ class CurrencySelector extends Component
             if ($countryCode) {
                 $this->updateCurrencyForCountry($countryCode);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('CurrencySelector: Error handling country-changed event', [
                 'country_code' => $countryCode,
                 'error' => $e->getMessage()
@@ -263,7 +264,7 @@ class CurrencySelector extends Component
                 'new_currency' => $this->currentCurrency,
                 'new_symbol' => $this->currentSymbol
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('CurrencySelector: Error updating currency', [
                 'currency_code' => $currencyCode,
                 'error' => $e->getMessage()

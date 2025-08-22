@@ -2,11 +2,24 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\CouponResource\Pages\ListCoupons;
+use App\Filament\Resources\CouponResource\Pages\CreateCoupon;
+use App\Filament\Resources\CouponResource\Pages\ViewCoupon;
+use App\Filament\Resources\CouponResource\Pages\EditCoupon;
 use App\Filament\Resources\CouponResource\Pages;
 use App\Filament\Resources\CouponResource\RelationManagers;
 use App\Models\Coupon;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,33 +30,33 @@ class CouponResource extends Resource
 {
     protected static ?string $model = Coupon::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('code')
+        return $schema
+            ->components([
+                TextInput::make('code')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('type')
+                TextInput::make('type')
                     ->required(),
-                Forms\Components\TextInput::make('value')
+                TextInput::make('value')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('min_order_amount')
+                TextInput::make('min_order_amount')
                     ->numeric(),
-                Forms\Components\TextInput::make('usage_limit')
+                TextInput::make('usage_limit')
                     ->numeric(),
-                Forms\Components\TextInput::make('used_count')
+                TextInput::make('used_count')
                     ->required()
                     ->numeric()
                     ->default(0),
-                Forms\Components\DateTimePicker::make('starts_at')
+                DateTimePicker::make('starts_at')
                     ->required(),
-                Forms\Components\DateTimePicker::make('expires_at')
+                DateTimePicker::make('expires_at')
                     ->required(),
-                Forms\Components\Toggle::make('active')
+                Toggle::make('active')
                     ->required(),
             ]);
     }
@@ -52,34 +65,34 @@ class CouponResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code')
+                TextColumn::make('code')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('type'),
-                Tables\Columns\TextColumn::make('value')
+                TextColumn::make('type'),
+                TextColumn::make('value')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('min_order_amount')
+                TextColumn::make('min_order_amount')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('usage_limit')
+                TextColumn::make('usage_limit')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('used_count')
+                TextColumn::make('used_count')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('starts_at')
+                TextColumn::make('starts_at')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('expires_at')
+                TextColumn::make('expires_at')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('active')
+                IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -87,13 +100,13 @@ class CouponResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -108,10 +121,10 @@ class CouponResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCoupons::route('/'),
-            'create' => Pages\CreateCoupon::route('/create'),
-            'view' => Pages\ViewCoupon::route('/{record}'),
-            'edit' => Pages\EditCoupon::route('/{record}/edit'),
+            'index' => ListCoupons::route('/'),
+            'create' => CreateCoupon::route('/create'),
+            'view' => ViewCoupon::route('/{record}'),
+            'edit' => EditCoupon::route('/{record}/edit'),
         ];
     }
 }

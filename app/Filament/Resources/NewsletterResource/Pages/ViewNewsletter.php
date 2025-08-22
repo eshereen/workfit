@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\NewsletterResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\NewsletterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewNewsletter extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            EditAction::make(),
         ];
     }
 }

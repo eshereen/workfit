@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use Exception;
+use App\Models\Product;
 use App\Models\Wishlist;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
@@ -56,7 +58,7 @@ class WishlistIndex extends Component
             $this->currencyCode = $currencyInfo['currency_code'];
             $this->currencySymbol = $currencyInfo['currency_symbol'];
             $this->isAutoDetected = $currencyInfo['is_auto_detected'];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Use defaults if currency service fails
         }
     }
@@ -79,7 +81,7 @@ class WishlistIndex extends Component
                     $wishlistItem->product->converted_compare_price = $currencyService->convertFromUSD($wishlistItem->product->compare_price, $this->currencyCode);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle conversion error silently
         }
     }
@@ -116,20 +118,20 @@ class WishlistIndex extends Component
     {
         if ($hasVariants) {
             // Redirect to product page for variant selection
-            $product = \App\Models\Product::find($productId);
+            $product = Product::find($productId);
             return redirect()->route('product.show', $product->slug);
         }
 
         try {
             $cartService = app(CartService::class);
-            $product = \App\Models\Product::find($productId);
+            $product = Product::find($productId);
 
             $cartService->addItem($product, 1);
 
             session()->flash('success', 'Product added to cart successfully!');
             $this->dispatch('cartUpdated');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             session()->flash('error', 'Error adding product to cart: ' . $e->getMessage());
         }
     }

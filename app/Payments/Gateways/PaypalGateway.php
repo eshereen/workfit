@@ -2,6 +2,9 @@
 
 namespace App\Payments\Gateways;
 
+use RuntimeException;
+use Exception;
+use GuzzleHttp\Client;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Http;
@@ -40,7 +43,7 @@ class PaypalGateway
 
             // Validate currency support
             if (!$this->isCurrencySupported($order->currency)) {
-                throw new \RuntimeException("PayPal does not support {$order->currency} currency. Please use USD, EUR, GBP, CAD, AUD, JPY, CHF, SGD, HKD, or NZD.");
+                throw new RuntimeException("PayPal does not support {$order->currency} currency. Please use USD, EUR, GBP, CAD, AUD, JPY, CHF, SGD, HKD, or NZD.");
             }
 
             if ($useCreditCard) {
@@ -59,7 +62,7 @@ class PaypalGateway
                 return $this->initiatePayPalAccountPayment($order, $payment);
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PayPal gateway: Error in initiate method: ' . $e->getMessage());
             return [
                 'success' => false,
@@ -106,7 +109,7 @@ class PaypalGateway
     {
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
-            throw new \RuntimeException('Failed to obtain PayPal access token');
+            throw new RuntimeException('Failed to obtain PayPal access token');
         }
 
         $orderData = [
@@ -180,11 +183,11 @@ class PaypalGateway
                     'redirect_url' => $approvalUrl
                 ];
             } else {
-                throw new \RuntimeException('PayPal approval URL not found');
+                throw new RuntimeException('PayPal approval URL not found');
             }
         } else {
             $errorMessage = $this->extractPayPalErrorMessage($responseData);
-            throw new \RuntimeException('Failed to create PayPal order: ' . $errorMessage);
+            throw new RuntimeException('Failed to create PayPal order: ' . $errorMessage);
         }
     }
 
@@ -214,7 +217,7 @@ class PaypalGateway
                 Log::error('PayPal gateway: Failed to get access token', ['response' => $data]);
                 return null;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PayPal gateway: Error getting access token: ' . $e->getMessage());
             return null;
         }
@@ -259,7 +262,7 @@ class PaypalGateway
 
             $accessToken = $this->getAccessToken();
             if (!$accessToken) {
-                throw new \RuntimeException('Failed to obtain PayPal access token');
+                throw new RuntimeException('Failed to obtain PayPal access token');
             }
 
             $url = $this->baseUrl . '/v2/checkout/orders/' . $orderId . '/capture';
@@ -275,7 +278,7 @@ class PaypalGateway
             ]);
 
             // Use Guzzle directly to ensure no body is sent
-            $client = new \GuzzleHttp\Client();
+            $client = new Client();
             $response = $client->post($url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $accessToken,
@@ -332,7 +335,7 @@ class PaypalGateway
                 ];
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PayPal gateway: Error capturing order: ' . $e->getMessage());
             return [
                 'success' => false,
@@ -355,7 +358,7 @@ class PaypalGateway
             ])->get($this->baseUrl . '/v2/checkout/orders/' . $orderId);
 
             return $response->json();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PayPal gateway: Error getting order details: ' . $e->getMessage());
             return null;
         }
@@ -376,7 +379,7 @@ class PaypalGateway
                 'client_secret_length' => strlen($this->clientSecret),
                 'client_id_length' => strlen($this->clientId)
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -416,7 +419,7 @@ class PaypalGateway
         }
 
         if (!$payment) {
-            throw new \RuntimeException('Payment not found for PayPal order ID: ' . $paypalOrderId . ' or payment ID: ' . $paymentId);
+            throw new RuntimeException('Payment not found for PayPal order ID: ' . $paypalOrderId . ' or payment ID: ' . $paymentId);
         }
 
         // Check if this is a credit card payment that needs frontend processing
@@ -462,7 +465,7 @@ class PaypalGateway
                         'order_status' => $orderDetails['status'] ?? 'unknown'
                     ]);
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('PayPal gateway: Error handling return', [
                     'payment_id' => $payment->id,
                     'error' => $e->getMessage(),
@@ -491,7 +494,7 @@ class PaypalGateway
                 'base_url' => $this->baseUrl,
                 'is_sandbox' => $this->isSandbox
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
                 'error' => $e->getMessage(),

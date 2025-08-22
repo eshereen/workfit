@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\CategoryFactory;
 use App\Traits\Sluggable;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Category extends Model implements HasMedia
 {
-    /** @use HasFactory<\Database\Factories\CategoryFactory> */
+    /** @use HasFactory<CategoryFactory> */
     use HasFactory,Sluggable, InteractsWithMedia;
     protected $fillable = ['name', 'slug', 'description','parent_id', 'active'];
 

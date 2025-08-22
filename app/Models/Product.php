@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductFactory;
 use App\Traits\Sluggable;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Spatie\Image\Enums\Fit;
@@ -13,7 +14,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Product extends Model implements HasMedia
 {
-    /** @use HasFactory<\Database\Factories\ProductFactory> */
+    /** @use HasFactory<ProductFactory> */
     use HasFactory, InteractsWithMedia, Sluggable;
     protected $fillable = ['name', 'slug', 'description', 'price', 'compare_price','featured', 'active','category_id','subcategory_id'];
 

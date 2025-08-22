@@ -2,11 +2,24 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\SubCategoryResource\Pages\ListSubCategories;
+use App\Filament\Resources\SubCategoryResource\Pages\CreateSubCategory;
+use App\Filament\Resources\SubCategoryResource\Pages\ViewSubCategory;
+use App\Filament\Resources\SubCategoryResource\Pages\EditSubCategory;
 use App\Filament\Resources\SubCategoryResource\Pages;
 use App\Filament\Resources\SubCategoryResource\RelationManagers;
 use App\Models\SubCategory;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,26 +30,26 @@ class SubCategoryResource extends Resource
 {
     protected static ?string $model = SubCategory::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('category_id')
+        return $schema
+            ->components([
+                TextInput::make('category_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('featured')
+                Toggle::make('featured')
                     ->required(),
-                Forms\Components\Toggle::make('active')
+                Toggle::make('active')
                     ->required(),
             ]);
     }
@@ -45,26 +58,26 @@ class SubCategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('category_id')
+                TextColumn::make('category_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('featured')
+                IconColumn::make('featured')
                     ->boolean(),
-                Tables\Columns\IconColumn::make('active')
+                IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -72,13 +85,13 @@ class SubCategoryResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -93,10 +106,10 @@ class SubCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSubCategories::route('/'),
-            'create' => Pages\CreateSubCategory::route('/create'),
-            'view' => Pages\ViewSubCategory::route('/{record}'),
-            'edit' => Pages\EditSubCategory::route('/{record}/edit'),
+            'index' => ListSubCategories::route('/'),
+            'create' => CreateSubCategory::route('/create'),
+            'view' => ViewSubCategory::route('/{record}'),
+            'edit' => EditSubCategory::route('/{record}/edit'),
         ];
     }
 }

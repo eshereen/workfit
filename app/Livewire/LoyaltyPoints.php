@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use App\Services\LoyaltyService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -56,7 +57,7 @@ class LoyaltyPoints extends Component
             $this->showRedeemForm = false;
             $this->pointsToRedeem = 100;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->redemptionError = $e->getMessage();
         }
     }

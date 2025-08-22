@@ -2,11 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\NewsletterResource\Pages\ListNewsletters;
+use App\Filament\Resources\NewsletterResource\Pages\CreateNewsletter;
+use App\Filament\Resources\NewsletterResource\Pages\ViewNewsletter;
+use App\Filament\Resources\NewsletterResource\Pages\EditNewsletter;
 use App\Filament\Resources\NewsletterResource\Pages;
 use App\Filament\Resources\NewsletterResource\RelationManagers;
 use App\Models\Newsletter;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,20 +29,20 @@ class NewsletterResource extends Resource
 {
     protected static ?string $model = Newsletter::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('email')
+        return $schema
+            ->components([
+                TextInput::make('email')
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('token')
+                TextInput::make('token')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Toggle::make('verified')
+                Toggle::make('verified')
                     ->required(),
             ]);
     }
@@ -39,21 +51,21 @@ class NewsletterResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('token')
+                TextColumn::make('token')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('verified')
+                IconColumn::make('verified')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -61,13 +73,13 @@ class NewsletterResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -82,10 +94,10 @@ class NewsletterResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNewsletters::route('/'),
-            'create' => Pages\CreateNewsletter::route('/create'),
-            'view' => Pages\ViewNewsletter::route('/{record}'),
-            'edit' => Pages\EditNewsletter::route('/{record}/edit'),
+            'index' => ListNewsletters::route('/'),
+            'create' => CreateNewsletter::route('/create'),
+            'view' => ViewNewsletter::route('/{record}'),
+            'edit' => EditNewsletter::route('/{record}/edit'),
         ];
     }
 }

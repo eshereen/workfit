@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Order;
+use App\Observers\OrderObserver;
+use Livewire\Livewire;
+use App\Livewire\CheckoutForm;
+use App\Livewire\PaymentMethodsSelector;
+use App\Livewire\LoyaltyPoints;
 use App\Events\OrderPlaced;
 use App\Events\PaymentStatusChanged;
 use App\Listeners\AwardLoyaltyPoints;
@@ -31,16 +37,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Register Order observer for payment status changes
-        \App\Models\Order::observe(\App\Observers\OrderObserver::class);
+        Order::observe(OrderObserver::class);
 
         // Manually register Livewire components if auto-discovery fails
-        if (class_exists(\Livewire\Livewire::class)) {
-            \Livewire\Livewire::component('checkout-form', \App\Livewire\CheckoutForm::class);
-            \Livewire\Livewire::component('payment-methods-selector', \App\Livewire\PaymentMethodsSelector::class);
+        if (class_exists(Livewire::class)) {
+            Livewire::component('checkout-form', CheckoutForm::class);
+            Livewire::component('payment-methods-selector', PaymentMethodsSelector::class);
 
             // Also try registering with full namespace
-            \Livewire\Livewire::component('App\\Livewire\\CheckoutForm', \App\Livewire\CheckoutForm::class);
-            \Livewire\Livewire::component('App\\Livewire\\PaymentMethodsSelector', \App\Livewire\PaymentMethodsSelector::class);
+            Livewire::component('App\\Livewire\\CheckoutForm', CheckoutForm::class);
+            Livewire::component('App\\Livewire\\PaymentMethodsSelector', PaymentMethodsSelector::class);
 
             // Debug: Log that components are being registered
             Log::info('Livewire components registration attempted', [
@@ -50,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
             ]);
 
             // Register loyalty-points component
-            \Livewire\Livewire::component('loyalty-points', \App\Livewire\LoyaltyPoints::class);
+            Livewire::component('loyalty-points', LoyaltyPoints::class);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use Livewire\Component;
 use App\Services\LoyaltyService;
 use Illuminate\Support\Facades\Auth;
@@ -74,7 +75,7 @@ class CheckoutLoyaltyPoints extends Component
                 'value' => $this->redemptionValue
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->errorMessage = $e->getMessage();
             $this->successMessage = '';
         }

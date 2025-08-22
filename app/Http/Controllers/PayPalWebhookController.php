@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Payment;
@@ -66,7 +67,7 @@ class PayPalWebhookController extends Controller
 
             return response()->json(['success' => true]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('PayPal webhook error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);

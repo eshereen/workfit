@@ -2,11 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\CountryResource\Pages\ListCountries;
+use App\Filament\Resources\CountryResource\Pages\CreateCountry;
+use App\Filament\Resources\CountryResource\Pages\ViewCountry;
+use App\Filament\Resources\CountryResource\Pages\EditCountry;
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers;
 use App\Models\Country;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,32 +29,32 @@ class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('code')
+                TextInput::make('code')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('phone_code')
+                TextInput::make('phone_code')
                     ->tel()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('currency_code')
+                TextInput::make('currency_code')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('currency_sympol')
+                TextInput::make('currency_sympol')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('tax_rate')
+                TextInput::make('tax_rate')
                     ->required()
                     ->numeric()
                     ->default(0.00),
-                Forms\Components\Toggle::make('active')
+                Toggle::make('active')
                     ->required(),
             ]);
     }
@@ -51,26 +63,26 @@ class CountryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('code')
+                TextColumn::make('code')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone_code')
+                TextColumn::make('phone_code')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('currency_code')
+                TextColumn::make('currency_code')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('currency_sympol')
+                TextColumn::make('currency_sympol')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tax_rate')
+                TextColumn::make('tax_rate')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('active')
+                IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -78,13 +90,13 @@ class CountryResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -99,10 +111,10 @@ class CountryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCountries::route('/'),
-            'create' => Pages\CreateCountry::route('/create'),
-            'view' => Pages\ViewCountry::route('/{record}'),
-            'edit' => Pages\EditCountry::route('/{record}/edit'),
+            'index' => ListCountries::route('/'),
+            'create' => CreateCountry::route('/create'),
+            'view' => ViewCountry::route('/{record}'),
+            'edit' => EditCountry::route('/{record}/edit'),
         ];
     }
 }

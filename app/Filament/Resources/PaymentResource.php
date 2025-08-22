@@ -2,11 +2,22 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\PaymentResource\Pages\ListPayments;
+use App\Filament\Resources\PaymentResource\Pages\CreatePayment;
+use App\Filament\Resources\PaymentResource\Pages\ViewPayment;
+use App\Filament\Resources\PaymentResource\Pages\EditPayment;
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Filament\Resources\PaymentResource\RelationManagers;
 use App\Models\Payment;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,37 +28,37 @@ class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('order_id')
+        return $schema
+            ->components([
+                Select::make('order_id')
                     ->relationship('order', 'id')
                     ->required(),
-                Forms\Components\TextInput::make('provider')
+                TextInput::make('provider')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('provider_reference')
+                TextInput::make('provider_reference')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('status')
+                TextInput::make('status')
                     ->required()
                     ->maxLength(255)
                     ->default('initiated'),
-                Forms\Components\TextInput::make('currency')
+                TextInput::make('currency')
                     ->required()
                     ->maxLength(3),
-                Forms\Components\TextInput::make('amount_minor')
+                TextInput::make('amount_minor')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('return_url')
+                TextInput::make('return_url')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('cancel_url')
+                TextInput::make('cancel_url')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('webhook_signature')
+                TextInput::make('webhook_signature')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('meta'),
+                TextInput::make('meta'),
             ]);
     }
 
@@ -55,31 +66,31 @@ class PaymentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('order.id')
+                TextColumn::make('order.id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('provider')
+                TextColumn::make('provider')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('provider_reference')
+                TextColumn::make('provider_reference')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('currency')
+                TextColumn::make('currency')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('amount_minor')
+                TextColumn::make('amount_minor')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('return_url')
+                TextColumn::make('return_url')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('cancel_url')
+                TextColumn::make('cancel_url')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('webhook_signature')
+                TextColumn::make('webhook_signature')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -87,13 +98,13 @@ class PaymentResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -108,10 +119,10 @@ class PaymentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPayments::route('/'),
-            'create' => Pages\CreatePayment::route('/create'),
-            'view' => Pages\ViewPayment::route('/{record}'),
-            'edit' => Pages\EditPayment::route('/{record}/edit'),
+            'index' => ListPayments::route('/'),
+            'create' => CreatePayment::route('/create'),
+            'view' => ViewPayment::route('/{record}'),
+            'edit' => EditPayment::route('/{record}/edit'),
         ];
     }
 }

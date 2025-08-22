@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Services\CountryCurrencyService;
+use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class Order extends Model
 {
-    /** @use HasFactory<\Database\Factories\OrderFactory> */
+    /** @use HasFactory<OrderFactory> */
     use HasFactory;
     protected $fillable = [
         'order_number',
@@ -130,7 +132,7 @@ class Order extends Model
 
     public function getCurrencySymbolAttribute()
     {
-        $currencyService = app(\App\Services\CountryCurrencyService::class);
+        $currencyService = app(CountryCurrencyService::class);
         return $currencyService->getCurrencySymbol($this->currency);
     }
 }

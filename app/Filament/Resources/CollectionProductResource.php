@@ -2,11 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\CollectionProductResource\Pages\ListCollectionProducts;
+use App\Filament\Resources\CollectionProductResource\Pages\CreateCollectionProduct;
+use App\Filament\Resources\CollectionProductResource\Pages\ViewCollectionProduct;
+use App\Filament\Resources\CollectionProductResource\Pages\EditCollectionProduct;
 use App\Filament\Resources\CollectionProductResource\Pages;
 use App\Filament\Resources\CollectionProductResource\RelationManagers;
 use App\Models\CollectionProduct;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,12 +25,12 @@ class CollectionProductResource extends Resource
 {
     protected static ?string $model = CollectionProduct::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 //
             ]);
     }
@@ -36,13 +44,13 @@ class CollectionProductResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -57,10 +65,10 @@ class CollectionProductResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCollectionProducts::route('/'),
-            'create' => Pages\CreateCollectionProduct::route('/create'),
-            'view' => Pages\ViewCollectionProduct::route('/{record}'),
-            'edit' => Pages\EditCollectionProduct::route('/{record}/edit'),
+            'index' => ListCollectionProducts::route('/'),
+            'create' => CreateCollectionProduct::route('/create'),
+            'view' => ViewCollectionProduct::route('/{record}'),
+            'edit' => EditCollectionProduct::route('/{record}/edit'),
         ];
     }
 }

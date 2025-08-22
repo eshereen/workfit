@@ -2,11 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\WishlistResource\Pages\ListWishlists;
+use App\Filament\Resources\WishlistResource\Pages\CreateWishlist;
+use App\Filament\Resources\WishlistResource\Pages\ViewWishlist;
+use App\Filament\Resources\WishlistResource\Pages\EditWishlist;
 use App\Filament\Resources\WishlistResource\Pages;
 use App\Filament\Resources\WishlistResource\RelationManagers;
 use App\Models\Wishlist;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,16 +27,16 @@ class WishlistResource extends Resource
 {
     protected static ?string $model = Wishlist::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('user_id')
+        return $schema
+            ->components([
+                TextInput::make('user_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('product_id')
+                TextInput::make('product_id')
                     ->required()
                     ->numeric(),
             ]);
@@ -36,17 +46,17 @@ class WishlistResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
+                TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('product_id')
+                TextColumn::make('product_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -54,13 +64,13 @@ class WishlistResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -75,10 +85,10 @@ class WishlistResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWishlists::route('/'),
-            'create' => Pages\CreateWishlist::route('/create'),
-            'view' => Pages\ViewWishlist::route('/{record}'),
-            'edit' => Pages\EditWishlist::route('/{record}/edit'),
+            'index' => ListWishlists::route('/'),
+            'create' => CreateWishlist::route('/create'),
+            'view' => ViewWishlist::route('/{record}'),
+            'edit' => EditWishlist::route('/{record}/edit'),
         ];
     }
 }

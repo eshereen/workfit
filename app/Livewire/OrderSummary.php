@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use Livewire\Component;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
@@ -174,7 +175,7 @@ class OrderSummary extends Component
                 'item_count' => count($this->cartItems)
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('OrderSummary: Error loading data', [
                 'error' => $e->getMessage()
             ]);

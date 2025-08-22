@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Country;
+use Exception;
 use Stevebauman\Location\Facades\Location;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +43,7 @@ class CountryCurrencyService
 
         // Then check if user has a preferred country
         if (Session::has('preferred_country_id')) {
-            $country = \App\Models\Country::find(Session::get('preferred_country_id'));
+            $country = Country::find(Session::get('preferred_country_id'));
             if ($country) {
                 return $country->currency_code;
             }
@@ -78,7 +80,7 @@ class CountryCurrencyService
 
     public function setPreferredCountry($countryId)
     {
-        $country = \App\Models\Country::find($countryId);
+        $country = Country::find($countryId);
         if ($country) {
             Session::put('preferred_country_id', $countryId);
             Session::put('preferred_currency', $country->currency_code);
@@ -92,10 +94,10 @@ class CountryCurrencyService
 
         // Find the country for this currency
         if (Session::has('preferred_country_id')) {
-            $country = \App\Models\Country::find(Session::get('preferred_country_id'));
+            $country = Country::find(Session::get('preferred_country_id'));
         } else {
             // Try to find a country with this currency
-            $country = \App\Models\Country::where('currency_code', $currencyCode)->first();
+            $country = Country::where('currency_code', $currencyCode)->first();
         }
 
         return [
@@ -123,7 +125,7 @@ class CountryCurrencyService
                 Log::info("Currency conversion: {$amount} USD to {$currencyCode} = {$converted} (rate: {$rate})");
                 return $converted;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Currency conversion error: " . $e->getMessage());
         }
 
@@ -144,7 +146,7 @@ class CountryCurrencyService
             // Fallback to hardcoded rates for common currencies
             return $this->getFallbackRate($currencyCode);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Failed to fetch exchange rate for {$currencyCode}: " . $e->getMessage());
             return $this->getFallbackRate($currencyCode);
         }
@@ -162,7 +164,7 @@ class CountryCurrencyService
                     return $data['rates'][$currencyCode];
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning("Exchange rate API failed: " . $e->getMessage());
         }
 
@@ -173,7 +175,7 @@ class CountryCurrencyService
     {
         // Fallback rates (updated periodically) - these are approximate
         $fallbackRates = [
-            'EGP' => 31.0,    // Egyptian Pound
+            'EGP' => 48.60,    // Egyptian Pound
             'GBP' => 0.79,    // British Pound
             'EUR' => 0.92,    // Euro
             'AED' => 3.67,    // UAE Dirham
@@ -213,13 +215,13 @@ class CountryCurrencyService
 
     public function getCountryCurrency($countryId)
     {
-        $country = \App\Models\Country::find($countryId);
+        $country = Country::find($countryId);
         return $country ? $country->currency_code : 'USD';
     }
 
     public function getCountryCurrencyByCode($countryCode)
     {
-        $country = \App\Models\Country::where('code', $countryCode)->first();
+        $country = Country::where('code', $countryCode)->first();
         return $country ? $country->currency_code : 'USD';
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use ReflectionClass;
+use Exception;
 use Illuminate\Console\Command;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
@@ -80,7 +82,7 @@ class DebugPaymentCalculation extends Command
             // 4. Check Exchange Rate
             $this->info("\n4. EXCHANGE RATE INFO:");
             // Use reflection to access protected method
-            $reflection = new \ReflectionClass($currencyService);
+            $reflection = new ReflectionClass($currencyService);
             $method = $reflection->getMethod('fetchExchangeRate');
             $method->setAccessible(true);
             $rate = $method->invoke($currencyService, 'EGP');
@@ -102,7 +104,7 @@ class DebugPaymentCalculation extends Command
             $this->info("=== Debug Complete ===");
             return 0;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Error during debug: " . $e->getMessage());
             $this->error("Stack trace: " . $e->getTraceAsString());
             return 1;
