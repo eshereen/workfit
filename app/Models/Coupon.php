@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\CouponType;
 use Database\Factories\CouponFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Coupon extends Model
 {
@@ -12,8 +13,9 @@ class Coupon extends Model
     use HasFactory;
     protected $fillable = ['code', 'type', 'value', 'min_order_amount', 'usage_limit', 'used_count', 'starts_at', 'expires_at', 'active'];
 
-     protected $casts = [
 
+     protected $casts = [
+        'type' => CouponType::class,
         'active' => 'boolean',
         'starts_at' => 'datetime',
         'expires_at' => 'datetime',
@@ -52,4 +54,10 @@ class Coupon extends Model
 
         return $subtotal * ($this->value / 100);
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+    
 }

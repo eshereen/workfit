@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withProviders([
         App\Providers\AppServiceProvider::class,
-     
+
         EventServiceProvider::class,
         RouteServiceProvider::class,
         App\Providers\LoyaltyServiceProvider::class,

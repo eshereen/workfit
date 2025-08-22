@@ -50,12 +50,14 @@ class ProductResource extends Resource
                     ->required()
                     ->maxLength(255),
                 SpatieMediaLibraryFileUpload::make('main_image')
-                ->collection('main_image')
-                    ->imageEditor(),
-                  SpatieMediaLibraryFileUpload::make('product_images')
-                    ->collection(collection: 'product_images')
+                    ->collection('main_image')
+                    ->imageEditor()
+                    ->disk('public'),
+                SpatieMediaLibraryFileUpload::make('product_images')
+                    ->collection('product_images')
                     ->multiple()
-                    ->imageEditor(),
+                    ->imageEditor()
+                    ->disk('public'),
                 Textarea::make('description')
                     ->columnSpanFull(),
                 TextInput::make('price')
@@ -76,10 +78,9 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 SpatieMediaLibraryImageColumn::make('main_image')
-
-                ->circular(),
+                ->collection('main_image')
+                    ->circular(),
                 TextColumn::make('category.name')
-
                     ->sortable(),
                 TextColumn::make('subcategory.name')
                     ->sortable(),
@@ -87,8 +88,7 @@ class ProductResource extends Resource
                     ->searchable(),
                 TextColumn::make('slug')
                     ->searchable(),
-
-                TextColumn::make(name: 'price')
+                TextColumn::make('price')
                     ->money()
                     ->sortable(),
                 TextColumn::make('compare_price')

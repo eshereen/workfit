@@ -5,20 +5,22 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\CurrencyController;
-use App\Http\Controllers\Newsletter\VerifyController;
-use App\Http\Controllers\Newsletter\UnsubscribeController;
-use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PaymentReturnController;
 use App\Http\Controllers\PayPalWebhookController;
+use App\Http\Controllers\Newsletter\VerifyController;
+use App\Http\Controllers\Newsletter\UnsubscribeController;
 
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // Currency routes
 Route::prefix('currency')->group(function () {

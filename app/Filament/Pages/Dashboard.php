@@ -6,6 +6,7 @@ use Filament\Pages\Page;
 use App\Filament\Widgets\RevenueChart;
 use App\Filament\Widgets\StatsOverview;
 use Filament\Pages\Dashboard as BaseDashboard;
+use App\Filament\Widgets\TopSellingProductsChart;
 
 class Dashboard extends BaseDashboard
 {
@@ -17,6 +18,7 @@ class Dashboard extends BaseDashboard
         return [
             StatsOverview::class,
             RevenueChart::class,
+            TopSellingProductsChart::class,
         ];
     }
 

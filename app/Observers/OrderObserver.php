@@ -7,6 +7,14 @@ use App\Models\Order;
 
 class OrderObserver
 {
+
+    public function created(Order $order): void
+    {
+        if ($order->coupon_id) {
+            $order->coupon->increment('used_count');
+        }
+    }
+
     /**
      * Handle the Order "updated" event.
      */

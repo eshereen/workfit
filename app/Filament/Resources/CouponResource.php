@@ -2,29 +2,31 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Coupon;
+use App\Enums\CouponType;
+use Filament\Tables\Table;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Actions\ViewAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
 use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\DateTimePicker;
+use App\Filament\Resources\CouponResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CouponResource\Pages\EditCoupon;
+use App\Filament\Resources\CouponResource\Pages\ViewCoupon;
+use App\Filament\Resources\CouponResource\RelationManagers;
 use App\Filament\Resources\CouponResource\Pages\ListCoupons;
 use App\Filament\Resources\CouponResource\Pages\CreateCoupon;
-use App\Filament\Resources\CouponResource\Pages\ViewCoupon;
-use App\Filament\Resources\CouponResource\Pages\EditCoupon;
-use App\Filament\Resources\CouponResource\Pages;
-use App\Filament\Resources\CouponResource\RelationManagers;
-use App\Models\Coupon;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CouponResource extends Resource
 {
@@ -39,7 +41,13 @@ class CouponResource extends Resource
                 TextInput::make('code')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('type')
+                Select::make('type')
+                    ->label('Coupon Type')
+                    ->enum(CouponType::class)
+                    ->options([
+                        CouponType::Fixed->value => CouponType::Fixed->label(),
+                        CouponType::Percentage->value => CouponType::Percentage->label(),
+                    ])
                     ->required(),
                 TextInput::make('value')
                     ->required()
@@ -48,10 +56,7 @@ class CouponResource extends Resource
                     ->numeric(),
                 TextInput::make('usage_limit')
                     ->numeric(),
-                TextInput::make('used_count')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
+          
                 DateTimePicker::make('starts_at')
                     ->required(),
                 DateTimePicker::make('expires_at')

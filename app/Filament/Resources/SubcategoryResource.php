@@ -2,29 +2,32 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\SubCategoryResource\Pages\ListSubCategories;
-use App\Filament\Resources\SubCategoryResource\Pages\CreateSubCategory;
-use App\Filament\Resources\SubCategoryResource\Pages\ViewSubCategory;
-use App\Filament\Resources\SubCategoryResource\Pages\EditSubCategory;
-use App\Filament\Resources\SubCategoryResource\Pages;
-use App\Filament\Resources\SubCategoryResource\RelationManagers;
-use App\Models\SubCategory;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Models\SubCategory;
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\SubCategoryResource\Pages;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use App\Filament\Resources\SubCategoryResource\RelationManagers;
+use App\Filament\Resources\SubCategoryResource\Pages\EditSubCategory;
+use App\Filament\Resources\SubCategoryResource\Pages\ViewSubCategory;
+use App\Filament\Resources\SubCategoryResource\Pages\CreateSubCategory;
+use App\Filament\Resources\SubCategoryResource\Pages\ListSubCategories;
 
 class SubCategoryResource extends Resource
 {
@@ -36,15 +39,20 @@ class SubCategoryResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('category_id')
+                SpatieMediaLibraryFileUpload::make('main_image')
+                ->collection('main_image')
+                ->imageEditor()
+                ->disk('public'),
+                Select::make('category.name')
                     ->required()
-                    ->numeric(),
+                   ->relationship('category', 'name'),
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
                 TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
+
                 Textarea::make('description')
                     ->columnSpanFull(),
                 Toggle::make('featured')
@@ -58,8 +66,10 @@ class SubCategoryResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('category_id')
-                    ->numeric()
+                SpatieMediaLibraryImageColumn::make('main_image')
+                ->collection('main_image')
+                    ->circular(),
+                TextColumn::make('category.name')
                     ->sortable(),
                 TextColumn::make('name')
                     ->searchable(),

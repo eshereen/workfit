@@ -135,4 +135,9 @@ class Order extends Model
         $currencyService = app(CountryCurrencyService::class);
         return $currencyService->getCurrencySymbol($this->currency);
     }
+
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
 }

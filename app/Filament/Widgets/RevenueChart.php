@@ -11,7 +11,7 @@ class RevenueChart extends ChartWidget
     protected  ?string $heading = 'Revenue (Last 3 Months - EGP)';
 
 
-   protected int | string | array $columnSpan = 'full';
+
    protected static ?  int $sort = 2;
     protected function getData(): array
     {

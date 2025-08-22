@@ -2,29 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\CollectionResource\Pages\ListCollections;
-use App\Filament\Resources\CollectionResource\Pages\CreateCollection;
-use App\Filament\Resources\CollectionResource\Pages\ViewCollection;
-use App\Filament\Resources\CollectionResource\Pages\EditCollection;
-use App\Filament\Resources\CollectionResource\Pages;
-use App\Filament\Resources\CollectionResource\RelationManagers;
-use App\Models\Collection;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Collection;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CollectionResource\Pages;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use App\Filament\Resources\CollectionResource\RelationManagers;
+use App\Filament\Resources\CollectionResource\Pages\EditCollection;
+use App\Filament\Resources\CollectionResource\Pages\ViewCollection;
+use App\Filament\Resources\CollectionResource\Pages\ListCollections;
+use App\Filament\Resources\CollectionResource\Pages\CreateCollection;
 
 class CollectionResource extends Resource
 {
@@ -36,6 +38,10 @@ class CollectionResource extends Resource
     {
         return $schema
             ->components([
+                SpatieMediaLibraryFileUpload::make('main_image')
+                ->collection('main_image')
+                ->imageEditor()
+                ->disk('public'),
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -53,6 +59,9 @@ class CollectionResource extends Resource
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('main_image')
+                ->collection('main_image')
+                    ->circular(),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('slug')
