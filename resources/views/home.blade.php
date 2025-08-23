@@ -2,12 +2,11 @@
 
 @section('content')
     <!-- Hero Section with Video Background -->
-    <section class="relative h-screen overflow-hidden mt-16">
+    <section class="relative -top-28 left-0 right-0 h-screen overflow-hidden">
         <!-- Video Background -->
         <div class="video-container">
-            <video autoplay muted loop playsinline>
-                <source src="videos/bg-video.mp4" type="video/mp4">
-                <source src="https://assets.mixkit.co/videos/preview/mixkit-woman-running-on-a-treadmill-4102-large.mp4" type="video/mp4">
+            <video autoplay muted loop playsinline poster="poster.jpg" class="w-full h-full object-cover">
+                <source src="videos/workfit.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -33,44 +32,10 @@
     </section>
 
     <!-- Featured Categories -->
-    <section class="py-16 px-4">
-        <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-12 animate-on-scroll">SHOP BY CATEGORY</h2>
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <!-- Category 1 -->
-                <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://picsum.photos/seed/workfit1/400/500.jpg" alt="Tops" class="w-full h-full object-cover hover-zoom">
-                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a href="#" class="text-white font-bold text-xl">MAN</a>
-                    </div>
-                </div>
-
-                <!-- Category 2 -->
-                <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://picsum.photos/seed/workfit2/400/500.jpg" alt="Bottoms" class="w-full h-full object-cover hover-zoom">
-                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a href="#" class="text-white font-bold text-xl capitalize">Women</a>
-                    </div>
-                </div>
-
-                <!-- Category 3 -->
-                <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://picsum.photos/seed/workfit3/400/500.jpg" alt="Accessories" class="w-full h-full object-cover hover-zoom">
-                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a href="#" class="text-white font-bold text-xl">ACCESSORIES</a>
-                    </div>
-                </div>
-
-                <!-- Category 4 -->
-                <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://picsum.photos/seed/workfit4/400/500.jpg" alt="Sale" class="w-full h-full object-cover hover-zoom">
-                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a href="#" class="text-white font-bold text-xl">SALE</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <section class="px-4">
+         <h1 class="text-center playfair font-bold text-5xl mb-2">Featured Products</h1>
+      </div>
+        @livewire('product-index')
     </section>
 
     <!-- Full-width Lifestyle Banner -->
@@ -409,4 +374,3 @@
         </div>
     </section>
 @endsection
-   

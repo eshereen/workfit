@@ -19,13 +19,6 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        mannikan: {
-                            pink: '#FF6B98',
-                            lightpink: '#FFD1DD',
-                            darkpink: '#D84A77',
-                        }
-                    },
                     fontFamily: {
                         'playfair': ['"Playfair Display"', 'serif'],
                         'poppins': ['Poppins', 'sans-serif'],
@@ -38,26 +31,14 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
-        .hero-section {
-            background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-            background-size: cover;
-            background-position: center;
-        }
-        .celebrity-slide {
-            scroll-snap-type: x mandatory;
-        }
-        .celebrity-slide > div {
-            scroll-snap-align: start;
-        }
-        .testimonial-card::before {
-            content: '"';
-            position: absolute;
-            top: -30px;
-            left: 20px;
-            font-size: 80px;
+        h1 {
             font-family: 'Playfair Display', serif;
-            color: rgba(255, 107, 152, 0.2);
         }
+        .hero-image {
+            background-image: url('https://images.unsplash.com/photo-1608146111783-497586265694?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80');
+            background-size
+        }
+
 
         /* Custom styles for animations and transitions */
         .hover-zoom {
@@ -107,7 +88,7 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
-        
+
         /* Video container styles for hero section */
         .video-container {
             position: absolute;
@@ -125,13 +106,13 @@
             top: 0;
             left: 0;
         }
-        
+
         /* Hero content positioning */
         .hero-content {
             position: relative;
             z-index: 20;
         }
-        
+
         /* Notification styles */
         .notification {
             transition: all 0.3s ease;
@@ -142,14 +123,16 @@
         .notification.hide {
             transform: translateX(100%);
         }
-    </style>
+
+     </style>
+
 </head>
-<body class="text-gray-800 bg-white" class="font-sans antialiased text-black bg-white">
+<body class=" antialiased">
 
     @include('layouts.navbar')
-    
+
     <!-- Notification System -->
-    <div id="notification-container" class="fixed top-4 right-4 z-50"></div>
+    <div id="notification-container" class="fixed top-4 right-4 z-50 p-4 text-white"></div>
 
     @yield('content')
 
@@ -164,20 +147,20 @@
         function showNotification(message, type = 'success') {
             const container = document.getElementById('notification-container');
             const notification = document.createElement('div');
-            
+
             notification.className = `notification mb-4 p-4 rounded-lg shadow-lg text-white transform translate-x-full ${
                 type === 'success' ? 'bg-green-500' : 'bg-red-500'
             }`;
             notification.textContent = message;
-            
+
             container.appendChild(notification);
-            
+
             // Show notification
             setTimeout(() => {
                 notification.classList.add('show');
                 notification.classList.remove('translate-x-full');
             }, 100);
-            
+
             // Hide and remove notification
             setTimeout(() => {
                 notification.classList.add('hide');

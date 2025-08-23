@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Collection;
@@ -25,6 +26,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@admin.com',
             'password' => bcrypt('password'), // Ensure to set a passwordsecurely
             'is_admin' => true,
+        ]);
+        //create coupon for new User
+        Coupon::factory()->create([
+            'code' => 'NEW_USER10',
+            'discount_type' => 'percentage',
+            'discount_value' => 10,
+            'valid_from' => now(),
+            'valid_to' => now()->addDays(30),
         ]);
            // Create categories with subcategories
     // Create categories with subcategories
@@ -59,5 +68,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(CountriesTableSeeder::class);
     }
+ 
 }
 

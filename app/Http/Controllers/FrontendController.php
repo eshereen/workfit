@@ -12,8 +12,11 @@ class FrontendController extends Controller
    public function index()
    {
 
-      $products = Product::with(['variants', 'category','subcategory'])
-        ->where('active', true)->get();
+      $products = Product::with(['variants', 'category','subcategory','media'])
+        ->where('active', true)
+        ->where('featured', true)
+        ->get()
+        ->take(12);
        return view('home',compact('products'));
    }
 

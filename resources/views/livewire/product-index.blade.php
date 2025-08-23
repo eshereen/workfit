@@ -12,7 +12,7 @@
             {{ session('error') }}
         </div>
     @endif
-
+@if(request()->routeIs('products.index'))
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-red-600">Shop</h1>
         <div class="flex items-center space-x-4">
@@ -34,6 +34,8 @@
             </select>
         </div>
     </div>
+
+    @endif
     @if($currencyCode !== 'USD')
     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
         <div class="text-sm text-green-800 text-center">
@@ -48,12 +50,19 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach($products as $product)
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20"  x-data="{ hover: false }"
+        @mouseenter="hover = true"
+        @mouseleave="hover = false">
             <div class="relative">
                 <a href="{{ route('product.show', $product->slug) }}">
                     <img src="{{ $product->getFirstMediaUrl('main_image', 'medium') }}"
                          alt="{{ $product->name }}"
-                         class="w-full h-64 object-cover">
+                         class="w-full h-64 object-cover
+                          :class="hover ? 'opacity-100' : 'opacity-0'">
+                    <img src="{{ $product->getFirstMediaUrl('product_images', 'medium') }}"
+                         alt="{{ $product->name }}"
+                         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                          :class="hover ? 'opacity-0' : 'opacity-100'">
                 </a>
                 <!-- Wishlist Button -->
                 @auth
@@ -132,10 +141,11 @@
         </div>
         @endforeach
     </div>
-
+    @if(request()->routeIs('products.index'))
     <div class="mt-8">
         {{ $products->links() }}
     </div>
+    @endif
 </div>
 
 <!-- Variant Selection Modal -->

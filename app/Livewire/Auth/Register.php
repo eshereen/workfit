@@ -2,14 +2,17 @@
 
 namespace App\Livewire\Auth;
 
-use Illuminate\Validation\Rules\Password;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
+use App\Models\Coupon;
+use Livewire\Component;
+use App\Mail\RegisterMail;
+use Livewire\Attributes\Layout;
+use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
-use Livewire\Attributes\Layout;
-use Livewire\Component;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Validation\Rules\Password;
 
 #[Layout('components.layouts.auth')]
 class Register extends Component
@@ -36,6 +39,9 @@ class Register extends Component
         $validated['password'] = Hash::make($validated['password']);
 
         event(new Registered(($user = User::create($validated))));
+        $coupon = Coupon::where('code', 'NEW_USER10')->first();
+        // Send welcome email
+        Mail::to($user->email)->send(new RegisterMail($user,$coupon));
 
         Auth::login($user);
 

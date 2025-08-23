@@ -2,8 +2,11 @@
 
 namespace App\Observers;
 
-use App\Events\PaymentStatusChanged;
 use App\Models\Order;
+use App\Mail\OrderCreated;
+use App\Mail\OrderShipped;
+use App\Events\PaymentStatusChanged;
+use Illuminate\Support\Facades\Mail;
 
 class OrderObserver
 {
@@ -13,6 +16,8 @@ class OrderObserver
         if ($order->coupon_id) {
             $order->coupon->increment('used_count');
         }
+        //Send email to customer after order created
+        Mail::to($order->email)->send(new OrderCreated($order));
     }
 
     /**
@@ -27,6 +32,10 @@ class OrderObserver
 
             // Fire event for payment status change
             event(new PaymentStatusChanged($order, $oldStatus, $newStatus));
+        }
+        //Send Mail to customer after shipping
+        if($order->wasChanged('status') && $order->status == 'shipped'){
+            Mail::to($order->email)->send(new OrderShipped($order));
         }
     }
 }

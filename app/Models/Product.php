@@ -71,16 +71,16 @@ class Product extends Model implements HasMedia
             ->singleFile() // Enforce only one image
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
             ->registerMediaConversions(function (Media $media) {
-                $media->addMediaConversion('thumb')
+                $this->addMediaConversion('thumb')
                     ->width(150)
                     ->height(150)
                     ->sharpen(10);
 
-                $media->addMediaConversion('medium')
+                $this->addMediaConversion('medium')
                     ->width(400)
                     ->height(400);
 
-                $media->addMediaConversion('large')
+                $this->addMediaConversion('large')
                     ->width(800)
                     ->height(800);
             });
@@ -89,15 +89,15 @@ class Product extends Model implements HasMedia
         $this->addMediaCollection('product_images')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
             ->registerMediaConversions(function (Media $media) {
-                $media->addMediaConversion('thumb')
+                $this->addMediaConversion('thumb')
                     ->width(150)
                     ->height(150);
 
-                $media->addMediaConversion('medium')
+                $this->addMediaConversion('medium')
                     ->width(600)
                     ->height(600);
 
-                $media->addMediaConversion('zoom')
+                $this->addMediaConversion('zoom')
                     ->width(1200)
                     ->height(1200)
                     ->quality(85);

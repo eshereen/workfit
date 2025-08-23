@@ -2,12 +2,14 @@
 
 namespace App\Mail;
 
+use App\Models\User;
+use App\Models\Coupon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class RegisterMail extends Mailable
 {
@@ -16,9 +18,10 @@ class RegisterMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public User $user, public Coupon $coupon)
     {
-        //
+        $this->user = $user;
+        $this->coupon = $coupon;
     }
 
     /**
@@ -27,7 +30,7 @@ class RegisterMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Register Mail',
+            subject: 'Welcome to ' . config('app.name'),
         );
     }
 
@@ -38,6 +41,9 @@ class RegisterMail extends Mailable
     {
         return new Content(
             markdown: 'mail.register',
+              with: [
+                'user' => $this->user,
+            ],
         );
     }
 
