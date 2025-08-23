@@ -12,6 +12,8 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\PaymentReturnController;
 use App\Http\Controllers\PayPalWebhookController;
 use App\Http\Controllers\Newsletter\VerifyController;
@@ -20,6 +22,10 @@ use App\Http\Controllers\Newsletter\UnsubscribeController;
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/collections', [CollectionController::class, 'index'])->name('collections.index');
+Route::get('/collection/{collection:slug}', [CollectionController::class, 'show'])->name('collection.show');
+Route::get('/categories', [CategoriesController::class, 'all'])->name('categories.all');
+Route::get('/categories/{categorySlug?}', [CategoriesController::class, 'index'])->name('categories.index');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // Currency routes
@@ -27,19 +33,8 @@ Route::prefix('currency')->group(function () {
     Route::post('/change', [CurrencyController::class, 'changeCurrency'])->name('currency.change');
     Route::get('/current', [CurrencyController::class, 'getCurrentCurrency'])->name('currency.current');
     Route::post('/reset', [CurrencyController::class, 'resetToDetected'])->name('currency.reset');
-    Route::get('/test', function() {
-        $currencyService = app(\App\Services\CountryCurrencyService::class);
-        $usdAmount = 10.00;
-        $egpAmount = $currencyService->convertFromUSD($usdAmount, 'EGP');
-        $sarAmount = $currencyService->convertFromUSD($usdAmount, 'SAR');
 
-        return response()->json([
-            'test_amount_usd' => $usdAmount,
-            'converted_to_egp' => $egpAmount,
-            'converted_to_sar' => $sarAmount,
-            'current_currency' => $currencyService->getCurrentCurrencyInfo()
-        ]);
-    })->name('currency.test');
+
 });
 
 // Checkout routes
@@ -53,9 +48,7 @@ Route::get('/checkout/test', [CheckoutController::class, 'testCheckout'])->name(
 Route::post('/checkout/debug', [CheckoutController::class, 'debugForm'])->name('checkout.debug');
 Route::post('/checkout/test-cod', [CheckoutController::class, 'testCodPayment'])->name('checkout.test-cod');
 Route::get('/checkout/test-simple-cod', [CheckoutController::class, 'testSimpleCod'])->name('checkout.test-simple-cod');
-Route::get('/checkout/test-direct', function() {
-    return view('test-checkout');
-})->name('checkout.test-direct');
+
 
 // PayPal credit card payment route
 Route::get('/checkout/paypal/credit-card/{payment}', [CheckoutController::class, 'showPayPalCreditCard'])->name('checkout.paypal.credit-card');
@@ -63,161 +56,6 @@ Route::post('/checkout/paypal/credit-card/{payment}/capture', [CheckoutControlle
 
 // PayPal webhook route
 Route::post('/paypal/webhook', [PayPalWebhookController::class, 'handleWebhook'])->name('paypal.webhook');
-
-// Debug route for PayPal gateway testing
-Route::get('/debug/paypal/{payment}', function(\App\Models\Payment $payment) {
-    try {
-        $gateway = app(\App\Payments\Gateways\PaypalGateway::class);
-
-        // Test access token
-        $tokenTest = $gateway->testAccessToken();
-
-        return response()->json([
-            'success' => true,
-            'payment_id' => $payment->id,
-            'payment_provider' => $payment->provider,
-            'payment_meta' => $payment->meta,
-            'token_test' => $tokenTest,
-            'gateway_class' => get_class($gateway)
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-    }
-})->name('debug.paypal');
-
-// Test PayPal gateway directly
-Route::get('/debug/paypal-test', function() {
-    try {
-        $gateway = app(\App\Payments\Gateways\PaypalGateway::class);
-        
-        // Test PayPal connectivity using the new method
-        $result = $gateway->testConnectivity();
-        
-        return response()->json($result);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-    }
-})->name('debug.paypal-test');
-
-// Debug payment data
-Route::get('/debug/payment/{id}', function($id) {
-    try {
-        $payment = \App\Models\Payment::find($id);
-        
-        if (!$payment) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Payment not found'
-            ]);
-        }
-        
-        return response()->json([
-            'success' => true,
-            'payment' => [
-                'id' => $payment->id,
-                'provider' => $payment->provider,
-                'status' => $payment->status,
-                'meta' => $payment->meta,
-                'order_id' => $payment->order_id,
-                'order_exists' => $payment->order ? true : false,
-                'order_data' => $payment->order ? [
-                    'id' => $payment->order->id,
-                    'order_number' => $payment->order->order_number,
-                    'total_amount' => $payment->order->total_amount,
-                    'currency' => $payment->order->currency
-                ] : null
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-    }
-})->name('debug.payment');
-
-// Debug route for payment methods
-Route::get('/debug/payment-methods/{countryCode}', function($countryCode) {
-    $resolver = app(\App\Services\PaymentMethodResolver::class);
-    $methods = $resolver->availableForCountry($countryCode);
-    $creditCardAvailable = $resolver->isCreditCardAvailableForCountry($countryCode);
-
-    return response()->json([
-        'country_code' => $countryCode,
-        'methods' => array_map(fn($m) => $m->value, $methods),
-        'credit_card_available' => $creditCardAvailable,
-        'session_country' => session('checkout_country')
-    ]);
-})->name('debug.payment-methods');
-
-// Debug route for Paymob callback testing
-Route::get('/debug/paymob-orders', function() {
-    $orders = \App\Models\Order::latest()->take(10)->get(['id', 'order_number', 'created_at']);
-    $payments = \App\Models\Payment::latest()->take(10)->get(['id', 'order_id', 'provider', 'status', 'created_at']);
-    
-    return response()->json([
-        'recent_orders' => $orders,
-        'recent_payments' => $payments
-    ]);
-})->name('debug.paymob-orders');
-
-// Debug route for testing Paymob order lookup
-Route::get('/debug/paymob-lookup/{merchantOrderId}', function($merchantOrderId) {
-    // Simulate the order lookup logic from the controller
-    $order = null;
-    $debug = [];
-    
-    // Try exact match first
-    $order = \App\Models\Order::where('order_number', $merchantOrderId)->first();
-    $debug['exact_match'] = [
-        'merchant_order_id' => $merchantOrderId,
-        'found' => $order ? 'yes' : 'no',
-        'order_id' => $order ? $order->id : null
-    ];
-    
-    // If not found, try partial match (remove Paymob's timestamp suffix)
-    if (!$order) {
-        $baseOrderNumber = preg_replace('/-\d+$/', '', $merchantOrderId);
-        $order = \App\Models\Order::where('order_number', $baseOrderNumber)->first();
-        $debug['base_match'] = [
-            'base_order_number' => $baseOrderNumber,
-            'found' => $order ? 'yes' : 'no',
-            'order_id' => $order ? $order->id : null
-        ];
-    }
-    
-    // If still not found, try LIKE search
-    if (!$order) {
-        $baseOrderNumber = preg_replace('/-\d+$/', '', $merchantOrderId);
-        $order = \App\Models\Order::where('order_number', 'LIKE', $baseOrderNumber . '%')->first();
-        $debug['like_match'] = [
-            'pattern' => $baseOrderNumber . '%',
-            'found' => $order ? 'yes' : 'no',
-            'order_id' => $order ? $order->id : null
-        ];
-    }
-    
-    return response()->json([
-        'merchant_order_id' => $merchantOrderId,
-        'debug' => $debug,
-        'final_result' => $order ? [
-            'found' => true,
-            'order_id' => $order->id,
-            'order_number' => $order->order_number
-        ] : [
-            'found' => false
-        ]
-    ]);
-})->name('debug.paymob-lookup');
 
 // Fixed callback URL for Paymob (since {order_id} placeholder isn't working)
 Route::get('/api/paymob/callback', [\App\Http\Controllers\PaymentController::class, 'handlePaymobCallback'])->name('paymob.callback');
@@ -248,13 +86,6 @@ Route::post('/payments/webhook/{gateway}', [\App\Http\Controllers\PaymentControl
 Route::get('/payments/return/{order}', [\App\Http\Controllers\PaymentController::class, 'handleReturn'])->name('payments.return');
 Route::get('/payments/cancel/{order}', [\App\Http\Controllers\PaymentController::class, 'handleCancel'])->name('payments.cancel');
 
-// Paymob callbacks now handled by standard routes:
-// - Webhook: /payments/webhook/paymob (handles payment status updates)
-// - Response: /payments/return/{order_id} (handles user redirects)
-
-
-
-
 
 //cart
 Route::prefix('cart')->group(function () {
@@ -270,7 +101,7 @@ Route::get('/newsletter/unsubscribe', UnsubscribeController::class)->name('newsl
 Route::get('/terms', [FrontendController::class, 'terms'])->name('terms');
 Route::get('/privacy', [FrontendController::class, 'privacy'])->name('privacy');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', \App\Livewire\Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -291,14 +122,14 @@ require __DIR__.'/auth.php';
 Route::get('/debug/order-items/{orderId}', function($orderId) {
     try {
         $order = \App\Models\Order::with(['items.product', 'items.variant'])->find($orderId);
-        
+
         if (!$order) {
             return response()->json(['error' => 'Order not found']);
         }
-        
+
         $items = $order->items;
         $itemsData = [];
-        
+
         foreach ($items as $item) {
             $itemsData[] = [
                 'id' => $item->id,
@@ -312,7 +143,7 @@ Route::get('/debug/order-items/{orderId}', function($orderId) {
                 'updated_at' => $item->updated_at
             ];
         }
-        
+
         return response()->json([
             'order_id' => $order->id,
             'order_number' => $order->order_number,
@@ -324,7 +155,7 @@ Route::get('/debug/order-items/{orderId}', function($orderId) {
                 'has_duplicates' => $items->pluck('product_id')->count() !== $items->pluck('product_id')->unique()->count()
             ]
         ]);
-        
+
     } catch (\Exception $e) {
         return response()->json([
             'error' => $e->getMessage(),

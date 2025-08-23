@@ -22,7 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web([
-            \App\Http\Middleware\CurrencyMiddleware::class,
+            // Temporarily disabled to test if it's causing 502 errors
+            // \App\Http\Middleware\CurrencyMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

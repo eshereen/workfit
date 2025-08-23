@@ -82,6 +82,9 @@ class SubscribeForm extends Component
 
         $this->reset(['email']);
         $this->submitted = true;
+
+        // Emit event for JavaScript to handle auto-hide
+        $this->dispatch('newsletter-subscribed');
     }
 
     public function render()

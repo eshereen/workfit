@@ -147,9 +147,33 @@
 
         <!-- Submit Button -->
     <div class="bg-white rounded-lg shadow-md p-6">
-        <button type="button" wire:click="submitForm" class="w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 transition-colors">
-            {{ Auth::check() ? 'Place Order' : 'Place Order as Guest' }}
+        <button type="button"
+                wire:click="submitForm"
+                wire:loading.attr="disabled"
+                wire:target="submitForm"
+                class="w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <span wire:loading.remove wire:target="submitForm">
+                {{ Auth::check() ? 'Place Order' : 'Place Order as Guest' }}
+            </span>
+            <span wire:loading wire:target="submitForm" class="flex items-center justify-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+            </span>
         </button>
+    </div>
+
+    <!-- Loading and Error Messages -->
+    <div wire:loading wire:target="submitForm" class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded mb-4">
+        <div class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Processing your order...
+        </div>
     </div>
 
     <!-- Debug: Show current payment method selection -->
@@ -201,6 +225,23 @@
         // Listen for Livewire events
         document.addEventListener('livewire:init', () => {
             console.log('Livewire initialized');
+
+            // Listen for custom Livewire events
+            Livewire.on('showLoading', (message) => {
+                console.log('Loading:', message);
+                // You can show a toast notification here
+            });
+
+            Livewire.on('showError', (message) => {
+                console.error('Error:', message);
+                // You can show an error toast notification here
+                alert('Error: ' + message);
+            });
+
+            Livewire.on('orderSuccess', (orderId) => {
+                console.log('Order success:', orderId);
+                // You can show a success toast notification here
+            });
 
                         // Debug: Check if components are loaded
             setTimeout(() => {

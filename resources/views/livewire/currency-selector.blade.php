@@ -5,10 +5,14 @@
      data-component-id="{{ $this->getId() }}"
      data-component-name="currency-selector">
 
- 
 
+@if(request()->routeIs('home'))
     <button @click="open = !open"
-            class="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors">
+            class="flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-white group-hover:text-gray-900 hover:text-red-600  rounded-md transition-colors ">
+            @else
+     <button @click="open = !open"
+            class="flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-gray-900 hover:text-red-600  rounded-md transition-colors">
+            @endif
         <span class="text-lg">{{ $currentSymbol }}</span>
         <span class="hidden sm:inline">{{ $currentCurrency }}</span>
         <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">

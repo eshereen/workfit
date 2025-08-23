@@ -1,146 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms & Conditions - Workfit</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Custom styles for animations and transitions */
-        .hover-zoom {
-            transition: transform 0.3s ease;
-        }
-        .hover-zoom:hover {
-            transform: scale(1.05);
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #FF0000;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #cc0000;
-        }
-        /* Table of contents styling */
-        .toc-link {
-            transition: all 0.3s ease;
-        }
-        .toc-link:hover {
-            color: #FF0000;
-            padding-left: 8px;
-        }
-        .toc-link.active {
-            color: #FF0000;
-            font-weight: bold;
-            border-left: 3px solid #FF0000;
-            padding-left: 12px;
-        }
-        /* Smooth scroll */
-        html {
-            scroll-behavior: smooth;
-        }
-        /* Section styling */
-        .section-content {
-            scroll-margin-top: 100px;
-        }
-    </style>
-</head>
-<body class="bg-white text-black font-sans antialiased" x-data="{
-    mobileMenuOpen: false,
-    cartItems: 0,
-    scrolled: false,
-    activeSection: ''
-}" x-init="() => {
-    // Initialize scroll listener
-    window.addEventListener('scroll', () => {
-        scrolled = window.scrollY > 10;
-
-        // Update active section in table of contents
-        const sections = document.querySelectorAll('.section-content');
-        sections.forEach(section => {
-            const rect = section.getBoundingClientRect();
-            if (rect.top <= 150 && rect.bottom >= 150) {
-                activeSection = section.id;
-            }
-        });
-    });
-}">
-
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-md py-2">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <a href="index.html" class="text-2xl font-bold">WORKFIT</a>
-                </div>
-
-                <!-- Desktop Navigation -->
-                <nav class="hidden md:flex space-x-8">
-                    <a href="index.html" class="font-medium hover:text-red-600 transition-colors">HOME</a>
-                    <a href="#" class="font-medium hover:text-red-600 transition-colors">NEW ARRIVALS</a>
-                    <a href="#" class="font-medium hover:text-red-600 transition-colors">WOMEN</a>
-                    <a href="#" class="font-medium hover:text-red-600 transition-colors">MEN</a>
-                    <a href="#" class="font-medium hover:text-red-600 transition-colors">COLLECTIONS</a>
-                    <a href="#" class="font-medium hover:text-red-600 transition-colors">SALE</a>
-                </nav>
-
-                <!-- Icons -->
-                <div class="flex items-center space-x-4">
-                    <button class="hover:text-red-600 transition-colors">
-                        <i class="fas fa-search text-xl"></i>
-                    </button>
-                    <button class="hover:text-red-600 transition-colors">
-                        <i class="fas fa-user text-xl"></i>
-                    </button>
-                    <button class="relative hover:text-red-600 transition-colors">
-                        <i class="fas fa-shopping-bag text-xl"></i>
-                        <span x-show="cartItems > 0"
-                              x-text="cartItems"
-                              class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"></span>
-                    </button>
-
-                    <!-- Mobile Menu Button -->
-                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div x-show="mobileMenuOpen"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 transform -translate-y-2"
-             x-transition:enter-end="opacity-100 transform translate-y-0"
-             x-transition:leave="transition ease-in duration-200"
-             x-transition:leave-start="opacity-100 transform translate-y-0"
-             x-transition:leave-end="opacity-0 transform -translate-y-2"
-             class="md:hidden bg-white py-4 px-4 shadow-lg">
-            <nav class="flex flex-col space-y-4">
-                <a href="index.html" class="font-medium hover:text-red-600 transition-colors">HOME</a>
-                <a href="#" class="font-medium hover:text-red-600 transition-colors">NEW ARRIVALS</a>
-                <a href="#" class="font-medium hover:text-red-600 transition-colors">WOMEN</a>
-                <a href="#" class="font-medium hover:text-red-600 transition-colors">MEN</a>
-                <a href="#" class="font-medium hover:text-red-600 transition-colors">COLLECTIONS</a>
-                <a href="#" class="font-medium hover:text-red-600 transition-colors">SALE</a>
-            </nav>
-        </div>
-    </header>
+@extends('layouts.app')
+@section('content')
 
     <!-- Main Content -->
     <main class="pt-20 min-h-screen">
@@ -148,7 +7,7 @@
         <section class="bg-black text-white py-16 px-4">
             <div class="container mx-auto text-center">
                 <h1 class="text-4xl md:text-5xl font-bold mb-4 fade-in">TERMS & CONDITIONS</h1>
-                <p class="text-lg text-gray-300 fade-in">Last updated: November 15, 2023</p>
+                <p class="text-lg text-gray-300 fade-in">Last updated: August 15, 2025</p>
             </div>
         </section>
 
@@ -348,72 +207,7 @@
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white py-12 px-4 border-t border-gray-200">
-        <div class="container mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <!-- Brand -->
-                <div class="animate-on-scroll">
-                    <h3 class="text-2xl font-bold mb-4">WORKFIT</h3>
-                    <p class="text-gray-600 mb-4">Premium activewear for performance and style.</p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-600 hover:text-red-600 transition-colors">
-                            <i class="fab fa-facebook text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-600 hover:text-red-600 transition-colors">
-                            <i class="fab fa-instagram text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-600 hover:text-red-600 transition-colors">
-                            <i class="fab fa-twitter text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-600 hover:text-red-600 transition-colors">
-                            <i class="fab fa-youtube text-xl"></i>
-                        </a>
-                    </div>
-                </div>
 
-                <!-- Shop -->
-                <div class="animate-on-scroll">
-                    <h4 class="font-bold mb-4">SHOP</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-600 hover:text-red-600 transition-colors">Women's</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-red-600 transition-colors">Men's</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-red-600 transition-colors">New Arrivals</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-red-600 transition-colors">Sale</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-red-600 transition-colors">Collections</a></li>
-                    </ul>
-                </div>
-
-                <!-- Support -->
-                <div class="animate-on-scroll">
-                    <h4 class="font-bold mb-4">SUPPORT</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-600 hover:text-red-600 transition-colors">Contact Us</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-red-600 transition-colors">FAQs</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-red-600 transition-colors">Shipping & Returns</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-red-600 transition-colors">Size Guide</a></li>
-                        <li><a href="terms.html" class="text-gray-600 hover:text-red-600 transition-colors">Terms & Conditions</a></li>
-                    </ul>
-                </div>
-
-                <!-- Newsletter -->
-                <div class="animate-on-scroll">
-                    <h4 class="font-bold mb-4">JOIN OUR NEWSLETTER</h4>
-                    <p class="text-gray-600 mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
-                    <form class="flex">
-                        <input type="email" placeholder="Enter your email" class="flex-grow px-4 py-2 border border-gray-300 focus:outline-none focus:border-red-600">
-                        <button type="submit" class="bg-red-600 text-white px-4 py-2 hover:bg-red-700 transition-colors">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="border-t border-gray-200 pt-8 text-center text-gray-600 animate-on-scroll">
-                <p>&copy; 2023 WORKFIT. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
 
     <script>
         // Additional JavaScript for enhanced functionality
@@ -444,5 +238,4 @@
             });
         });
     </script>
-</body>
-</html>
+@endsection

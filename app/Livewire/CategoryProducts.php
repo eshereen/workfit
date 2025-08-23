@@ -3,8 +3,8 @@
 namespace App\Livewire;
 
 use Exception;
+use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
 use Livewire\Component;
@@ -13,13 +13,16 @@ use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class ProductIndex extends Component
+class CategoryProducts extends Component
 {
     use WithPagination;
 
+    public $categorySlug;
+    public $category;
+    public $selectedCategories = [];
+    public $selectedSubcategories = [];
     public $search = '';
     public $sortBy = 'newest';
-    public $category = '';
     public $wishlistProductIds = [];
     public $currencyCode = 'USD';
     public $currencySymbol = '$';
@@ -32,6 +35,14 @@ class ProductIndex extends Component
     public $selectedVariant = null;
     public $quantity = 1;
 
+    #[On('filtersChanged')]
+    public function updateFilters($filters)
+    {
+        $this->selectedCategories = $filters['categories'] ?? [];
+        $this->selectedSubcategories = $filters['subcategories'] ?? [];
+        $this->resetPage();
+    }
+
     #[On('wishlistUpdated')]
     public function loadWishlist()
     {
@@ -42,36 +53,28 @@ class ProductIndex extends Component
         }
     }
 
-        #[On('currencyChanged')]
+    #[On('currencyChanged')]
     public function refreshCurrency()
     {
-        Log::info('Currency change event received in ProductIndex');
-
+        Log::info('Currency change event received in CategoryProducts');
         $this->loadCurrencyInfo();
-        // Force a re-render so paginated items get fresh conversion
         $this->dispatch('$refresh');
-
-        // Log the currency change
-        Log::info('Currency changed in ProductIndex', [
-            'new_currency' => $this->currencyCode,
-            'new_symbol' => $this->currencySymbol
-        ]);
     }
 
-    // Alternative method to handle currency changes
-    public function handleCurrencyChange($currencyCode = null)
+    public function mount($categorySlug = null)
     {
-        Log::info('Manual currency change triggered', ['currency' => $currencyCode]);
-        $this->refreshCurrency();
+        $this->categorySlug = $categorySlug;
+        $this->loadCategory();
+        $this->loadWishlist();
+        $this->loadCurrencyInfo();
     }
 
-    public function mount()
+    public function loadCategory()
     {
-        try {
-            $this->loadWishlist();
-            $this->loadCurrencyInfo();
-        } catch (Exception $e) {
-            // Handle wishlist loading error silently
+        if ($this->categorySlug) {
+            $this->category = Category::where('slug', $this->categorySlug)
+                ->where('active', true)
+                ->first();
         }
     }
 
@@ -84,64 +87,8 @@ class ProductIndex extends Component
             $this->currencyCode = $currencyInfo['currency_code'];
             $this->currencySymbol = $currencyInfo['currency_symbol'];
             $this->isAutoDetected = $currencyInfo['is_auto_detected'];
-
-            // Convert product prices to current currency
-            $this->convertProductPrices();
         } catch (Exception $e) {
             // Use defaults if currency service fails
-        }
-    }
-
-    protected function convertProductPrices($products = null)
-    {
-        if ($this->currencyCode === 'USD') {
-            return; // No conversion needed
-        }
-
-        try {
-            $currencyService = app(CountryCurrencyService::class);
-
-            // Convert all product prices in the collection
-            $productsToConvert = $products;
-            if ($productsToConvert) {
-                foreach ($productsToConvert as $product) {
-                    if ($product->price) {
-                        $product->converted_price = $currencyService->convertFromUSD($product->price, $this->currencyCode);
-                    }
-                    if ($product->compare_price && $product->compare_price > 0) {
-                        $product->converted_compare_price = $currencyService->convertFromUSD($product->compare_price, $this->currencyCode);
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            // Handle conversion error silently
-        }
-    }
-
-    protected function convertVariantPrices()
-    {
-        if ($this->currencyCode === 'USD' || !$this->selectedProduct) {
-            return; // No conversion needed
-        }
-
-        try {
-            $currencyService = app(CountryCurrencyService::class);
-
-            // Convert product price
-            if ($this->selectedProduct->price) {
-                $this->selectedProduct->converted_price = $currencyService->convertFromUSD($this->selectedProduct->price, $this->currencyCode);
-            }
-
-            // Convert variant prices
-            if ($this->selectedProduct->variants) {
-                foreach ($this->selectedProduct->variants as $variant) {
-                    if ($variant->price) {
-                        $variant->converted_price = $currencyService->convertFromUSD($variant->price, $this->currencyCode);
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            // Handle conversion error silently
         }
     }
 
@@ -166,24 +113,17 @@ class ProductIndex extends Component
             $message = '';
 
             if ($existingWishlist) {
-                // Remove from wishlist
                 $existingWishlist->delete();
                 $message = 'Product removed from wishlist!';
-                // Remove from local array
                 $this->wishlistProductIds = array_filter($this->wishlistProductIds, function($id) use ($productId) {
                     return $id != $productId;
                 });
             } else {
-                // Add to wishlist
-                $user->wishlist()->create([
-                    'product_id' => $productId
-                ]);
+                $user->wishlist()->create(['product_id' => $productId]);
                 $message = 'Product added to wishlist!';
-                // Add to local array
                 $this->wishlistProductIds[] = $productId;
             }
 
-            // Emit events
             $this->dispatch('wishlistUpdated');
             $this->dispatch('showNotification', [
                 'message' => $message,
@@ -191,7 +131,6 @@ class ProductIndex extends Component
             ]);
 
         } catch (Exception $e) {
-            // Log::error('Error in toggleWishlist: ' . $e->getMessage());
             $this->dispatch('showNotification', [
                 'message' => 'An error occurred while updating your wishlist: ' . $e->getMessage(),
                 'type' => 'error'
@@ -206,9 +145,6 @@ class ProductIndex extends Component
         $this->selectedVariant = null;
         $this->quantity = 1;
         $this->showVariantModal = true;
-
-        // Convert variant prices to current currency
-        $this->convertVariantPrices();
     }
 
     public function selectVariant($variantId)
@@ -216,7 +152,6 @@ class ProductIndex extends Component
         $this->selectedVariantId = $variantId;
         $this->selectedVariant = $this->selectedProduct->variants->find($variantId);
 
-        // Reset quantity if it exceeds stock
         if ($this->selectedVariant && $this->quantity > $this->selectedVariant->stock) {
             $this->quantity = $this->selectedVariant->stock;
         }
@@ -251,14 +186,12 @@ class ProductIndex extends Component
             $cartService = app(CartService::class);
             $cartService->addItemWithVariant($this->selectedProduct, $this->selectedVariant, $this->quantity);
 
-            // Close modal and reset
             $this->showVariantModal = false;
             $this->selectedProduct = null;
             $this->selectedVariantId = null;
             $this->selectedVariant = null;
             $this->quantity = 1;
 
-            // Emit events
             $this->dispatch('cartUpdated');
             $this->dispatch('showNotification', [
                 'message' => 'Product added to cart successfully!',
@@ -305,20 +238,30 @@ class ProductIndex extends Component
 
     public function render()
     {
-        // Check if currency has changed since last render
-        $this->checkCurrencyChange();
-
         $query = Product::with(['category', 'subcategory', 'media', 'variants'])
             ->where('active', true);
 
+        // If a specific category is selected, filter by it
+        if ($this->category) {
+            $query->where('category_id', $this->category->id);
+        }
+
+        // Apply category filter
+        if ($this->selectedCategories) {
+            $query->whereIn('category_id', $this->selectedCategories);
+        }
+
+        // Apply subcategory filter
+        if ($this->selectedSubcategories) {
+            $query->whereIn('subcategory_id', $this->selectedSubcategories);
+        }
+
+        // Apply search filter
         if ($this->search) {
             $query->where('name', 'like', '%' . $this->search . '%');
         }
 
-        if ($this->category) {
-            $query->where('category_id', $this->category);
-        }
-
+        // Apply sorting
         switch ($this->sortBy) {
             case 'price_low':
                 $query->orderBy('price', 'asc');
@@ -332,63 +275,27 @@ class ProductIndex extends Component
                 break;
         }
 
-        $products = $query->paginate(8);
+        $products = $query->paginate(12);
 
-        // Convert product prices to current currency
-        $this->convertProductPrices($products);
-
-        return view('livewire.product-index', [
-            'products' => $products
+        return view('livewire.category-products', [
+            'products' => $products,
+            'category' => $this->category
         ]);
     }
 
-    protected function checkCurrencyChange()
-    {
-        try {
-            $currencyService = app(CountryCurrencyService::class);
-            $currentInfo = $currencyService->getCurrentCurrencyInfo();
-
-            if ($this->currencyCode !== $currentInfo['currency_code']) {
-                Log::info('Currency change detected in render', [
-                    'old_currency' => $this->currencyCode,
-                    'new_currency' => $currentInfo['currency_code']
-                ]);
-
-                $this->currencyCode = $currentInfo['currency_code'];
-                $this->currencySymbol = $currentInfo['currency_symbol'];
-                $this->isAutoDetected = $currentInfo['is_auto_detected'];
-            }
-        } catch (Exception $e) {
-            // Handle error silently
-        }
-    }
-
-    /**
-     * Get the hex color code for a color name from config
-     */
     public function getColorCode($colorName)
     {
         $colors = config('colors');
-        return $colors[$colorName] ?? '#808080'; // Default to gray if color not found
+        return $colors[$colorName] ?? '#808080';
     }
 
-    /**
-     * Get contrasting text color (black or white) for a given background color
-     */
     public function getContrastColor($hexColor)
     {
-        // Remove # if present
         $hex = ltrim($hexColor, '#');
-
-        // Convert to RGB
         $r = hexdec(substr($hex, 0, 2));
         $g = hexdec(substr($hex, 2, 2));
         $b = hexdec(substr($hex, 4, 2));
-
-        // Calculate luminance
         $luminance = (0.299 * $r + 0.587 * $g + 0.114 * $b) / 255;
-
-        // Return black for light backgrounds, white for dark backgrounds
         return $luminance > 0.5 ? '#000000' : '#FFFFFF';
     }
 }

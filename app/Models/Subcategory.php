@@ -14,7 +14,7 @@ class Subcategory extends Model implements HasMedia
 {
     /** @use HasFactory<SubcategoryFactory> */
     use HasFactory, Sluggable,InteractsWithMedia;
-    protected $fillable = ['name', 'slug', 'description','parent_id', 'active'];
+    protected $fillable = ['name', 'slug', 'description','category_id', 'active'];
 
      //register media collections
     public function registerMediaCollections(): void
@@ -41,6 +41,11 @@ class Subcategory extends Model implements HasMedia
 
         public function category()
         {
-            return $this->belongsTo(Category::class);
+            return $this->belongsTo(Category::class, 'category_id');
+        }
+
+        public function products()
+        {
+            return $this->hasMany(Product::class);
         }
 }

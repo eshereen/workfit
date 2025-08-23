@@ -17,7 +17,7 @@ class OrderObserver
             $order->coupon->increment('used_count');
         }
         //Send email to customer after order created
-        Mail::to($order->email)->send(new OrderCreated($order));
+        Mail::to($order->email)->queue(new OrderCreated($order));
     }
 
     /**
@@ -35,7 +35,7 @@ class OrderObserver
         }
         //Send Mail to customer after shipping
         if($order->wasChanged('status') && $order->status == 'shipped'){
-            Mail::to($order->email)->send(new OrderShipped($order));
+            Mail::to($order->email)->queue(new OrderShipped($order));
         }
     }
 }

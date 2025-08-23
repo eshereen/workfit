@@ -10,8 +10,6 @@
     @livewireStyles
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@preline/preline@2.0.0/dist/preline.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -36,9 +34,8 @@
         }
         .hero-image {
             background-image: url('https://images.unsplash.com/photo-1608146111783-497586265694?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80');
-            background-size
+            background-size: cover;
         }
-
 
         /* Custom styles for animations and transitions */
         .hover-zoom {
@@ -113,6 +110,42 @@
             z-index: 20;
         }
 
+        /* Line clamping utilities */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Newsletter notification animations */
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Table of contents styling */
+        .toc-link {
+            transition: all 0.3s ease;
+        }
+        .toc-link:hover {
+            color: #FF0000;
+            padding-left: 8px;
+        }
+        .toc-link.active {
+            color: #FF0000;
+            font-weight: bold;
+            border-left: 3px solid #FF0000;
+            padding-left: 12px;
+        }
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Section styling */
+        .section-content {
+            scroll-margin-top: 100px;
+        }
+
         /* Notification styles */
         .notification {
             transition: all 0.3s ease;
@@ -123,11 +156,9 @@
         .notification.hide {
             transform: translateX(100%);
         }
-
      </style>
-
 </head>
-<body class=" antialiased">
+<body class="bg-white text-black font-sans antialiased">
 
     @include('layouts.navbar')
 

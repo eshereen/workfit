@@ -97,7 +97,8 @@ class CountryCurrencyService
             $country = Country::find(Session::get('preferred_country_id'));
         } else {
             // Try to find a country with this currency
-            $country = Country::where('currency_code', $currencyCode)->first();
+      
+            $country = Country::select('id','code','currency_code','currency_sympol')->where('currency_code', $currencyCode)->first();
         }
 
         return [
@@ -221,7 +222,7 @@ class CountryCurrencyService
 
     public function getCountryCurrencyByCode($countryCode)
     {
-        $country = Country::where('code', $countryCode)->first();
+        $country = Country::select('id','code','currency_code','currency_sympol')->where('code', $countryCode)->first();
         return $country ? $country->currency_code : 'USD';
     }
 

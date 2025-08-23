@@ -36,6 +36,7 @@
     </div>
 
     @endif
+    @if(!request()->routeIs('home'))
     @if($currencyCode !== 'USD')
     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
         <div class="text-sm text-green-800 text-center">
@@ -46,6 +47,7 @@
             @endif
         </div>
     </div>
+    @endif
     @endif
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

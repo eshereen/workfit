@@ -1,7 +1,7 @@
 {{-- resources/views/livewire/newsletter/subscribe-form.blade.php --}}
 <div class="max-w-md">
     @if($submitted)
-        <div class="rounded-md bg-green-50 p-3 text-sm text-green-700">
+        <div id="newsletter-success" class="rounded-md bg-green-50 p-3 text-sm text-green-700 animate-fade-in">
             Thanks! Please check your email to confirm your subscription.
         </div>
     @else
@@ -9,18 +9,55 @@
             {{-- Honeypot --}}
             <input type="text" wire:model="bot_field" class="hidden" tabindex="-1" autocomplete="off" />
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Email</label>
+            <div class="flex gap-2">
                 <input type="email" wire:model.defer="email"
-                       class="mt-1 block w-full rounded border-gray-300 focus:border-red-500 focus:ring-red-500"
-                       placeholder="you@example.com">
-                @error('email') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
+                       class="flex-grow px-4 py-2 border border-gray-300 focus:outline-none focus:border-red-600 text-gray-900"
+                       placeholder="Enter your email"
+                       required>
+
+                <button type="submit"
+                        class="bg-red-600 text-white px-4 py-2 hover:bg-red-700 transition-colors flex items-center justify-center">
+                        <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
-            <button type="submit"
-                    class="inline-flex items-center rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700">
-                Subscribe
-            </button>
+
+            @error('email')
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+            @enderror
         </form>
     @endif
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide newsletter success message after 3 seconds
+    const successMessage = document.getElementById('newsletter-success');
+    if (successMessage) {
+        setTimeout(() => {
+            successMessage.style.transition = 'opacity 0.5s ease-out';
+            successMessage.style.opacity = '0';
+            setTimeout(() => {
+                successMessage.remove();
+            }, 500);
+        }, 3000);
+    }
+});
+
+// Listen for Livewire events to handle dynamic content
+document.addEventListener('livewire:init', () => {
+    Livewire.on('newsletter-subscribed', () => {
+        // Auto-hide success message after 3 seconds when triggered by Livewire
+        setTimeout(() => {
+            const successMessage = document.getElementById('newsletter-success');
+            if (successMessage) {
+                successMessage.style.transition = 'opacity 0.5s ease-out';
+                successMessage.style.opacity = '0';
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 500);
+            }
+        }, 3000);
+    });
+});
+</script>
 

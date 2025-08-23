@@ -34,6 +34,10 @@ class Product extends Model implements HasMedia
     {
         return $this->belongsTo(Subcategory::class);
     }
+    public function collection()
+    {
+        return $this->belongsTo(Collection::class);
+    }
 
     public function variants()
     {

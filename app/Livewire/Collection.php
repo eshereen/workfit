@@ -3,8 +3,9 @@
 namespace App\Livewire;
 
 use Exception;
+use App\Models\Collection as CollectionModel;
 use App\Models\Product;
-use App\Models\ProductVariant;
+use App\Models\CollectionProduct;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
 use Livewire\Component;
@@ -13,13 +14,15 @@ use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class ProductIndex extends Component
+
+class Collection extends Component
 {
     use WithPagination;
-
+   public $collection = null;
     public $search = '';
     public $sortBy = 'newest';
-    public $category = '';
+    public $collectionSlug = '';
+
     public $wishlistProductIds = [];
     public $currencyCode = 'USD';
     public $currencySymbol = '$';
@@ -42,17 +45,17 @@ class ProductIndex extends Component
         }
     }
 
-        #[On('currencyChanged')]
+    #[On('currencyChanged')]
     public function refreshCurrency()
     {
-        Log::info('Currency change event received in ProductIndex');
+        Log::info('Currency change event received in Collection');
 
         $this->loadCurrencyInfo();
         // Force a re-render so paginated items get fresh conversion
         $this->dispatch('$refresh');
 
         // Log the currency change
-        Log::info('Currency changed in ProductIndex', [
+        Log::info('Currency changed in Collection', [
             'new_currency' => $this->currencyCode,
             'new_symbol' => $this->currencySymbol
         ]);
@@ -65,13 +68,26 @@ class ProductIndex extends Component
         $this->refreshCurrency();
     }
 
-    public function mount()
+    public function mount($collectionSlug = null)
     {
+
         try {
+            $this->collectionSlug = $collectionSlug;
+            $this->loadCollection();
             $this->loadWishlist();
             $this->loadCurrencyInfo();
         } catch (Exception $e) {
-            // Handle wishlist loading error silently
+            // Handle collection loading error silently
+        }
+    }
+
+    public function loadCollection()
+    {
+        if ($this->collectionSlug) {
+            $this->collection = CollectionModel::where('slug', $this->collectionSlug)
+                ->where('active', true)
+                ->with(['products.category', 'products.subcategory', 'products.media', 'products.variants'])
+                ->first();
         }
     }
 
@@ -109,7 +125,7 @@ class ProductIndex extends Component
                         $product->converted_price = $currencyService->convertFromUSD($product->price, $this->currencyCode);
                     }
                     if ($product->compare_price && $product->compare_price > 0) {
-                        $product->converted_compare_price = $currencyService->convertFromUSD($product->compare_price, $this->currencyCode);
+                        $product->converted_price = $currencyService->convertFromUSD($product->compare_price, $this->currencyCode);
                     }
                 }
             }
@@ -191,7 +207,6 @@ class ProductIndex extends Component
             ]);
 
         } catch (Exception $e) {
-            // Log::error('Error in toggleWishlist: ' . $e->getMessage());
             $this->dispatch('showNotification', [
                 'message' => 'An error occurred while updating your wishlist: ' . $e->getMessage(),
                 'type' => 'error'
@@ -308,15 +323,19 @@ class ProductIndex extends Component
         // Check if currency has changed since last render
         $this->checkCurrencyChange();
 
-        $query = Product::with(['category', 'subcategory', 'media', 'variants'])
+        if (!$this->collection) {
+            return view('livewire.collection', [
+                'products' => collect([]),
+                'collection' => null
+            ]);
+        }
+
+        $query = $this->collection->products()
+            ->with(['category', 'subcategory', 'media', 'variants'])
             ->where('active', true);
 
         if ($this->search) {
             $query->where('name', 'like', '%' . $this->search . '%');
-        }
-
-        if ($this->category) {
-            $query->where('category_id', $this->category);
         }
 
         switch ($this->sortBy) {
@@ -332,13 +351,14 @@ class ProductIndex extends Component
                 break;
         }
 
-        $products = $query->paginate(8);
+        $products = $query->paginate(12);
 
         // Convert product prices to current currency
         $this->convertProductPrices($products);
 
-        return view('livewire.product-index', [
-            'products' => $products
+        return view('livewire.collection', [
+            'products' => $products,
+            'collection' => $this->collection
         ]);
     }
 
@@ -390,5 +410,48 @@ class ProductIndex extends Component
 
         // Return black for light backgrounds, white for dark backgrounds
         return $luminance > 0.5 ? '#000000' : '#FFFFFF';
+    }
+
+    /**
+     * Get collection statistics
+     */
+    public function getCollectionStats()
+    {
+        if (!$this->collection) {
+            return null;
+        }
+
+        return [
+            'total_products' => $this->collection->products()->count(),
+            'active_products' => $this->collection->products()->where('active', true)->count(),
+            'has_media' => $this->collection->media->count() > 0,
+            'created_date' => $this->collection->created_at->format('M d, Y'),
+            'updated_date' => $this->collection->updated_at->format('M d, Y'),
+        ];
+    }
+
+    /**
+     * Check if collection has any products
+     */
+    public function hasProducts()
+    {
+        return $this->collection && $this->collection->products()->count() > 0;
+    }
+
+    /**
+     * Get collection categories
+     */
+    public function getCollectionCategories()
+    {
+        if (!$this->collection) {
+            return collect();
+        }
+
+        return $this->collection->products()
+            ->with('category')
+            ->get()
+            ->pluck('category')
+            ->unique('id')
+            ->filter();
     }
 }

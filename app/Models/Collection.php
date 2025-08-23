@@ -16,9 +16,17 @@ class Collection extends Model implements HasMedia
     use HasFactory, Sluggable,InteractsWithMedia;
     protected $fillable = ['name', 'slug', 'description','active'];
 
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     public function products()
     {
-        return $this->belongsToMany(Product::class);
+        return $this->belongsToMany(Product::class, 'collection_product');
     }
      //register media collections
     public function registerMediaCollections(): void
