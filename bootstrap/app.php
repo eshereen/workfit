@@ -21,10 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Providers\LoyaltyServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->web([
-            // Temporarily disabled to test if it's causing 502 errors
-            // \App\Http\Middleware\CurrencyMiddleware::class,
-        ]);
+        // Append our currency middleware to the web group in a supported way
+        $middleware->appendToGroup('web', \App\Http\Middleware\CurrencyMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

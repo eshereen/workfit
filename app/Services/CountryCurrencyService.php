@@ -72,9 +72,7 @@ class CountryCurrencyService
     public function setPreferredCurrency($currencyCode)
     {
         // Clear all currency-related session data to force a fresh start
-        Session::forget('preferred_currency');
         Session::forget('preferred_country_id');
-        Session::forget('currency_initialized');
         Session::forget('detected_country');
         Session::forget('detected_currency');
 
@@ -93,7 +91,12 @@ class CountryCurrencyService
         $country = Country::find($countryId);
         if ($country) {
             Session::put('preferred_country_id', $countryId);
-            Session::put('preferred_currency', $country->currency_code);
+
+            // Do not override a manual currency selection
+            $hasManualSelection = Session::has('preferred_currency') && Session::get('currency_initialized') === true;
+            if (!$hasManualSelection) {
+                Session::put('preferred_currency', $country->currency_code);
+            }
         }
     }
 
@@ -107,7 +110,7 @@ class CountryCurrencyService
             $country = Country::find(Session::get('preferred_country_id'));
         } else {
             // Try to find a country with this currency
-      
+
             $country = Country::select('id','code','currency_code','currency_sympol')->where('currency_code', $currencyCode)->first();
         }
 

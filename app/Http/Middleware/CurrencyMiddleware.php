@@ -28,6 +28,17 @@ class CurrencyMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
+        // Skip currency detection for Livewire internal update requests to avoid interfering
+        // with Livewire's AJAX lifecycle and prevent transient errors during rapid updates
+        if ($request->is('livewire/*') || $request->headers->has('x-livewire')) {
+            return $next($request);
+        }
+
+        // If user has manually selected a currency, don't run auto-detection
+        if (Session::has('preferred_currency') && Session::get('currency_initialized') === true) {
+            return $next($request);
+        }
+
         // Only set currency if user hasn't manually selected one and hasn't been initialized
         if (!Session::has('preferred_currency') && !Session::has('currency_initialized')) {
             // Detect country and currency from IP

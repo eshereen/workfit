@@ -120,10 +120,10 @@
 
                         <!-- Price -->
                         <div class="flex items-center gap-2 mb-3">
-                            <span class="text-lg font-bold text-gray-900">{{ $currencySymbol }}{{ number_format($product->price, 2) }}</span>
+                            <span class="text-lg font-bold text-gray-900">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->price), 2) }}</span>
 
                             @if($product->compare_price && $product->compare_price > $product->price)
-                                <span class="text-sm text-gray-500 line-through">{{ $currencySymbol }}{{ number_format($product->compare_price, 2) }}</span>
+                                <span class="text-sm text-gray-500 line-through">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->compare_price), 2) }}</span>
                             @endif
                         </div>
 
@@ -236,7 +236,7 @@
                                             <span class="text-sm font-medium">{{ $variant->name  }}</span>
                                         </div>
                                         <div class="text-sm text-gray-600 mt-1">
-                                            {{ $currencySymbol }}{{ number_format($variant->price, 2) }}
+                                            {{ $currencySymbol }}{{ number_format($this->convertPrice($variant->price), 2) }}
                                         </div>
                                         <div class="text-xs text-gray-500 mt-1">
                                             Stock: {{ $variant->stock }}
@@ -276,7 +276,7 @@
                         {{ !$selectedVariant ? 'disabled' : '' }}
                     >
                         @if($selectedVariant)
-                            Add to Cart - {{ $currencySymbol }}{{ number_format($selectedVariant->price, 2) }}
+                            Add to Cart - {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedVariant->price), 2) }}
                         @else
                             Select a variant first
                         @endif

@@ -206,16 +206,24 @@ class CurrencySelector extends Component
     }
 
     #[On('currency-changed')]
-    public function handleCurrencyChanged($currencyCode)
+    public function handleCurrencyChanged($currencyCode = null)
     {
         Log::info('CurrencySelector: Received currency-changed event', ['currency_code' => $currencyCode]);
+        if ($currencyCode === null) {
+            $info = app(CountryCurrencyService::class)->getCurrentCurrencyInfo();
+            $currencyCode = $info['currency_code'] ?? 'USD';
+        }
         $this->updateToCurrency($currencyCode);
     }
 
     #[On('global-currency-changed')]
-    public function handleGlobalCurrencyChanged($currencyCode)
+    public function handleGlobalCurrencyChanged($currencyCode = null)
     {
         Log::info('CurrencySelector: Received global-currency-changed event', ['currency_code' => $currencyCode]);
+        if ($currencyCode === null) {
+            $info = app(CountryCurrencyService::class)->getCurrentCurrencyInfo();
+            $currencyCode = $info['currency_code'] ?? 'USD';
+        }
         $this->updateToCurrency($currencyCode);
     }
 

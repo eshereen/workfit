@@ -54,6 +54,8 @@ class CollectionProducts extends Component
     }
 
     #[On('currencyChanged')]
+    #[On('currency-changed')]
+    #[On('global-currency-changed')]
     public function refreshCurrency()
     {
         Log::info('Currency change event received in CollectionProducts');
@@ -89,6 +91,16 @@ class CollectionProducts extends Component
             $this->isAutoDetected = $currencyInfo['is_auto_detected'];
         } catch (Exception $e) {
             // Use defaults if currency service fails
+        }
+    }
+
+    public function convertPrice($amount)
+    {
+        try {
+            $currencyService = app(CountryCurrencyService::class);
+            return $currencyService->convertFromUSD($amount, $this->currencyCode);
+        } catch (Exception $e) {
+            return $amount;
         }
     }
 

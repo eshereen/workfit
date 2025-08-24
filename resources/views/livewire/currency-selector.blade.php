@@ -351,59 +351,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.showNotification) {
                     window.showNotification(`Currency changed to ${currencyCode}`, 'success');
                 }
+                // Dispatch Livewire events so components re-read currency immediately
+                try {
+                    if (window.Livewire && window.Livewire.dispatch) {
+                        // Dispatch without payload to avoid Livewire unpack issues
+                        window.Livewire.dispatch('currencyChanged');
+                        window.Livewire.dispatch('currency-changed');
+                        window.Livewire.dispatch('global-currency-changed');
+                    }
+                } catch (e) {
+                    console.error('Error dispatching Livewire currency events:', e);
+                }
                                                 // Try Livewire refresh first, fallback to page reload
-                setTimeout(() => {
-                    console.log('🔄 Refreshing Livewire components...');
-
-                    let refreshSuccess = false;
-
-                    if (window.Livewire) {
-                        try {
-                            // List all Livewire components for debugging
-                            console.log('🔍 All Livewire components:', window.Livewire.all());
-
-                            // Try to refresh all components
-                            const components = window.Livewire.all();
-                            if (components.length > 0) {
-                                                                console.log(`🔄 Attempting to refresh ${components.length} Livewire components...`);
-                                components.forEach((component, index) => {
-                                    try {
-                                        console.log(`📍 Refreshing component ${index}:`, component.el.className || component.el.tagName);
-                                        component.$refresh();
-                                        refreshSuccess = true;
-                                    } catch (e) {
-                                        console.error(`❌ Error refreshing component ${index}:`, e);
-                                    }
-                                });
-
-                                if (refreshSuccess) {
-                                    console.log('✅ Livewire components refreshed successfully');
-
-                                    // Wait a moment for components to refresh, then verify
-                                    setTimeout(() => {
-                                        console.log('🔍 Verifying refresh - checking navbar currency...');
-                                        const navbarCurrency = document.querySelector('.currency-selector .text-lg');
-                                        if (navbarCurrency) {
-                                            console.log('📍 Navbar currency element:', navbarCurrency.textContent);
-                                        }
-                                    }, 500);
-
-                                    return; // Exit early if refresh worked
-                                }
-                            }
-                        } catch (e) {
-                            console.error('❌ Error with Livewire refresh:', e);
-                        }
-                    }
-
-                    // Fallback: reload page if Livewire refresh didn't work
-                    if (!refreshSuccess) {
-                        console.log('⚠️ Livewire refresh failed, falling back to page reload');
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 300);
-                    }
-                }, 200);
+                // Rely on Livewire events; avoid page reloads to prevent flicker
+                return;
             } else {
                 console.error('❌ Currency change failed:', data.message);
             }
