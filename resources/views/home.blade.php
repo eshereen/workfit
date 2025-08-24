@@ -40,14 +40,14 @@
 
     <!-- Full-width Lifestyle Banner -->
     <section class="relative h-96 overflow-hidden animate-on-scroll">
-        <img src="https://picsum.photos/seed/workfit-banner1/1920/400.jpg" alt="Lifestyle Banner" class="w-full h-full object-cover">
+        <img src="https://images.unsplash.com/photo-1607962837359-5e7e89f86776?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lifestyle Banner" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
             <div class="text-center text-white px-4">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">SUMMER COLLECTION</h2>
                 <p class="text-xl mb-6 max-w-2xl mx-auto">Stay cool and stylish with our latest summer essentials</p>
-                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
+                <a href="{{ route('collections.index') }}"   class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
                     SHOP NOW
-                </button>
+                </a>
             </div>
         </div>
     </section>
@@ -77,31 +77,31 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 h-screen">
                 <!-- RUN Block -->
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://picsum.photos/seed/run/600/400.jpg" alt="Run" class="w-full h-full object-cover hover-zoom">
+                    <img src="https://images.unsplash.com/photo-1679216129631-fbcec034558c?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Run" class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">RUN</h3>
                         <p class="text-white text-center px-4 mb-4">Lightweight gear for your daily runs</p>
-
+                        <a href="{{ route('collections.index') }}" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
                     </div>
                 </div>
 
                 <!-- TRAIN Block -->
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://picsum.photos/seed/train/600/400.jpg" alt="Train" class="w-full h-full object-cover hover-zoom">
+                    <img src="https://images.unsplash.com/photo-1646072508263-af94f0218bf0?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Train" class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">TRAIN</h3>
                         <p class="text-white text-center px-4 mb-4">Durable apparel for intense workouts</p>
-
+                        <a href="{{ route('collections.index') }}" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
                     </div>
                 </div>
 
                 <!-- REC Block -->
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://picsum.photos/seed/rec/600/400.jpg" alt="Rec" class="w-full h-full object-cover hover-zoom">
+                    <img src="https://images.unsplash.com/photo-1715192383684-24c6614d2b54?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Rec" class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">REC</h3>
                         <p class="text-white text-center px-4 mb-4">Comfortable styles for recovery days</p>
-
+ <a href="{{route('collections.index')}}" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
                     </div>
                 </div>
             </div>
@@ -130,7 +130,7 @@
 
     <!-- Full-width Lifestyle Banner 2 -->
     <section class="relative h-96 overflow-hidden animate-on-scroll">
-        <img src="https://picsum.photos/seed/workfit-banner2/1920/400.jpg" alt="Lifestyle Banner" class="w-full h-full object-cover">
+        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lifestyle Banner" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
             <div class="text-center text-white px-4">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">NEW ARRIVALS</h2>

@@ -23,12 +23,12 @@
 
        <!-- Icons -->
        <div class="flex items-center flex-1 space-x-4 justify-end relative z-[1001]">
-           <a href="{{ route('location') }}" class="font-xs hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Location</a>
+           <a href="{{ route('location') }}" class="font-xs uppercase hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Location</a>
 
            <!-- Currency Selector -->
            @include('components.currency-selector')
 
-           <a href="/login" class="font-xs hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Account</a>
+           <a href="/login" class="font-xs hover:text-red-600 uppercase transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Account</a>
 
             <!-- Cart and Wishlist Counts -->
             @livewire('cart-wishlist-counts')

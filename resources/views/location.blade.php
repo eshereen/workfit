@@ -176,7 +176,7 @@
 
     <!-- Hero Section -->
     <section class="relative h-96 overflow-hidden mt-16">
-        <img src="https://picsum.photos/seed/workfit-locations-hero/1920/600.jpg" alt="Workfit Locations" class="w-full h-full object-cover">
+        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Workfit Locations" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black bg-opacity-60"></div>
         <div class="relative z-10 h-full flex items-center justify-center">
             <div class="text-center text-white px-4">
@@ -330,7 +330,7 @@
             
             <div class="max-w-6xl mx-auto animate-on-scroll">
                 <div class="map-container bg-gray-200 rounded-lg overflow-hidden shadow-lg">
-                    <img src="https://picsum.photos/seed/workfit-locations-map/1200/675.jpg" alt="Workfit Locations Map" class="w-full h-full object-cover">
+                    <img src="https://images.unsplash.com/photo-1712150177656-b3c0bd50eb25?q=80&w=1892&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Workfit Locations Map" class="w-full h-full object-cover">
                 </div>
                 
                 <div class="mt-8 bg-white p-6 rounded-lg shadow-md">

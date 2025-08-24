@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <h1 class="text-4xl md:text-5xl font-bold mb-4 fade-in">PRIVACY POLICY</h1>
-                <p class="text-lg text-gray-300 fade-in">Last updated: November 15, 2023</p>
+                <p class="text-lg text-gray-300 fade-in">Last updated: August 15, 2025</p>
             </div>
         </section>
 
