@@ -22,6 +22,11 @@ class AwardLoyaltyPoints implements ShouldQueue
     {
         $order = $event->order;
 
+        // Only award points if the order has an associated user (not guest orders)
+        if (!$order->user) {
+            return;
+        }
+
         // Award points immediately when order is placed
         // This provides better user experience - users see points right away
 
