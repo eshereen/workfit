@@ -12,6 +12,7 @@ class CollectionController extends Controller
      */
     public function show($slug)
     {
+        $title = 'WorkFit|Collections';
         $collection = Collection::where('slug', $slug)
             ->where('active', true)
             ->with(['products.category', 'products.subcategory', 'products.media', 'products.variants'])
@@ -19,7 +20,8 @@ class CollectionController extends Controller
 
         return view('collection', [
             'collection' => $collection,
-            'collectionSlug' => $collection->slug
+            'collectionSlug' => $collection->slug,
+            'title' => 'WorkFit|Collections'
         ]);
     }
 
@@ -28,11 +30,12 @@ class CollectionController extends Controller
      */
     public function index()
     {
+        $title = 'WorkFit|Collections';
         $collections = Collection::where('active', true)
             ->withCount('products')
             ->get();
 
-        return view('collections.index', compact('collections'));
+        return view('collections.index', compact('collections','title'));
     }
 
     /**

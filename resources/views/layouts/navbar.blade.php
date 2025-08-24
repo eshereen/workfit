@@ -1,8 +1,8 @@
    <!-- Header -->
    @if(request()->routeIs('home'))
- <header class="relative max-h-28  z-50 transition-all duration-300 py-3 mb-10 bg-transparent hover:bg-white  text-white font-semibold hover:text-gray-900 group">
+ <header class="relative max-h-28  z-[1100] transition-all duration-300 py-3 mb-10 bg-transparent hover:bg-white  text-white font-semibold hover:text-gray-900 group">
     @else
-    <header class="fixed top-0 left-0 right-0 z-50 max-h-28   transition-all duration-300 py-3 mb-10 bg-white hover:bg-white  text-gray-900 font-semibold group">
+    <header class="fixed top-0 left-0 right-0 z-[1100] max-h-28   transition-all duration-300 py-3 mb-10 bg-white hover:bg-white  text-gray-900 font-semibold group">
     @endif
 <div class="container mx-auto px-4">
    <div class="flex items-center justify-between">
@@ -22,8 +22,8 @@
        </div>
 
        <!-- Icons -->
-       <div class="flex items-center flex-1 space-x-4 justify-end">
-           <a href="#" class="font-xs hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Location</a>
+       <div class="flex items-center flex-1 space-x-4 justify-end relative z-[1001]">
+           <a href="{{ route('location') }}" class="font-xs hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Location</a>
 
            <!-- Currency Selector -->
            @include('components.currency-selector')
@@ -34,33 +34,23 @@
             @livewire('cart-wishlist-counts')
 
            <!-- Mobile Menu Button -->
-           <button class="md:hidden" onclick="toggleMobileMenu()">
+           <button id="mobile-menu-button" class="md:hidden" type="button" aria-controls="mobileMenu" aria-expanded="false" onclick="toggleMobileMenu()">
                <i class="fas fa-bars text-xl"></i>
            </button>
        </div>
    </div>
 </div>
 
-<!-- Mobile Menu -->
-<div id="mobileMenu" class="md:hidden bg-transparent hover:bg-white py-4 px-4 shadow-lg hidden">
+</header>
+
+<!-- Mobile Menu (moved outside header) -->
+<div id="mobileMenu" class="md:hidden fixed top-16 left-0 right-0 z-[1090] bg-white py-4 px-4 shadow-lg hidden">
    <nav class="flex flex-col space-y-4">
-       <a href="#" class="font-medium hover:text-red-600 transition-colors">NEW ARRIVALS</a>
-       <a href="#" class="font-medium hover:text-red-600 transition-colors">WOMEN</a>
-       <a href="#" class="font-medium hover:text-red-600 transition-colors">MEN</a>
+       <a href="{{route('categories.index', 'women')}}" class="font-medium hover:text-red-600 transition-colors uppercase">Women</a>
+    
+       <a href="{{route('categories.index', 'men')}}" class="font-medium hover:text-red-600 transition-colors">MEN</a>
        <a href="{{ route('categories.all') }}" class="font-medium hover:text-red-600 transition-colors">CATEGORIES</a>
        <a href="{{ route('collections.index') }}" class="font-medium hover:text-red-600 transition-colors">COLLECTIONS</a>
 
    </nav>
 </div>
-
-<script>
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobileMenu');
-    if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-    } else {
-        menu.classList.add('hidden');
-    }
-}
-</script>
-</header>

@@ -35,7 +35,6 @@
     <section class="px-4">
          <h1 class="text-center  font-bold text-5xl mb-2">Just Arrived</h1>
          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
-      </div>
         @livewire('product-index')
     </section>
 

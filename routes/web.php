@@ -20,13 +20,13 @@ use App\Http\Controllers\Newsletter\VerifyController;
 use App\Http\Controllers\Newsletter\UnsubscribeController;
 
 Route::get('/', [FrontendController::class, 'index'])->name('home');
+/*** Products Pages */
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/collections', [CollectionController::class, 'index'])->name('collections.index');
 Route::get('/collection/{collection:slug}', [CollectionController::class, 'show'])->name('collection.show');
 Route::get('/categories', [CategoriesController::class, 'all'])->name('categories.all');
 Route::get('/categories/{categorySlug?}', [CategoriesController::class, 'index'])->name('categories.index');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // Currency routes
 Route::prefix('currency')->group(function () {
@@ -98,8 +98,21 @@ Route::prefix('cart')->group(function () {
 });
 Route::get('/newsletter/verify', VerifyController::class)->name('newsletter.verify');
 Route::get('/newsletter/unsubscribe', UnsubscribeController::class)->name('newsletter.unsubscribe');
+//Terms
 Route::get('/terms', [FrontendController::class, 'terms'])->name('terms');
+//Privacy
 Route::get('/privacy', [FrontendController::class, 'privacy'])->name('privacy');
+//About
+Route::get('/about', [FrontendController::class, 'about'])->name('about');
+//Refund
+Route::get('/return-policy', [FrontendController::class, 'return'])->name('return');
+//Location
+Route::get('/location', [FrontendController::class, 'location'])->name('location');
+/*** Contact Page */
+Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+/*** Dashboard  */
 
 Route::get('dashboard', \App\Livewire\Dashboard::class)
     ->middleware(['auth', 'verified'])
@@ -118,48 +131,4 @@ Route::middleware(['auth'])->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Debug route for checking order items
-Route::get('/debug/order-items/{orderId}', function($orderId) {
-    try {
-        $order = \App\Models\Order::with(['items.product', 'items.variant'])->find($orderId);
 
-        if (!$order) {
-            return response()->json(['error' => 'Order not found']);
-        }
-
-        $items = $order->items;
-        $itemsData = [];
-
-        foreach ($items as $item) {
-            $itemsData[] = [
-                'id' => $item->id,
-                'product_id' => $item->product_id,
-                'product_name' => $item->product->name ?? 'N/A',
-                'quantity' => $item->quantity,
-                'price' => $item->price,
-                'variant_id' => $item->variant_id,
-                'variant_info' => $item->variant ? $item->variant->color . ', ' . $item->variant->size : 'N/A',
-                'created_at' => $item->created_at,
-                'updated_at' => $item->updated_at
-            ];
-        }
-
-        return response()->json([
-            'order_id' => $order->id,
-            'order_number' => $order->order_number,
-            'total_items' => $items->count(),
-            'items' => $itemsData,
-            'duplicate_check' => [
-                'product_ids' => $items->pluck('product_id')->toArray(),
-                'unique_product_ids' => $items->pluck('product_id')->unique()->toArray(),
-                'has_duplicates' => $items->pluck('product_id')->count() !== $items->pluck('product_id')->unique()->count()
-            ]
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-    }
-})->name('debug.order-items');

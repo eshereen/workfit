@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WorkFit</title>
+    <title>{{ $title ?? 'WorkFit' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Livewire Styles -->
     @livewireStyles
-
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">    </link>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    </link>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
      <script>
         tailwind.config = {
             theme: {
@@ -25,142 +25,13 @@
             }
         }
     </script>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-        h1 {
-            font-family: 'Playfair Display', serif;
-        }
-        .hero-image {
-            background-image: url('https://images.unsplash.com/photo-1608146111783-497586265694?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80');
-            background-size: cover;
-        }
 
-        /* Custom styles for animations and transitions */
-        .hover-zoom {
-            transition: transform 0.3s ease;
-        }
-        .hover-zoom:hover {
-            transform: scale(1.05);
-        }
-        .product-image-container {
-            overflow: hidden;
-        }
-        .product-image-secondary {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .product-image-container:hover .product-image-primary {
-            opacity: 0;
-        }
-        .product-image-container:hover .product-image-secondary {
-            opacity: 1;
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .slide-in {
-            animation: slideIn 0.7s ease-out;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* Video container styles for hero section */
-        .video-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        .video-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        /* Hero content positioning */
-        .hero-content {
-            position: relative;
-            z-index: 20;
-        }
-
-        /* Line clamping utilities */
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* Newsletter notification animations */
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        /* Table of contents styling */
-        .toc-link {
-            transition: all 0.3s ease;
-        }
-        .toc-link:hover {
-            color: #FF0000;
-            padding-left: 8px;
-        }
-        .toc-link.active {
-            color: #FF0000;
-            font-weight: bold;
-            border-left: 3px solid #FF0000;
-            padding-left: 12px;
-        }
-        /* Smooth scroll */
-        html {
-            scroll-behavior: smooth;
-        }
-        /* Section styling */
-        .section-content {
-            scroll-margin-top: 100px;
-        }
-
-        /* Notification styles */
-        .notification {
-            transition: all 0.3s ease;
-        }
-        .notification.show {
-            transform: translateX(0);
-        }
-        .notification.hide {
-            transform: translateX(100%);
-        }
-     </style>
 </head>
 <body class="bg-white text-black font-sans antialiased">
 
     @include('layouts.navbar')
+
+    
 
     <!-- Notification System -->
     <div id="notification-container" class="fixed top-4 right-4 z-50 p-4 text-white"></div>
@@ -171,6 +42,8 @@
 
     <!-- Livewire Scripts -->
     @livewireScripts
+
+    <script src="{{ asset('js/app.js') . '?v=' . filemtime(public_path('js/app.js')) }}"></script>
 
     <!-- Notification System Script -->
     <script>

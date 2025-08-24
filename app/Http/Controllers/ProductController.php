@@ -20,6 +20,7 @@ class ProductController extends Controller
      */
     public function index()
     {
+
         $products = Product::with(['category', 'subcategory', 'media'])
             ->where('active', true)
             ->latest()
@@ -39,7 +40,7 @@ class ProductController extends Controller
             return $product;
         });
 
-        return view('products.index', compact('products', 'currencyInfo'));
+        return view('products.index', compact('products', 'currencyInfo','title'));
     }
 
     /**

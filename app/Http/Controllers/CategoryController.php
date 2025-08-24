@@ -9,7 +9,8 @@ class CategoryController extends Controller
 {
     public function index()
     {
+        $title = 'WorkFit|Categories';
         $categories = Category::with('products')->get();
-        return view('categories', compact('categories'));
+        return view('categories', compact('categories','title'));
     }
 }

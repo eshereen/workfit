@@ -308,7 +308,14 @@ class ProductIndex extends Component
         // Check if currency has changed since last render
         $this->checkCurrencyChange();
 
-        $query = Product::with(['category', 'subcategory', 'media', 'variants'])
+        // Only eager-load what's needed on home page to reduce payload
+        $with = ['category', 'media'];
+        if (!request()->routeIs('home')) {
+            $with[] = 'subcategory';
+            $with[] = 'variants';
+        }
+
+        $query = Product::with($with)
             ->where('active', true);
 
         if ($this->search) {
@@ -332,7 +339,8 @@ class ProductIndex extends Component
                 break;
         }
 
-        $products = $query->paginate(8);
+        $perPage = request()->routeIs('home') ? 8 : 12;
+        $products = $query->paginate($perPage);
 
         // Convert product prices to current currency
         $this->convertProductPrices($products);

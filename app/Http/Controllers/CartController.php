@@ -28,6 +28,7 @@ class CartController extends Controller
      */
     public function index()
     {
+        $title = 'WorkFit|Cart';
         // Get current currency info
         $currencyInfo = $this->currencyService->getCurrentCurrencyInfo();
 

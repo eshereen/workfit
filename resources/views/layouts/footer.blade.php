@@ -37,9 +37,9 @@
             <div class="animate-on-scroll">
                 <h4 class="font-bold mb-4">SUPPORT</h4>
                 <ul class="space-y-2">
-                    <li><a href="" class="text-gray-200 hover:text-red-600 transition-colors">Contact Us</a></li>
+                    <li><a href="{{ route('contact.index') }}" class="text-gray-200 hover:text-red-600 transition-colors">Contact Us</a></li>
                     <li><a href="{{ route('terms') }}" class="text-gray-200 hover:text-red-600 transition-colors">Terms & Conditions</a></li>
-                    <li><a href="" class="text-gray-200 hover:text-red-600 transition-colors">Shipping & Returns</a></li>
+                    <li><a href="{{ route('return') }}" class="text-gray-200 hover:text-red-600 transition-colors">Shipping & Returns</a></li>
                     <li><a href="{{ route('privacy') }}" class="text-gray-200 hover:text-red-600 transition-colors">privacy</a></li>
 
                 </ul>

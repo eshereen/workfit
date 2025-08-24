@@ -90,6 +90,7 @@ class CheckoutController extends Controller
             'currencyCode' => $currencyInfo['currency_code'],
             'currencySymbol' => $currencyInfo['currency_symbol'],
             'isAutoDetected' => $currencyInfo['is_auto_detected'],
+            'title' => 'WorkFit|Checkout',
         ]);
     }
 

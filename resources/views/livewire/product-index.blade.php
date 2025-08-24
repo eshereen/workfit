@@ -59,8 +59,8 @@
                 <a href="{{ route('product.show', $product->slug) }}">
                     <img src="{{ $product->getFirstMediaUrl('main_image', 'medium') }}"
                          alt="{{ $product->name }}"
-                         class="w-full h-64 object-cover
-                          :class="hover ? 'opacity-100' : 'opacity-0'">
+                         class="w-full h-64 object-cover"
+                         :class="hover ? 'opacity-100' : 'opacity-0'">
                     <img src="{{ $product->getFirstMediaUrl('product_images', 'medium') }}"
                          alt="{{ $product->name }}"
                          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"

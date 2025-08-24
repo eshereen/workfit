@@ -15,23 +15,26 @@ class CountryCurrencyService
     public function detectCountry()
     {
         $ip = request()->ip();
-        Log::info("CountryCurrencyService: Detecting country for IP: {$ip}");
+        // Cache detection per IP to avoid repeated slow lookups
+        return Cache::remember("detected_country_{$ip}", now()->addDay(), function () use ($ip) {
+            Log::info("CountryCurrencyService: Detecting country for IP: {$ip}");
 
-        $location = Location::get($ip);
-        Log::info("CountryCurrencyService: Location result", ['location' => $location]);
+            $location = Location::get($ip);
+            Log::info("CountryCurrencyService: Location result", ['location' => $location]);
 
-        if ($location) {
-            $result = [
-                'country_code' => $location->countryCode,
-                'country_name' => $location->countryName,
-                'currency_code' => $this->mapCountryToCurrency($location->countryCode)
-            ];
-            Log::info("CountryCurrencyService: Detection successful", $result);
-            return $result;
-        }
+            if ($location) {
+                $result = [
+                    'country_code' => $location->countryCode,
+                    'country_name' => $location->countryName,
+                    'currency_code' => $this->mapCountryToCurrency($location->countryCode)
+                ];
+                Log::info("CountryCurrencyService: Detection successful", $result);
+                return $result;
+            }
 
-        Log::warning("CountryCurrencyService: Could not detect location for IP: {$ip}");
-        return null;
+            Log::warning("CountryCurrencyService: Could not detect location for IP: {$ip}");
+            return null;
+        });
     }
 
     public function getPreferredCurrency()
@@ -49,9 +52,16 @@ class CountryCurrencyService
             }
         }
 
-        // Finally, fall back to IP detection
+        // If we previously auto-detected, reuse that to avoid re-detecting every request
+        if (Session::has('detected_currency')) {
+            return Session::get('detected_currency');
+        }
+
+        // Finally, fall back to IP detection (memoized by cache) and store in session
         $detected = $this->detectCountry();
         if ($detected && $detected['currency_code']) {
+            Session::put('detected_country', $detected['country_code']);
+            Session::put('detected_currency', $detected['currency_code']);
             return $detected['currency_code'];
         }
 

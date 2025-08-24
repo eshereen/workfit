@@ -11,7 +11,8 @@ class FrontendController extends Controller
 {
    public function index()
    {
-        $categories = Category::with(['products'])->get();
+    $title = 'WorkFit|Home';
+      $categories = Category::with(['products'])->get();
       $products = Product::with(['variants', 'category','subcategory','media'])
         ->where('active', true)
         ->where('featured', true)
@@ -27,7 +28,8 @@ class FrontendController extends Controller
         $men = Category::with(['products'])->where('name','Men')->first();
         $women = Category::with(['products'])->where('name','Women')->first();
         $kids = Category::with(['products'])->where('name','Kids')->first();
- return view('home',compact('products','men','women','kids','featured','categories'));
+
+        return view('home',compact('products','men','women','kids','featured','categories'));
 
 
    }
@@ -36,20 +38,41 @@ class FrontendController extends Controller
 
    public function thankyou()
    {
-       return view(view: 'thankyou');
+
+    $title = 'WorkFit|Thank you';
+       return view('thankyou',compact('title'));
    }
 
 
    public function terms()
    {
-       return view(view: 'terms');
+    $title = 'WorkFit|Terms & Conditions';
+       return view( 'terms',compact('title'));
    }
 
 
    public function privacy()
    {
-       return view(view: 'privacy');
+    $title = 'WorkFit|Privacy Policy';
+       return view( 'privacy',compact('title'));
    }
+   public function about()
+   {
+    $title = 'WorkFit|About Us';
+       return view('about',compact('title'));
+   }
+
+    public function return()
+    {
+        $title = 'WorkFit|Return Policy';
+        return view('return',compact('title'));
+    }
+    public function location()
+    {
+        $title = 'WorkFit|Locations';
+        return view( 'location',compact('title'));
+    }
+
 
 
 }

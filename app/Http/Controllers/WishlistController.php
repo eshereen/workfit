@@ -15,6 +15,7 @@ class WishlistController extends BaseController
      */
     public function index()
     {
+        $title = 'WorkFit|Wishlist';
         return view('wishlist.index');
     }
 }
