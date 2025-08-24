@@ -17,7 +17,7 @@ class OrderObserver
             $order->coupon->increment('used_count');
         }
         //Send email to customer after order created
-       // Mail::to($order->email)->queue(new OrderCreated($order));
+        Mail::to($order->email)->later(now()->addSeconds(5), new OrderCreated($order));
     }
 
     /**
