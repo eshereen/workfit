@@ -127,23 +127,6 @@
     <!-- Payment Methods Selector -->
     @livewire('payment-methods-selector')
 
-    <!-- Debug Info (remove in production) -->
-    @if(config('app.debug'))
-        <div class="bg-gray-100 p-4 rounded-lg mb-4">
-            <h3 class="font-semibold mb-2">Debug Info:</h3>
-            <p><strong>Payment Method:</strong> {{ $selectedPaymentMethod ?? 'Not selected' }}</p>
-            <p><strong>PayPal Type:</strong> {{ $paypalPaymentType ?? 'Not set' }}</p>
-            <p><strong>Billing Country:</strong> {{ $billingCountry ?? 'Not set' }}</p>
-            <p><strong>First Name:</strong> {{ $firstName ?? 'Not set' }}</p>
-            <p><strong>Email:</strong> {{ $email ?? 'Not set' }}</p>
-        </div>
-
-        <!-- Form Data Debug -->
-        <div id="debug-info" class="bg-yellow-100 p-4 rounded-lg mb-4">
-            <h3 class="font-semibold mb-2">Form Data to be Submitted:</h3>
-            <p>Click "Place Order" to see the actual form data</p>
-        </div>
-    @endif
 
         <!-- Submit Button -->
     <div class="bg-white rounded-lg shadow-md p-6">
@@ -176,15 +159,7 @@
         </div>
     </div>
 
-    <!-- Debug: Show current payment method selection -->
-    @if(config('app.debug'))
-        <div class="bg-blue-100 p-4 rounded-lg mb-4">
-            <h3 class="font-semibold mb-2">Current Payment Method Selection:</h3>
-            <p><strong>Selected Method:</strong> {{ $selectedPaymentMethod ?? 'Not set' }}</p>
-            <p><strong>Is COD:</strong> {{ ($selectedPaymentMethod === 'cash_on_delivery') ? 'Yes' : 'No' }}</p>
-            <p><strong>Is Paymob:</strong> {{ ($selectedPaymentMethod === 'paymob') ? 'Yes' : 'No' }}</p>
-        </div>
-    @endif
+
 
     <!-- Hidden Form for Submission -->
     <form id="checkout-form" method="POST" action="{{ route('checkout.process') }}" style="display: none;">
@@ -209,146 +184,5 @@
         <input type="hidden" name="currency" value="{{ $currentCurrency }}">
     </form>
 
-    <!-- Debug: Show hidden form values -->
-    @if(config('app.debug'))
-        <div class="bg-yellow-100 p-4 rounded-lg mb-4">
-            <h3 class="font-semibold mb-2">Hidden Form Values:</h3>
-            <p><strong>Payment Method in Hidden Form:</strong> {{ $selectedPaymentMethod ?? 'Not set' }}</p>
-            <p><strong>PayPal Type in Hidden Form:</strong> {{ $paypalPaymentType ?? 'Not set' }}</p>
-        </div>
-    @endif
-
-    <!-- JavaScript Debug -->
-    <script>
-        console.log('CheckoutForm Livewire component loaded');
-
-        // Listen for Livewire events
-        document.addEventListener('livewire:init', () => {
-            console.log('Livewire initialized');
-
-            // Listen for custom Livewire events
-            Livewire.on('showLoading', (message) => {
-                console.log('Loading:', message);
-                // You can show a toast notification here
-            });
-
-            Livewire.on('showError', (message) => {
-                console.error('Error:', message);
-                // You can show an error toast notification here
-                alert('Error: ' + message);
-            });
-
-            Livewire.on('orderSuccess', (orderId) => {
-                console.log('Order success:', orderId);
-                // You can show a success toast notification here
-            });
-
-                        // Debug: Check if components are loaded
-            setTimeout(() => {
-                console.log('🔍 Debug: Checking component state...');
-
-                // Check if PaymentMethodsSelector is loaded
-                const paymentSelector = document.querySelector('[wire\\:id*="payment-methods-selector"]');
-                console.log('PaymentMethodsSelector found:', !!paymentSelector);
-
-                // Check if CheckoutForm is loaded
-                const checkoutForm = document.querySelector('[wire\\:id*="checkout-form"]');
-                console.log('CheckoutForm found:', !!checkoutForm);
-
-                // Log all Livewire components
-                const allComponents = document.querySelectorAll('[wire\\:id]');
-                console.log('All Livewire components:', Array.from(allComponents).map(el => el.getAttribute('wire:id')));
-
-                // Debug: Check for any elements with wire:id that might be our components
-                console.log('🔍 Debug: Checking for component elements...');
-                allComponents.forEach((el, index) => {
-                    const wireId = el.getAttribute('wire:id');
-                    const className = el.className;
-                    const tagName = el.tagName;
-                    console.log(`Component ${index}:`, {
-                        wireId,
-                        className,
-                        tagName,
-                        element: el
-                    });
-                });
-
-                // Also check for any divs that might contain our components
-                const allDivs = document.querySelectorAll('div');
-                console.log('🔍 Debug: Total divs found:', allDivs.length);
-
-                // Look for any divs that might be our components
-                allDivs.forEach((div, index) => {
-                    if (div.innerHTML.includes('payment') || div.innerHTML.includes('checkout')) {
-                        console.log(`Potential component div ${index}:`, {
-                            className: div.className,
-                            id: div.id,
-                            innerHTML: div.innerHTML.substring(0, 200) + '...'
-                        });
-                    }
-                });
-            }, 1000);
-        });
-
-        // Listen for form submission
-        document.addEventListener('livewire:submit', () => {
-            console.log('Livewire form submission started');
-        });
-
-        // Listen for form submission errors
-        document.addEventListener('livewire:error', (error) => {
-            console.error('Livewire error:', error);
-        });
-
-        // Listen for redirect event from Livewire
-        document.addEventListener('redirect-to-checkout', (event) => {
-            console.log('Redirecting to checkout process:', event.detail);
-            window.location.href = event.detail;
-        });
-
-        function debugFormData() {
-            console.log('🔍 Debug: Form submission started');
-
-            const form = document.getElementById('checkout-form');
-            if (form) {
-                console.log('✅ Form found:', form);
-
-                const formData = new FormData(form);
-                console.log('📋 Form data entries:');
-
-                for (const [key, value] of formData.entries()) {
-                    console.log(`  ${key}: ${value}`);
-                }
-
-                // Show debug info on page
-                const debugInfo = document.getElementById('debug-info');
-                if (debugInfo) {
-                    debugInfo.innerHTML = '<h3 class="font-semibold mb-2">Form Data Being Submitted:</h3>';
-                    for (const [key, value] of formData.entries()) {
-                        debugInfo.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
-                    }
-                }
-
-                // Submit the form
-                console.log('🚀 Submitting form to:', form.action);
-                form.submit();
-
-            } else {
-                console.error('❌ Form not found!');
-            }
-        }
-
-        // Also listen for actual form submission
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('checkout-form');
-            if (form) {
-                form.addEventListener('submit', (e) => {
-                    console.log('🎯 Form submit event triggered');
-                    console.log('Form action:', form.action);
-                    console.log('Form method:', form.method);
-                });
-            }
-        });
-    </script>
 </div>
 
