@@ -12,10 +12,7 @@
         </div>
     @endif
 
-    <!-- Debug Info -->
-    @if(false && config('app.debug'))
-    <!-- Debug information is available but hidden -->
-    @endif
+ 
 
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Product Images -->
@@ -119,10 +116,10 @@
                                 $colorCode = $this->getColorCode($color);
                             @endphp
                             <button wire:click="selectVariant('{{ $variantForColor->id }}')"
-                                    class="px-4 py-2 border rounded-md text-sm transition-all duration-200 {{ $selectedVariant && $selectedVariant->color === $color ? 'ring-2 ring-gray-900 ring-offset-2' : 'hover:scale-105' }}"
+                                    class="px-3 py-3 mx-px border rounded-full text-sm transition-all duration-200 {{ $selectedVariant && $selectedVariant->color === $color ? 'ring-2 ring-gray-900 ring-offset-2' : 'hover:scale-105' }}"
                                     @if($selectedVariant && $selectedVariant->color === $color) aria-pressed="true" @endif
                                     style="background-color: {{ $colorCode }}; color: {{ $this->getContrastColor($colorCode) }}; border-color: {{ $colorCode }};">
-                                {{ $color }}
+                               
                             </button>
                             @endforeach
                         </div>
@@ -182,13 +179,7 @@
                             </svg>
                         </button>
                     </div>
-                    @if(config('app.debug'))
-                    <div class="text-xs text-gray-500 mt-1">
-                        <p>Current Quantity: {{ $quantity }}</p>
-                        <p>Max Quantity: {{ $selectedVariant ? min($selectedVariant->stock, 10) : min($product->quantity, 10) }}</p>
-                        <p>Has Variant: {{ $selectedVariant ? 'Yes' : 'No' }}</p>
-                    </div>
-                    @endif
+                   
                 </div>
 
                 <!-- Selected Variant Info -->
@@ -324,12 +315,4 @@ function initializeQuantityInput() {
     }
 }
 
-// Listen for Livewire events
-window.addEventListener('livewire:init', () => {
-    console.log('Livewire initialized on product show');
-});
-
-window.addEventListener('livewire:load', () => {
-    console.log('Livewire loaded on product show');
-});
 </script>
