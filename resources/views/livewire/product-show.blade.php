@@ -12,24 +12,40 @@
         </div>
     @endif
 
- 
+
 
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Product Images -->
-        <div class="lg:w-1/2">
+                <div class="lg:w-1/2" x-data="{
+            currentImage: '{{ $product->getFirstMediaUrl('main_image', 'large') }}',
+            images: [
+                {
+                    large: '{{ $product->getFirstMediaUrl('main_image', 'large') }}',
+                    medium: '{{ $product->getFirstMediaUrl('main_image', 'medium') }}'
+                },
+                @foreach($product->getMedia('product_images') as $image)
+                {
+                    large: '{{ $image->getUrl('zoom') }}',
+                    medium: '{{ $image->getUrl('medium') }}'
+                },
+                @endforeach
+            ]
+        }">
             <div class="mb-4">
-                <img src="{{ $product->getFirstMediaUrl('main_image', 'large') }}"
+                <img :src="currentImage"
                      alt="{{ $product->name }}"
                      class="w-full rounded-lg shadow-md">
             </div>
             <div class="grid grid-cols-4 gap-2">
-                @foreach($product->getMedia('product_images') as $image)
-                <div class="border rounded overflow-hidden">
-                    <img src="{{ $image->getUrl('medium') }}"
-                         alt="{{ $product->name }}"
-                         class="w-full h-24 object-cover cursor-pointer hover:opacity-80">
-                </div>
-                @endforeach
+                <template x-for="(image, index) in images" :key="index">
+                    <div class="border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors"
+                         :class="currentImage === image.large ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'"
+                         @click="currentImage = image.large">
+                        <img :src="image.medium"
+                             alt="{{ $product->name }}"
+                             class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
+                    </div>
+                </template>
             </div>
         </div>
 
@@ -119,7 +135,7 @@
                                     class="px-3 py-3 mx-px border rounded-full text-sm transition-all duration-200 {{ $selectedVariant && $selectedVariant->color === $color ? 'ring-2 ring-gray-900 ring-offset-2' : 'hover:scale-105' }}"
                                     @if($selectedVariant && $selectedVariant->color === $color) aria-pressed="true" @endif
                                     style="background-color: {{ $colorCode }}; color: {{ $this->getContrastColor($colorCode) }}; border-color: {{ $colorCode }};">
-                               
+
                             </button>
                             @endforeach
                         </div>
@@ -179,7 +195,7 @@
                             </svg>
                         </button>
                     </div>
-                   
+
                 </div>
 
                 <!-- Selected Variant Info -->
@@ -255,7 +271,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Product show page loaded, setting up quantity functions...');
-    
+
     // Initialize quantity input
     initializeQuantityInput();
 });
@@ -265,14 +281,14 @@ function incrementQuantity() {
     const input = document.getElementById('quantity-input');
     const currentValue = parseInt(input.value) || 1;
     const maxValue = parseInt(input.max) || 10;
-    
+
     if (currentValue < maxValue) {
         const newValue = currentValue + 1;
         input.value = newValue;
-        
+
         // Update Livewire component
         @this.set('quantity', newValue);
-        
+
         console.log('Quantity incremented to:', newValue);
     } else {
         console.log('Cannot increment - at maximum');
@@ -283,14 +299,14 @@ function incrementQuantity() {
 function decrementQuantity() {
     const input = document.getElementById('quantity-input');
     const currentValue = parseInt(input.value) || 1;
-    
+
     if (currentValue > 1) {
         const newValue = currentValue - 1;
         input.value = newValue;
-        
+
         // Update Livewire component
         @this.set('quantity', newValue);
-        
+
         console.log('Quantity decremented to:', newValue);
     } else {
         console.log('Cannot decrement - at minimum');
@@ -300,10 +316,10 @@ function decrementQuantity() {
 // Function to update quantity from input change
 function updateQuantityFromInput(value) {
     const newValue = parseInt(value) || 1;
-    
+
     // Update Livewire component
     @this.set('quantity', newValue);
-    
+
     console.log('Quantity updated from input to:', newValue);
 }
 
