@@ -111,21 +111,14 @@ class CheckoutController extends Controller
             session()->forget('checkout_data');
         }
 
-        // Debug: Log authentication status
-        Log::info('Unified checkout: Processing request', [
-            'is_authenticated' => Auth::check(),
-            'user_id' => Auth::id(),
-            'request_all' => $request->all(),
-            'has_session_data' => !empty($sessionData),
-            'session_data' => $sessionData
-        ]);
+
 
         // Check if user is authenticated
         if (Auth::check()) {
-            Log::info('Unified checkout: User is authenticated, calling processAuthenticatedCheckout');
+
             return $this->processAuthenticatedCheckout($request);
         } else {
-            Log::info('Unified checkout: User is guest, calling processGuestCheckout');
+
             return $this->processGuestCheckout($request);
         }
     }
@@ -160,51 +153,30 @@ class CheckoutController extends Controller
             'loyalty_points_applied' => 'nullable|integer|min:0',
         ]);
 
-        // Debug: Log what we're getting from request
-        Log::info('CheckoutController: Request data validated for authenticated checkout', [
-            'validated_data' => $validated,
-            'request_all' => $request->all(),
-            'payment_method' => $validated['payment_method'] ?? 'NOT_SET',
-            'payment_method_type' => gettype($validated['payment_method'] ?? null),
-            'is_cod' => ($validated['payment_method'] ?? '') === 'cash_on_delivery',
-            'is_paymob' => ($validated['payment_method'] ?? '') === 'paymob',
-            'is_paypal' => ($validated['payment_method'] ?? '') === 'paypal'
-        ]);
+
 
         $user = Auth::user();
         $cart = $this->cartService->getCart();
 
-        // Debug: Log cart information
-        Log::info('Checkout: Cart information', [
-            'cart_count' => $cart->count(),
-            'cart_items' => $cart->toArray(),
-            'cart_is_empty' => $cart->isEmpty()
-        ]);
+
 
         if ($cart->isEmpty()) {
-            Log::warning('Checkout: Cart is empty, redirecting to cart page');
+
             return redirect()->route('cart.index')->with('error', 'Your cart is empty. Please add items before checkout.');
         }
 
         try {
             DB::beginTransaction();
 
-            // Log the checkout attempt
-            Log::info('Authenticated checkout attempt', [
-                'user_id' => $user->id,
-                'request_all' => $request->all(),
-                'validated_data' => $validated,
-                'cart_count' => $cart->count(),
-                'cart_items' => $cart->toArray()
-            ]);
+
 
             // Create or update customer
             $customer = $this->createOrUpdateCustomer($user, $validated);
-            Log::info('Customer created/updated successfully', ['customer_id' => $customer->id]);
+
 
             // Create order
             $order = $this->createOrder($validated, $customer, $user, false);
-            Log::info('Order created successfully', ['order_id' => $order->id]);
+
 
             // Handle loyalty points redemption if applied
             if (!empty($validated['loyalty_points_applied']) && $validated['loyalty_points_applied'] > 0) {
@@ -216,11 +188,7 @@ class CheckoutController extends Controller
                         $order,
                         "Order #{$order->order_number} discount"
                     );
-                    Log::info('Loyalty points redeemed successfully', [
-                        'order_id' => $order->id,
-                        'points_redeemed' => $validated['loyalty_points_applied'],
-                        'discount_amount' => $validated['loyalty_discount'] ?? 0
-                    ]);
+
                 } catch (Exception $e) {
                     Log::error('Failed to redeem loyalty points', [
                         'order_id' => $order->id,
@@ -269,19 +237,6 @@ $cancelUrl = route('payments.cancel', ['order' => $order->id]);
                 $paymentType = $validated['paypal_payment_type'];
             }
 
-            Log::info('PayPal payment type determined', [
-                'payment_method' => $validated['payment_method'],
-                'paypal_payment_type' => $validated['paypal_payment_type'] ?? 'not set',
-                'final_payment_type' => $paymentType,
-                'use_credit_card' => ($paymentType === 'credit_card')
-            ]);
-
-            // Log payment method before processing
-            Log::info('About to process payment', [
-                'payment_method' => $validated['payment_method'],
-                'order_id' => $order->id,
-                'is_cod' => $validated['payment_method'] === 'cash_on_delivery'
-            ]);
 
             $result = $this->paymentService->createPayment(
                 $order,
@@ -291,12 +246,7 @@ $cancelUrl = route('payments.cancel', ['order' => $order->id]);
                 $paymentType
             );
 
-            Log::info('Payment processing result', [
-                'payment_method' => $validated['payment_method'],
-                'result_keys' => array_keys($result),
-                'has_redirect_url' => !empty($result['redirect_url']),
-                'redirect_url' => $result['redirect_url'] ?? null
-            ]);
+
 
 // Order items already created above - no need to create them again
 
@@ -305,13 +255,7 @@ $this->cartService->clearCart();
 DB::commit();
 
             // Handle different payment methods appropriately
-            Log::info('Authenticated checkout: Processing payment method', [
-                'payment_method' => $validated['payment_method'],
-                'is_cod' => $validated['payment_method'] === 'cash_on_delivery',
-                'result_keys' => array_keys($result),
-                'has_redirect_url' => !empty($result['redirect_url']),
-                'redirect_url' => $result['redirect_url'] ?? null
-            ]);
+
 
             if ($validated['payment_method'] === 'cash_on_delivery') {
                 // COD should never redirect - go directly to thank you page
@@ -332,19 +276,12 @@ DB::commit();
 
             // For PayPal credit card payments, redirect to our custom page
             if (isset($result['requires_frontend_processing']) && $result['requires_frontend_processing']) {
-                Log::info('Redirecting to PayPal credit card page', [
-                    'payment_method' => $validated['payment_method'],
-                    'redirect_url' => $result['redirect_url']
-                ]);
+
                 return redirect()->to($result['redirect_url']);
             }
 
             // If we reach here, something went wrong - redirect to thank you page as fallback
-            Log::warning('No redirect URL found for payment method, redirecting to thank you page as fallback', [
-                'payment_method' => $validated['payment_method'],
-                'result_keys' => array_keys($result),
-                'has_redirect_url' => !empty($result['redirect_url'])
-            ]);
+
             return redirect()->route('thankyou', ['order' => $order->id])
                 ->with('success', 'Order placed successfully!');
 
@@ -384,28 +321,14 @@ DB::commit();
             'currency' => 'required|string|max:3',
         ]);
 
-        // Debug: Log what we're getting from request - GUEST CHECKOUT
-        Log::info('CheckoutController: Request data validated for guest checkout', [
-            'validated_data' => $validated,
-            'request_all' => $request->all(),
-            'payment_method' => $validated['payment_method'] ?? 'NOT_SET',
-            'payment_method_type' => gettype($validated['payment_method'] ?? null),
-            'is_cod' => ($validated['payment_method'] ?? '') === 'cash_on_delivery',
-            'is_paymob' => ($validated['payment_method'] ?? '') === 'paymob',
-            'is_paypal' => ($validated['payment_method'] ?? '') === 'paypal'
-        ]);
+
 
         $cart = $this->cartService->getCart();
 
-        // Debug: Log cart information
-        Log::info('Checkout: Cart information', [
-            'cart_count' => $cart->count(),
-            'cart_items' => $cart->toArray(),
-            'cart_is_empty' => $cart->isEmpty()
-        ]);
+
 
         if ($cart->isEmpty()) {
-            Log::warning('Checkout: Cart is empty, redirecting to cart page');
+
             return redirect()->route('cart.index')->with('error', 'Your cart is empty. Please add items before checkout.');
         }
 
@@ -413,24 +336,19 @@ DB::commit();
             DB::beginTransaction();
 
             // Log the checkout attempt
-            Log::info('Guest checkout attempt', [
-                'request_all' => $request->all(),
-                'validated_data' => $validated,
-                'cart_count' => $cart->count(),
-                'cart_items' => $cart->toArray()
-            ]);
+
 
             // Create customer
             $customer = $this->createGuestCustomer($validated);
-            Log::info('Customer created successfully', ['customer_id' => $customer->id]);
+
 
             // Create order
             $order = $this->createOrder($validated, $customer, null, true);
-            Log::info('Order created successfully', ['order_id' => $order->id]);
+
             event(new OrderPlaced($order));
             // Create order items
             $this->createOrderItems($order, $cart);
-            Log::info('Order items created successfully');
+
 
             // Clear cart
             // Check availability for the selected country
@@ -466,24 +384,13 @@ if ($validated['payment_method'] === 'paypal' && isset($validated['paypal_paymen
     $paymentType = $validated['paypal_payment_type'];
 }
 
-Log::info('PayPal payment type determined (guest)', [
-    'payment_method' => $validated['payment_method'],
-    'paypal_payment_type' => $validated['paypal_payment_type'] ?? 'not set',
-    'final_payment_type' => $paymentType,
-    'use_credit_card' => ($paymentType === 'credit_card')
-]);
+
 
 // For credit card payments, don't set a return URL since they don't redirect back from PayPal
 if ($paymentType === 'credit_card') {
     $returnUrl = null;
 }
 
-            // Log payment method before processing
-            Log::info('About to process payment (guest)', [
-                'payment_method' => $validated['payment_method'],
-                'order_id' => $order->id,
-                'is_cod' => $validated['payment_method'] === 'cash_on_delivery'
-            ]);
 
             $result = $this->paymentService->createPayment(
                 $order,
@@ -493,12 +400,6 @@ if ($paymentType === 'credit_card') {
                 $paymentType
             );
 
-            Log::info('Payment processing result (guest)', [
-                'payment_method' => $validated['payment_method'],
-                'result_keys' => array_keys($result),
-                'has_redirect_url' => !empty($result['redirect_url']),
-                'redirect_url' => $result['redirect_url'] ?? null
-            ]);
 
 // Order items already created above - no need to create them again
 
@@ -507,28 +408,16 @@ $this->cartService->clearCart();
 DB::commit();
 
             // Handle different payment methods appropriately
-            Log::info('Guest checkout: Processing payment method', [
-                'payment_method' => $validated['payment_method'],
-                'is_cod' => $validated['payment_method'] === 'cash_on_delivery',
-                'result_keys' => array_keys($result),
-                'has_redirect_url' => !empty($result['redirect_url']),
-                'redirect_url' => $result['redirect_url'] ?? null
-            ]);
+
 
             if ($validated['payment_method'] === 'cash_on_delivery') {
                 // COD should never redirect - go directly to thank you page
-                Log::info('COD payment completed (guest), redirecting to thank you page', [
-                    'payment_method' => $validated['payment_method'],
-                    'order_id' => $order->id
-                ]);
+
                 return redirect()->route('thankyou', ['order' => $order->id])
                     ->with('success', 'Order placed successfully! Payment will be collected on delivery.');
             } elseif (!empty($result['redirect_url'])) {
                 // Other payment methods (Paymob, PayPal) that need external redirect
-                Log::info('Guest checkout: Redirecting to external gateway', [
-                    'payment_method' => $validated['payment_method'],
-                    'redirect_url' => $result['redirect_url']
-                ]);
+
                 return redirect()->away($result['redirect_url']);
             }
 
@@ -538,11 +427,7 @@ DB::commit();
             }
 
             // If we reach here, something went wrong - redirect to thank you page as fallback
-            Log::warning('No redirect URL found for payment method (guest), redirecting to thank you page as fallback', [
-                'payment_method' => $validated['payment_method'],
-                'result_keys' => array_keys($result),
-                'has_redirect_url' => !empty($result['redirect_url'])
-            ]);
+
             return redirect()->route('thankyou', ['order' => $order->id])
                 ->with('success', 'Order placed successfully!');
 
@@ -630,12 +515,7 @@ DB::commit();
      */
     protected function createOrder(array $data, Customer $customer, ?User $user, bool $isGuest)
     {
-        // Debug: Log the data being received
-        Log::info('createOrder: Data received', [
-            'data' => $data,
-            'customer_id' => $customer->id,
-            'is_guest' => $isGuest
-        ]);
+
 
         // Get country and currency information from billing country
         $country = Country::find($data['billing_country_id']);
@@ -692,10 +572,7 @@ DB::commit();
             'shipping_building_number' => $data['use_billing_for_shipping'] ? $data['billing_building_number'] : $data['shipping_building_number'],
         ];
 
-        // Debug: Log the order data being inserted
-        Log::info('createOrder: Order data to be inserted', [
-            'order_data' => $orderData
-        ]);
+
 
         return Order::create($orderData);
     }
@@ -729,11 +606,7 @@ DB::commit();
                 $productId = (int) $item['id'];
             }
 
-            Log::info('Extracted product ID', [
-                'original_id' => $item['id'],
-                'extracted_product_id' => $productId,
-                'variant_id' => $item['attributes']['variant_id'] ?? null
-            ]);
+
 
             // Validate that we have a valid product ID
             if (!$productId || $productId <= 0) {
@@ -748,13 +621,7 @@ DB::commit();
                     'price' => $item['price'],
                 ]);
 
-                Log::info('Order item created successfully', [
-                    'order_id' => $order->id,
-                    'product_id' => $productId,
-                    'variant_id' => $item['attributes']['variant_id'] ?? null,
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price']
-                ]);
+
             } catch (Exception $e) {
                 Log::error('Failed to create order item', [
                     'order_id' => $order->id,
@@ -768,10 +635,7 @@ DB::commit();
             }
         }
 
-        Log::info('Order items created successfully', [
-            'order_id' => $order->id,
-            'items_count' => $order->items()->count()
-        ]);
+
     }
 
     /**
@@ -790,14 +654,7 @@ DB::commit();
 
             $orderNumber = 'WF-' . date('Y-m-d-H-i-s') . '-' . $microseconds . '-' . $randomString . '-' . $ipHash;
 
-            // Log the generated order number for debugging
-            Log::info('Generated order number', [
-                'order_number' => $orderNumber,
-                'timestamp' => $timestamp,
-                'microseconds' => $microseconds,
-                'random_string' => $randomString,
-                'ip_hash' => $ipHash
-            ]);
+
 
         } while (Order::where('order_number', $orderNumber)->exists());
 
@@ -830,236 +687,10 @@ DB::commit();
         return view('checkout.confirmation', compact('order', 'currencyInfo'));
     }
 
-    /**
-     * Debug route to see what form data is being submitted
-     */
-    public function debugForm(Request $request)
-    {
-        Log::info('Debug form called', [
-            'method' => $request->method(),
-            'all_data' => $request->all(),
-            'payment_method' => $request->input('payment_method'),
-            'payment_method_type' => gettype($request->input('payment_method')),
-            'is_cod' => $request->input('payment_method') === 'cash_on_delivery',
-            'is_paymob' => $request->input('payment_method') === 'paymob',
-            'is_paypal' => $request->input('payment_method') === 'paypal',
-            'headers' => $request->headers->all()
-        ]);
 
-        return response()->json([
-            'method' => $request->method(),
-            'all_data' => $request->all(),
-            'shipping_address' => $request->input('shipping_address'),
-            'billing_address' => $request->input('billing_address'),
-            'payment_method' => $request->input('payment_method'),
-            'payment_method_type' => gettype($request->input('payment_method')),
-            'is_cod' => $request->input('payment_method') === 'cash_on_delivery',
-            'is_paymob' => $request->input('payment_method') === 'paymob',
-            'is_paypal' => $request->input('payment_method') === 'paypal',
-            'email' => $request->input('email'),
-            'first_name' => $request->input('first_name'),
-            'last_name' => $request->input('last_name'),
-            'phone_number' => $request->input('phone_number'),
-            'headers' => $request->headers->all()
-        ]);
-    }
 
-    /**
-     * Simple test to check COD behavior directly
-     */
-    public function testSimpleCod(Request $request)
-    {
-        Log::info('Simple COD test called');
 
-        $paymentMethod = 'cash_on_delivery';
 
-        // Test the exact condition we use in processCheckout
-        $isCod = ($paymentMethod === 'cash_on_delivery');
-
-        Log::info('Simple COD test', [
-            'payment_method' => $paymentMethod,
-            'is_cod' => $isCod,
-            'should_redirect_to_thank_you' => $isCod
-        ]);
-
-        if ($paymentMethod === 'cash_on_delivery') {
-            Log::info('Simple COD test: Redirecting to thank you page');
-            return redirect()->route('thankyou', ['order' => 999])
-                ->with('success', 'COD test successful! This proves COD redirection works.');
-        }
-
-        return response()->json(['error' => 'Should not reach here']);
-    }
-
-    /**
-     * Test COD payment specifically to debug redirection issue
-     */
-    public function testCodPayment(Request $request)
-    {
-        Log::info('Testing COD payment directly');
-
-        try {
-            // Create a minimal test data set for COD
-            $testData = [
-                'first_name' => 'Test',
-                'last_name' => 'User',
-                'email' => 'test@example.com',
-                'phone_number' => '1234567890',
-                'billing_country_id' => 1, // Assuming Egypt is ID 1
-                'billing_state' => 'Cairo',
-                'billing_city' => 'Cairo',
-                'billing_address' => '123 Test St',
-                'billing_building_number' => '1',
-                'shipping_country_id' => 1,
-                'shipping_state' => 'Cairo',
-                'shipping_city' => 'Cairo',
-                'shipping_address' => '123 Test St',
-                'shipping_building_number' => '1',
-                'use_billing_for_shipping' => true,
-                'payment_method' => 'cash_on_delivery',
-                'currency' => 'EGP'
-            ];
-
-            Log::info('Test COD: Creating fake cart');
-            // Add a test item to cart if empty
-            $cart = $this->cartService->getCart();
-            if ($cart->isEmpty()) {
-                Log::info('Test COD: Cart is empty, this would normally fail');
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Cart is empty. Add items first.',
-                    'cart_count' => $cart->count()
-                ]);
-            }
-
-            Log::info('Test COD: Processing payment with data', $testData);
-
-            // Test the COD gateway directly
-            $gateway = app(CodGateway::class);
-            Log::info('Test COD: COD gateway created');
-
-            // Create a test payment record
-            $testPayment = new Payment([
-                'provider' => 'cash_on_delivery',
-                'status' => 'initiated',
-                'currency' => 'EGP',
-                'amount_minor' => 10000, // 100 EGP
-            ]);
-
-            // Create a test order
-            $testOrder = new Order([
-                'order_number' => 'TEST-' . time(),
-                'currency' => 'EGP',
-                'total_amount' => 100,
-                'payment_method' => 'cash_on_delivery'
-            ]);
-
-            Log::info('Test COD: Calling gateway initiate method');
-            $result = $gateway->initiate($testOrder, $testPayment);
-
-            Log::info('Test COD: Gateway result', [
-                'result' => $result,
-                'has_redirect_url' => !empty($result['redirect_url']),
-                'redirect_url' => $result['redirect_url'] ?? null
-            ]);
-
-            // Test the payment method check
-            $paymentMethod = $testData['payment_method'];
-            $isCod = ($paymentMethod === 'cash_on_delivery');
-
-            Log::info('Test COD: Payment method check', [
-                'payment_method' => $paymentMethod,
-                'is_cod' => $isCod,
-                'should_redirect' => !$isCod && !empty($result['redirect_url'])
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'test_data' => $testData,
-                'gateway_result' => $result,
-                'payment_method_check' => [
-                    'payment_method' => $paymentMethod,
-                    'is_cod' => $isCod,
-                    'should_redirect' => !$isCod && !empty($result['redirect_url']),
-                    'has_redirect_url' => !empty($result['redirect_url']),
-                    'redirect_url' => $result['redirect_url'] ?? null
-                ]
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Test COD failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ], 500);
-        }
-    }
-
-    /**
-     * Test method to debug checkout issues
-     */
-    public function testCheckout(Request $request)
-    {
-        try {
-            $cart = $this->cartService->getCart();
-            $cartData = $cart->toArray();
-
-            Log::info('Test checkout - Cart data', [
-                'cart_count' => $cart->count(),
-                'cart_items' => $cartData
-            ]);
-
-            // Test customer creation
-            $testData = [
-                'email' => 'test@example.com',
-                'first_name' => 'Test',
-                'last_name' => 'User',
-                'phone_number' => '1234567890',
-                'shipping_address' => [
-                    'country' => 'United States',
-                    'state' => 'CA',
-                    'city' => 'Test City',
-                    'address' => '123 Test St',
-                    'postal_code' => '12345'
-                ],
-                'billing_address' => [
-                    'country' => 'United States',
-                    'state' => 'CA',
-                    'city' => 'Test City',
-                    'address' => '123 Test St',
-                    'postal_code' => '12345'
-                ],
-                'payment_method' => 'cash_on_delivery'
-            ];
-
-            $customer = $this->createGuestCustomer($testData);
-            Log::info('Test customer created', ['customer_id' => $customer->id]);
-
-            return response()->json([
-                'success' => true,
-                'cart_data' => $cartData,
-                'customer_created' => true,
-                'customer_id' => $customer->id
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Test checkout failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ], 500);
-        }
-    }
 
     /**
      * Get currency conversion for AJAX requests
@@ -1165,13 +796,6 @@ DB::commit();
      */
     public function capturePayPalCreditCard(Request $request, Payment $payment)
     {
-        Log::info('PayPal credit card capture initiated', [
-            'payment_id' => $payment->id,
-            'order_id' => $payment->order_id,
-            'provider' => $payment->provider,
-            'payment_type' => $payment->meta['payment_type'] ?? 'unknown',
-            'request_data' => $request->all()
-        ]);
 
         // Verify this is a PayPal credit card payment
         if ($payment->provider !== 'paypal' ||
@@ -1188,10 +812,7 @@ DB::commit();
             'paypal_order_id' => 'required|string',
         ]);
 
-        Log::info('PayPal order ID validated', [
-            'payment_id' => $payment->id,
-            'paypal_order_id' => $validated['paypal_order_id']
-        ]);
+
 
         try {
             // Update payment with PayPal order ID
@@ -1202,10 +823,6 @@ DB::commit();
                 ])
             ]);
 
-            Log::info('Payment meta updated with PayPal order ID', [
-                'payment_id' => $payment->id,
-                'paypal_order_id' => $validated['paypal_order_id']
-            ]);
 
             // Capture the payment using PayPal gateway
             $gateway = app(PaypalGateway::class);
@@ -1216,10 +833,7 @@ DB::commit();
 
             $result = $gateway->captureOrder($payment, $validated['paypal_order_id']);
 
-            Log::info('PayPal gateway capture result', [
-                'payment_id' => $payment->id,
-                'result' => $result
-            ]);
+
 
             if ($result['success']) {
                 // Update payment status
@@ -1231,11 +845,7 @@ DB::commit();
                     ])
                 ]);
 
-                Log::info('Payment completed successfully', [
-                    'payment_id' => $payment->id,
-                    'order_id' => $payment->order_id,
-                    'status' => 'completed'
-                ]);
+         
 
                 // Redirect to thank you page
                 return redirect()->route('thankyou', ['order' => $payment->order_id])

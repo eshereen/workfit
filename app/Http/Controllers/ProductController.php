@@ -20,7 +20,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-
+        $title = 'Products | WorkFit';
         $products = Product::with(['category', 'subcategory', 'media'])
             ->where('active', true)
             ->latest()
@@ -48,6 +48,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        $title = $product->name . ' | WorkFit';
         // Get current currency info
         $currencyInfo = $this->currencyService->getCurrentCurrencyInfo();
 
@@ -59,6 +60,6 @@ class ProductController extends Controller
             $product->converted_compare_price = $this->currencyService->convertFromUSD($product->compare_price, $currencyInfo['currency_code']);
         }
 
-        return view('products.show', compact('product', 'currencyInfo'));
+        return view('products.show', compact('product', 'currencyInfo', 'title'));
     }
 }
