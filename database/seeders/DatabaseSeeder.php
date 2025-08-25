@@ -67,7 +67,11 @@ class DatabaseSeeder extends Seeder
         });
 
         $this->call(CountriesTableSeeder::class);
+
+        // Seed orders and related data
+        $this->call(OrderSeeder::class);
+        $this->call(OrderWithPaymentsSeeder::class);
     }
- 
+
 }
 
