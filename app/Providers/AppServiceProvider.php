@@ -10,6 +10,7 @@ use App\Listeners\AwardLoyaltyPoints;
 use App\Listeners\HandlePaymentStatusChange;
 use App\Observers\OrderObserver;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -33,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+         Schema::defaultStringLength(191);
         // Temporarily disabled to debug 502 on checkout (emails in observer)
          Order::observe(OrderObserver::class);
 

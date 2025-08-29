@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->string('provider'); // 'paymob','paypal','cod'
-            $table->string('provider_reference')->nullable(); // intent id, paymob order id, paypal capture id
+            $table->string('provider',100); // 'paymob','paypal','cod'
+            $table->string('provider_reference',100)->nullable(); // intent id, paymob order id, paypal capture id
             $table->string('status')->default('initiated'); // initiated, pending_redirect, succeeded, failed, canceled
             $table->string('currency', 3); // e.g. EGP, USD, AED
             $table->unsignedBigInteger('amount_minor'); // amount in minor units for precision

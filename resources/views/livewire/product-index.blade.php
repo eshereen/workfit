@@ -62,6 +62,7 @@
                          class="w-full h-64 object-cover"
                          :class="hover ? 'opacity-100' : 'opacity-0'">
                     <img src="{{ $product->getFirstMediaUrl('product_images', 'medium') }}"
+                    loading="lazy"
                          alt="{{ $product->name }}"
                          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                           :class="hover ? 'opacity-0' : 'opacity-100'">

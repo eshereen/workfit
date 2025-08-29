@@ -1,4 +1,4 @@
-<div class="bg-white rounded-lg shadow-md p-6">
+<div class="bg-white rounded-lg shadow-md p-6 w-2/3">
     <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg font-semibold text-gray-900">Loyalty Points</h3>
         <div class="text-2xl font-bold text-blue-600">

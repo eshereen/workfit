@@ -24,10 +24,11 @@ class Collection extends Model implements HasMedia
         return 'slug';
     }
 
-    public function products()
-    {
-        return $this->belongsToMany(Product::class, 'collection_product');
-    }
+  public function products()
+{
+    return $this->belongsToMany(Product::class, 'collection_products', 'collection_id', 'product_id');
+}
+
      //register media collections
     public function registerMediaCollections(): void
     {
@@ -39,15 +40,18 @@ class Collection extends Model implements HasMedia
                 $this->addMediaConversion('thumb')
                     ->width(150)
                     ->height(150)
-                    ->sharpen(10);
+                    ->sharpen(10)
+                    ->nonQueued();
 
                 $this->addMediaConversion('medium')
                     ->width(400)
-                    ->height(400);
+                    ->height(400)
+                    ->nonQueued();
 
                 $this->addMediaConversion('large')
                     ->width(800)
-                    ->height(800);
+                    ->height(800)
+                    ->nonQueued();
             });
 
 }

@@ -37,6 +37,14 @@ class PaymobGateway implements PaymentGateway
 
     public function initiate(Order $order, Payment $payment): array
     {
+        // Log that Paymob gateway is being used
+        Log::info('PaymobGateway: initiate called', [
+            'order_id' => $order->id,
+            'payment_id' => $payment->id,
+            'order_currency' => $order->currency,
+            'payment_provider' => $payment->provider
+        ]);
+
         // Ensure EGP
         if (strtoupper($order->currency) !== 'EGP') {
             throw new RuntimeException('Paymob requires EGP (Egypt).');
@@ -123,17 +131,30 @@ class PaymobGateway implements PaymentGateway
 
         Log::info('Paymob billing data prepared', ['billing_data' => $billingData]);
 
-                        // Build callback URLs - using the new Paymob callback route
-        $successUrl = route('paymob.callback');
-        $failureUrl = route('paymob.callback');
-        
+        // Build callback URLs - using Laravel's url() helper for better reliability
+        try {
+            // Primary method: Use Laravel's url() helper
+            $successUrl = url('/api/paymob/callback') . '?order_id=' . $order->id . '&status=success';
+            $failureUrl = url('/api/paymob/callback') . '?order_id=' . $order->id . '&status=failure';
+        } catch (\Exception $e) {
+            // Fallback method: Manual URL construction
+            $appUrl = config('app.url');
+            $baseUrl = rtrim($appUrl, '/'); // Remove any trailing slashes
+
+            // Construct URLs with explicit slash
+            $successUrl = $baseUrl . '/' . ltrim('api/paymob/callback?order_id=' . $order->id . '&status=success', '/');
+            $failureUrl = $baseUrl . '/' . ltrim('api/paymob/callback?order_id=' . $order->id . '&status=failure', '/');
+        }
+
         Log::info('Paymob callback URLs', [
             'success_url' => $successUrl,
             'failure_url' => $failureUrl,
             'order_id' => $order->id,
-            'note' => 'Using new Paymob callback route: /api/paymob/callback'
+            'payment_id' => $payment->id,
+            'base_url' => url('/'),
+            'app_url' => config('app.url')
         ]);
-        
+
         $key = Http::post(config('paymob.payment_key_endpoint'), [
             'auth_token' => $auth['token'],
             'amount_cents' => $payment->amount_minor,

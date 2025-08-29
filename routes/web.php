@@ -57,8 +57,8 @@ Route::post('/checkout/paypal/credit-card/{payment}/capture', [CheckoutControlle
 // PayPal webhook route
 Route::post('/paypal/webhook', [PayPalWebhookController::class, 'handleWebhook'])->name('paypal.webhook');
 
-// Fixed callback URL for Paymob (since {order_id} placeholder isn't working)
-Route::get('/api/paymob/callback', [\App\Http\Controllers\PaymentController::class, 'handlePaymobCallback'])->name('paymob.callback');
+// Paymob callback URL - handles both GET and POST requests
+Route::match(['get', 'post'], '/api/paymob/callback', [\App\Http\Controllers\PaymentController::class, 'handlePaymobCallback'])->name('paymob.callback');
 
 // Simple test route to verify the controller method works
 Route::get('/paymob/test', function() {

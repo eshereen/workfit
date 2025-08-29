@@ -43,14 +43,14 @@ class PaymentController extends Controller
                     'payment_id' => $payment->id,
                     'order_id' => $order->id
                 ]);
-                
+
                 // For Paymob, we assume success if we reach this point
                 $payment->update(['status' => 'succeeded']);
                 $order->update([
                     'payment_status' => 'paid',
                     'status' => 'processing'
                 ]);
-                
+
                 Log::info('Paymob payment marked as successful', [
                     'payment_id' => $payment->id,
                     'order_id' => $order->id
@@ -120,157 +120,136 @@ class PaymentController extends Controller
         // Paymob callbacks now handled by standard methods:
     // - handleWebhook() for /payments/webhook/paymob
     // - handleReturn() for /payments/return/{order_id}
-    
+
     /**
-     * Handle Paymob callback with fixed URL (since {order_id} placeholder doesn't work)
+     * Handle Paymob callback - simplified and improved version
      */
     public function handlePaymobCallback(Request $request)
     {
-        // Basic debug - this should always appear in logs
-        error_log('=== PAYMOB CALLBACK METHOD ENTERED ===');
-        error_log('Paymob callback method called!');
-        error_log('Request data: ' . json_encode($request->all()));
-        
         try {
-            Log::info('Paymob callback method called', ['method' => __METHOD__]);
-            Log::info('Paymob callback received', ['request' => $request->all()]);
-            
-            // Extract order ID from the callback data
-            $orderId = $request->input('order') ?? 
-                       $request->input('merchant_order_id') ?? 
-                       $request->input('id');
-            
-            Log::info('Paymob callback: Extracted order ID', [
-                'order_id' => $orderId, 
-                'merchant_order_id' => $request->input('merchant_order_id'),
-                'order' => $request->input('order'),
-                'id' => $request->input('id')
+            Log::info('Paymob callback received', [
+                'query_params' => $request->query(),
+                'all_params' => $request->all(),
+                'method' => $request->method()
             ]);
-            
+
+            // First try to get order_id from query parameters (our custom parameter)
+            $orderId = $request->query('order_id') ?? $request->input('order_id');
+
+            // If not found, try extracting from Paymob's callback data
+            if (!$orderId) {
+                $orderId = $request->input('merchant_order_id') ??
+                           $request->input('order') ??
+                           $request->input('id');
+            }
+
+            Log::info('Paymob callback: Order ID extraction', [
+                'extracted_order_id' => $orderId,
+                'from_query' => $request->query('order_id'),
+                'status_param' => $request->query('status')
+            ]);
+
             if (!$orderId) {
                 Log::error('Paymob callback: No order ID found', ['request' => $request->all()]);
-                return redirect()->route('checkout')->with('error', 'Invalid callback data');
+                return redirect()->route('checkout')->with('error', 'Invalid payment callback');
             }
 
-            // Find the order by merchant_order_id (Paymob sends this)
-            // First try to find by merchant_order_id from the callback
-            $merchantOrderId = $request->input('merchant_order_id');
-            $order = null;
-            
-            if ($merchantOrderId) {
-                // Try exact match first
-                $order = Order::where('order_number', $merchantOrderId)->first();
-                Log::info('Paymob callback: Searching by exact merchant_order_id', [
-                    'merchant_order_id' => $merchantOrderId,
-                    'found' => $order ? 'yes' : 'no'
-                ]);
-                
-                
-                if (!$order) {
-                    // Remove the last part after the last hyphen (Paymob's timestamp suffix)
+            // Find the order
+            $order = Order::find($orderId);
+
+            // If not found by ID, try by order number
+            if (!$order) {
+                $order = Order::where('order_number', $orderId)->first();
+
+                // If still not found and we have merchant_order_id, try removing timestamp suffix
+                if (!$order && $request->input('merchant_order_id')) {
+                    $merchantOrderId = $request->input('merchant_order_id');
                     $baseOrderNumber = preg_replace('/-\d+$/', '', $merchantOrderId);
-                    Log::info('Paymob callback: Created base order number', [
-                        'original' => $merchantOrderId,
-                        'base' => $baseOrderNumber
-                    ]);
-                    
                     $order = Order::where('order_number', $baseOrderNumber)->first();
-                    Log::info('Paymob callback: Searching by base order number (removed suffix)', [
-                        'base_order_number' => $baseOrderNumber,
-                        'original_merchant_order_id' => $merchantOrderId,
-                        'found' => $order ? 'yes' : 'no'
-                    ]);
-                }
-                
-                // If still not found, try LIKE search
-                if (!$order && isset($baseOrderNumber)) {
-                    $order = Order::where('order_number', 'LIKE', $baseOrderNumber . '%')->first();
-                    Log::info('Paymob callback: Searching with LIKE pattern', [
-                        'pattern' => $baseOrderNumber . '%',
-                        'found' => $order ? 'yes' : 'no'
-                    ]);
                 }
             }
-            
-            // If not found, try by the extracted orderId
-            if (!$order && $orderId) {
-                $order = Order::where('id', $orderId)
-                             ->orWhere('order_number', $orderId)
-                             ->first();
-                Log::info('Paymob callback: Searching by extracted orderId', [
-                    'orderId' => $orderId,
-                    'found' => $order ? 'yes' : 'no'
-                ]);
-            }
-            
+
             if (!$order) {
                 Log::error('Paymob callback: Order not found', [
-                    'order_id' => $orderId,
-                    'merchant_order_id' => $merchantOrderId,
-                    'all_request_data' => $request->all()
+                    'searched_order_id' => $orderId,
+                    'merchant_order_id' => $request->input('merchant_order_id')
                 ]);
-                
-                // For debugging, let's show what we're looking for
-                $debugInfo = [
-                    'searching_for' => [
-                        'exact_merchant_order_id' => $merchantOrderId,
-                        'base_order_number' => isset($baseOrderNumber) ? $baseOrderNumber : 'not set',
-                        'extracted_order_id' => $orderId
-                    ],
-                    'callback_data' => $request->all()
-                ];
-                
-                Log::error('Paymob callback debug info', $debugInfo);
-                
-                return redirect()->route('checkout')->with('error', 'Order not found. Please contact support.');
+                return redirect()->route('checkout')->with('error', 'Order not found');
             }
 
-            Log::info('Paymob callback: Order found, processing payment', [
+            Log::info('Paymob callback: Order found', [
                 'order_id' => $order->id,
-                'order_number' => $order->order_number,
-                'paymob_order' => $orderId
+                'order_number' => $order->order_number
             ]);
 
-            // Check if payment was successful
+            // Determine payment success based on multiple indicators
+            $statusParam = $request->query('status'); // Our custom status parameter
             $success = $request->input('success', false);
             $errorOccurred = $request->input('error_occured', false);
-            
-            // Convert string values to proper booleans
+
+            // Convert to proper booleans
             $success = filter_var($success, FILTER_VALIDATE_BOOLEAN);
             $errorOccurred = filter_var($errorOccurred, FILTER_VALIDATE_BOOLEAN);
-            
-            if ($success && !$errorOccurred) {
-                // Payment successful - update order and payment status
+
+            // Payment is successful if:
+            // 1. status=success in query params, OR
+            // 2. success=true and error_occured=false from Paymob
+            $paymentSuccessful = ($statusParam === 'success') || ($success && !$errorOccurred);
+
+            Log::info('Paymob callback: Payment status evaluation', [
+                'status_param' => $statusParam,
+                'paymob_success' => $success,
+                'paymob_error_occurred' => $errorOccurred,
+                'final_success' => $paymentSuccessful
+            ]);
+
+            if ($paymentSuccessful) {
+                // Update payment status
                 $payment = $order->payments()->latest()->first();
                 if ($payment) {
                     $payment->update(['status' => 'succeeded']);
                 }
-                
+
+                // Update order status
                 $order->update([
                     'payment_status' => 'paid',
                     'status' => 'processing'
                 ]);
-                
-                Log::info('Paymob payment marked as successful', [
+
+                Log::info('Paymob payment completed successfully', [
                     'order_id' => $order->id,
                     'payment_id' => $payment->id ?? 'none'
                 ]);
-                
+
                 return redirect()->route('thankyou', ['order' => $order->id])
                                ->with('success', 'Payment completed successfully!');
             } else {
                 // Payment failed
+                $payment = $order->payments()->latest()->first();
+                if ($payment) {
+                    $payment->update(['status' => 'failed']);
+                }
+
+                $order->update([
+                    'payment_status' => 'failed',
+                    'status' => 'pending'
+                ]);
+
                 Log::warning('Paymob payment failed', [
                     'order_id' => $order->id,
-                    'success' => $success,
-                    'error_occured' => $errorOccurred
+                    'status_param' => $statusParam,
+                    'paymob_success' => $success,
+                    'paymob_error_occurred' => $errorOccurred
                 ]);
-                
+
                 return redirect()->route('checkout')->with('error', 'Payment failed. Please try again.');
             }
 
         } catch (Exception $e) {
-            Log::error('Paymob callback error: ' . $e->getMessage());
+            Log::error('Paymob callback error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->all()
+            ]);
             return redirect()->route('checkout')->with('error', 'Payment verification failed');
         }
     }

@@ -16,8 +16,14 @@ class CountryFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            //
+      
+              return [
+            'name' => $this->faker->unique()->country(),
+            'code' => $this->faker->unique()->regexify('[A-Z]{2}'),
+            'phone_code' => $this->faker->numberBetween(1, 999),
+            'currency_code' => $this->faker->randomElement(['USD', 'EUR', 'GBP', 'CAD', 'AUD']),
+            'currency_sympol' => $this->faker->randomElement(['$', '€', '£', 'C$', 'A$']),
         ];
+       
     }
 }

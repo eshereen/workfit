@@ -190,52 +190,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Search and Filter Section -->
-    <section class="py-12 px-4 bg-gray-50 sticky top-16 z-40">
-        <div class="container mx-auto">
-            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                <!-- Search Bar -->
-                <div class="w-full md:w-1/2">
-                    <div class="relative">
-                        <input type="text" x-model="searchQuery" placeholder="Search by location, city, or store name..." 
-                               class="search-input w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
-                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    </div>
-                </div>
-                
-                <!-- Filter Buttons -->
-                <div class="flex flex-wrap gap-2">
-                    <button @click="activeFilter = 'all'" 
-                            :class="activeFilter === 'all' ? 'active' : ''"
-                            class="filter-btn px-4 py-2 border border-gray-300 rounded-lg font-medium">
-                        All Stores
-                    </button>
-                    <button @click="activeFilter = 'flagship'" 
-                            :class="activeFilter === 'flagship' ? 'active' : ''"
-                            class="filter-btn px-4 py-2 border border-gray-300 rounded-lg font-medium">
-                        Flagship
-                    </button>
-                    <button @click="activeFilter = 'retail'" 
-                            :class="activeFilter === 'retail' ? 'active' : ''"
-                            class="filter-btn px-4 py-2 border border-gray-300 rounded-lg font-medium">
-                        Retail
-                    </button>
-                    <button @click="activeFilter = 'mall'" 
-                            :class="activeFilter === 'mall' ? 'active' : ''"
-                            class="filter-btn px-4 py-2 border border-gray-300 rounded-lg font-medium">
-                        Mall
-                    </button>
-                    <button @click="activeFilter = 'airport'" 
-                            :class="activeFilter === 'airport' ? 'active' : ''"
-                            class="filter-btn px-4 py-2 border border-gray-300 rounded-lg font-medium">
-                        Airport
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Locations Grid -->
     <section class="py-16 px-4">
         <div class="container mx-auto">
@@ -295,91 +249,11 @@
                             </div>
                             
                             <!-- Features -->
-                            <div class="mb-4">
-                                <h4 class="font-semibold mb-2">Features:</h4>
-                                <div class="flex flex-wrap gap-2">
-                                    <template x-for="feature in location.features" :key="feature">
-                                        <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded" x-text="feature"></span>
-                                    </template>
-                                </div>
-                            </div>
-                            
-                            <!-- Action Buttons -->
-                            <div class="flex gap-2">
-                                <button class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                                    <i class="fas fa-directions mr-2"></i>Directions
-                                </button>
-                                <button class="flex-1 border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors">
-                                    <i class="fas fa-phone mr-2"></i>Call
-                                </button>
-                            </div>
+                           
                         </div>
                     </div>
                 </template>
             </div>
         </div>
     </section>
-
-    <!-- Interactive Map Section -->
-    <section class="py-16 px-4 bg-gray-50">
-        <div class="container mx-auto">
-            <div class="text-center mb-12 animate-on-scroll">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">STORE LOCATOR MAP</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Explore all our locations on the interactive map</p>
-            </div>
-            
-            <div class="max-w-6xl mx-auto animate-on-scroll">
-                <div class="map-container bg-gray-200 rounded-lg overflow-hidden shadow-lg">
-                    <img src="https://images.unsplash.com/photo-1712150177656-b3c0bd50eb25?q=80&w=1892&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Workfit Locations Map" class="w-full h-full object-cover">
-                </div>
-                
-                <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold mb-4">Map Legend</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-red-600 rounded-full mr-2"></div>
-                            <span>Flagship Stores</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-blue-600 rounded-full mr-2"></div>
-                            <span>Retail Stores</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-green-600 rounded-full mr-2"></div>
-                            <span>Mall Locations</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 bg-purple-600 rounded-full mr-2"></div>
-                            <span>Airport Stores</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Upcoming Stores Section -->
-    <section class="py-16 px-4">
-        <div class="container mx-auto">
-            <div class="text-center mb-12 animate-on-scroll">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">COMING SOON</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">New Workfit stores opening near you</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                <template x-for="store in upcomingStores" :key="store.name">
-                    <div class="bg-white p-6 rounded-lg shadow-md text-center animate-on-scroll">
-                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 mx-auto mb-4">
-                            <i class="fas fa-store text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2" x-text="store.name"></h3>
-                        <p class="text-gray-600 mb-2" x-text="store.location"></p>
-                        <p class="text-sm text-gray-500 mb-4">Opening: <span x-text="store.opening"></span></p>
-                        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full font-medium" x-text="store.status"></span>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </section>
-
 @endsection

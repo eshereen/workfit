@@ -71,6 +71,7 @@
                         @if($product->media->count() > 0)
                             <img
                                 src="{{ $product->getFirstMediaUrl('main_image','medium') }}"
+                                loading="lazy"
                                 alt="{{ $product->name }}"
                                 class="w-full h-64 object-cover"
                             >

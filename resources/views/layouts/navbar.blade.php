@@ -16,10 +16,19 @@
             <a href="{{ route('collections.index') }}" class="font-xs hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">COLLECTIONS</a>
        </nav>
            <!-- Logo -->
+     @if(request()->routeIs('home'))
+            <div class="flex items-center flex-1 justify-center">
+
+       <img src="/imgs/workfit_logo_white.png" alt="logo" class="w-20 block group-hover:hidden">
+                <!-- Black logo (only visible on hover) -->
+                <img src="/imgs/workfit_logo_black.png" alt="logo" class="w-20 hidden group-hover:block">
+                </div>
+       @else
        <div class="flex items-center flex-1 justify-center">
 
-           <a href="{{ route('home') }}" class="text-2xl font-bold"> <img src="/imgs/workfit.png" alt="logo" class="w-20"></a>
+           <a href="{{ route('home') }}" class="text-2xl font-bold"> <img src="/imgs/workfit_logo_black.png" alt="logo" class="w-20"></a>
        </div>
+       @endif
 
        <!-- Icons -->
        <div class="flex items-center flex-1 space-x-4 justify-end relative z-[1001]">

@@ -17,34 +17,6 @@
         </div>
     </section>
 
-    <!-- Tab Navigation -->
-    <section class="py-8 px-4 bg-gray-100 sticky top-16 z-40">
-        <div class="container mx-auto">
-            <div class="flex flex-wrap justify-center gap-4">
-                <button @click="activeTab = 'shipping'"
-                        :class="activeTab === 'shipping' ? 'bg-red-600 text-white' : 'bg-white text-black'"
-                        class="px-6 py-3 font-medium rounded-lg transition-colors">
-                    SHIPPING POLICY
-                </button>
-                <button @click="activeTab = 'returns'"
-                        :class="activeTab === 'returns' ? 'bg-red-600 text-white' : 'bg-white text-black'"
-                        class="px-6 py-3 font-medium rounded-lg transition-colors">
-                    RETURNS POLICY
-                </button>
-                <button @click="activeTab = 'exchanges'"
-                        :class="activeTab === 'exchanges' ? 'bg-red-600 text-white' : 'bg-white text-black'"
-                        class="px-6 py-3 font-medium rounded-lg transition-colors">
-                    EXCHANGES
-                </button>
-                <button @click="activeTab = 'faq'"
-                        :class="activeTab === 'faq' ? 'bg-red-600 text-white' : 'bg-white text-black'"
-                        class="px-6 py-3 font-medium rounded-lg transition-colors">
-                    FAQ
-                </button>
-            </div>
-        </div>
-    </section>
-
     <!-- Main Content -->
     <main class="py-12 px-4">
         <div class="container mx-auto">
@@ -508,118 +480,8 @@
                 </section>
             </div>
 
-            <!-- FAQ -->
-            <div x-show="activeTab === 'faq'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                <section class="mb-16 animate-on-scroll">
-                    <h2 class="text-3xl font-bold mb-8 text-center">FREQUENTLY ASKED QUESTIONS</h2>
-
-                    <div class="max-w-4xl mx-auto">
-                        <div class="space-y-4">
-                            <!-- FAQ Item 1 -->
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <button @click="activeAccordion = activeAccordion === 'faq1' ? null : 'faq1'" class="w-full p-6 text-left flex justify-between items-center">
-                                    <h3 class="text-xl font-bold">How long will it take to receive my order?</h3>
-                                    <i class="fas fa-chevron-down transition-transform" :class="activeAccordion === 'faq1' ? 'rotate-180' : ''"></i>
-                                </button>
-                                <div class="accordion-content" :class="activeAccordion === 'faq1' ? 'active' : ''">
-                                    <div class="p-6 pt-0 text-gray-700">
-                                        <p>Delivery times depend on the shipping method you select at checkout:</p>
-                                        <ul class="list-disc pl-6 mt-2 space-y-1">
-                                            <li>Standard Shipping: 5-7 business days</li>
-                                            <li>Express Shipping: 2-3 business days</li>
-                                            <li>Overnight Shipping: 1 business day</li>
-                                            <li>International Standard: 10-15 business days</li>
-                                            <li>International Express: 5-7 business days</li>
-                                        </ul>
-                                        <p class="mt-2">Please note that these timeframes are estimates and may be affected by factors beyond our control, such as weather conditions or customs processing for international orders.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- FAQ Item 2 -->
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <button @click="activeAccordion = activeAccordion === 'faq2' ? null : 'faq2'" class="w-full p-6 text-left flex justify-between items-center">
-                                    <h3 class="text-xl font-bold">Can I change my shipping address after placing an order?</h3>
-                                    <i class="fas fa-chevron-down transition-transform" :class="activeAccordion === 'faq2' ? 'rotate-180' : ''"></i>
-                                </button>
-                                <div class="accordion-content" :class="activeAccordion === 'faq2' ? 'active' : ''">
-                                    <div class="p-6 pt-0 text-gray-700">
-                                        <p>We understand that mistakes happen. If you need to change your shipping address, please contact us as soon as possible at support@workfit.com or call us at (555) 123-4567.</p>
-                                        <p class="mt-2">If your order hasn't been processed yet, we'll do our best to update the shipping address. However, once an order has been shipped, we cannot change the delivery address.</p>
-                                        <p class="mt-2">For orders that have already shipped, you may be able to redirect the package through the carrier's website, but additional fees may apply.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- FAQ Item 3 -->
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <button @click="activeAccordion = activeAccordion === 'faq3' ? null : 'faq3'" class="w-full p-6 text-left flex justify-between items-center">
-                                    <h3 class="text-xl font-bold">What if my order arrives damaged or incorrect?</h3>
-                                    <i class="fas fa-chevron-down transition-transform" :class="activeAccordion === 'faq3' ? 'rotate-180' : ''"></i>
-                                </button>
-                                <div class="accordion-content" :class="activeAccordion === 'faq3' ? 'active' : ''">
-                                    <div class="p-6 pt-0 text-gray-700">
-                                        <p>We apologize if your order arrives damaged or incorrect. Please contact us within 48 hours of delivery at support@workfit.com with your order number and photos of the damaged or incorrect item.</p>
-                                        <p class="mt-2">We'll promptly send you a replacement at no additional cost. If the item is no longer available, we'll offer you a full refund or the opportunity to select a different item of equal value.</p>
-                                        <p class="mt-2">For damaged items, we may ask you to return the original item, but we'll provide a prepaid shipping label.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- FAQ Item 4 -->
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <button @click="activeAccordion = activeAccordion === 'faq4' ? null : 'faq4'" class="w-full p-6 text-left flex justify-between items-center">
-                                    <h3 class="text-xl font-bold">How do I track my order?</h3>
-                                    <i class="fas fa-chevron-down transition-transform" :class="activeAccordion === 'faq4' ? 'rotate-180' : ''"></i>
-                                </button>
-                                <div class="accordion-content" :class="activeAccordion === 'faq4' ? 'active' : ''">
-                                    <div class="p-6 pt-0 text-gray-700">
-                                        <p>Once your order is shipped, you'll receive a shipping confirmation email with a tracking number. You can use this tracking number on the carrier's website to track your package.</p>
-                                        <p class="mt-2">You can also track your order by logging into your Workfit account and viewing your order history.</p>
-                                        <p class="mt-2">If you haven't received a tracking number within 3 business days of placing your order, please contact us at support@workfit.com.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- FAQ Item 5 -->
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <button @click="activeAccordion = activeAccordion === 'faq5' ? null : 'faq5'" class="w-full p-6 text-left flex justify-between items-center">
-                                    <h3 class="text-xl font-bold">What is your return policy for sale items?</h3>
-                                    <i class="fas fa-chevron-down transition-transform" :class="activeAccordion === 'faq5' ? 'rotate-180' : ''"></i>
-                                </button>
-                                <div class="accordion-content" :class="activeAccordion === 'faq5' ? 'active' : ''">
-                                    <div class="p-6 pt-0 text-gray-700">
-                                        <p>Items purchased during a sale event are eligible for return within 30 days of delivery, unless marked as "Final Sale."</p>
-                                        <p class="mt-2">Items marked as "Final Sale" cannot be returned or exchanged. These items are clearly marked on the product page and in your shopping cart.</p>
-                                        <p class="mt-2">If you're unsure whether an item is final sale, please check the product page or contact us before making your purchase.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- FAQ Item 6 -->
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <button @click="activeAccordion = activeAccordion === 'faq6' ? null : 'faq6'" class="w-full p-6 text-left flex justify-between items-center">
-                                    <h3 class="text-xl font-bold">How long does it take to process a refund?</h3>
-                                    <i class="fas fa-chevron-down transition-transform" :class="activeAccordion === 'faq6' ? 'rotate-180' : ''"></i>
-                                </button>
-                                <div class="accordion-content" :class="activeAccordion === 'faq6' ? 'active' : ''">
-                                    <div class="p-6 pt-0 text-gray-700">
-                                        <p>Once we receive and inspect your return, we'll process your refund within 5-7 business days.</p>
-                                        <p class="mt-2">After we process the refund, it may take additional time for the funds to appear in your account, depending on your payment method:</p>
-                                        <ul class="list-disc pl-6 mt-2 space-y-1">
-                                            <li>Credit/Debit Cards: 5-10 business days</li>
-                                            <li>PayPal: 3-5 business days</li>
-                                            <li>Gift Cards: Immediate</li>
-                                        </ul>
-                                        <p class="mt-2">You'll receive an email confirmation once your refund has been processed.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
+          
+                          
             <!-- Contact Section -->
             <section class="py-12 px-4 bg-gray-100 animate-on-scroll">
                 <div class="container mx-auto">

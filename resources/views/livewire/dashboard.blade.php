@@ -5,16 +5,6 @@
             <p class="text-gray-600 mt-2">Welcome back! Here's your account overview.</p>
         </div>
 
-        <!-- Test Button to verify Livewire is working -->
-        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 class="text-lg font-semibold text-blue-900 mb-2">Livewire Test</h3>
-            <button wire:click="testClick" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Test Livewire Click
-            </button>
-            @if(session()->has('test_message'))
-                <p class="mt-2 text-blue-700">{{ session('test_message') }}</p>
-            @endif
-        </div>
 
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <livewire:loyalty-points />

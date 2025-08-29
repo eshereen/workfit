@@ -8,8 +8,6 @@ return [
     'integration_id_card' => env('PAYMOB_INTEGRATION_ID_CARD'),
     'hmac' => env('PAYMOB_HMAC_KEY'),
 
-    // Callback URLs
-    'success_url' => env('PAYMOB_SUCCESS_URL'),
-    'failure_url' => env('PAYMOB_FAILURE_URL'),
-    'webhook_url' => env('PAYMOB_WEBHOOK_URL'),
+    // Note: success_url, failure_url, and webhook_url are now generated dynamically
+    // using Laravel routes to avoid environment-specific URL issues
 ];

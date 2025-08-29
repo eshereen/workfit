@@ -27,15 +27,18 @@ class Subcategory extends Model implements HasMedia
                 $this->addMediaConversion('thumb')
                     ->width(150)
                     ->height(150)
-                    ->sharpen(10);
+                    ->sharpen(10)
+                    ->nonQueued();
 
                 $this->addMediaConversion('medium')
                     ->width(400)
-                    ->height(400);
+                    ->height(400)
+                    ->nonQueued();
 
                 $this->addMediaConversion('large')
                     ->width(800)
-                    ->height(800);
+                    ->height(800)
+                    ->nonQueued();
             });
         }
 

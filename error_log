@@ -1,0 +1,1 @@
+[26-Aug-2025 10:16:28 UTC] PHP Fatal error:  Could not check compatibility between App\Models\User::canAccessPanel(App\Models\Panel $panel): bool and Filament\Models\Contracts\FilamentUser::canAccessPanel(Filament\Panel $panel): bool, because class App\Models\Panel is not available in /home/elragtow/workfit.medsite.dev/app/Models/User.php on line 93

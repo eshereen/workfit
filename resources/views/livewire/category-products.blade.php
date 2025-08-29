@@ -58,12 +58,13 @@
     @if($products->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($products as $product)
-                <a href="{{ route('product.show', $product->slug) }}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div  class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <!-- Product Image -->
-                    <div class="relative group">
+                    <a href="{{ route('product.show', $product->slug) }}" class="relative group">
                         @if($product->media->count() > 0)
                             <img
                                 src="{{ $product->getFirstMediaUrl('main_image','medium') }}"
+                                loading="lazy"
                                 alt="{{ $product->name }}"
                                 class="w-full h-64 object-cover"
                             >
@@ -92,7 +93,7 @@
                                     </button>
                                 @endif
                             </div>
-                        </div>
+                        </a>
 
                         <!-- Wishlist Button -->
                         <button
@@ -157,7 +158,7 @@
                             @endif
                         </div>
                     </div>
-                </a>
+                </div>
             @endforeach
         </div>
 

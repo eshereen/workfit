@@ -34,10 +34,10 @@ class Product extends Model implements HasMedia
     {
         return $this->belongsTo(Subcategory::class);
     }
-    public function collection()
-    {
-        return $this->belongsTo(Collection::class);
-    }
+   public function collections()
+{
+    return $this->belongsToMany(Collection::class, 'collection_products', 'product_id', 'collection_id');
+}
 
     public function variants()
     {
@@ -68,45 +68,139 @@ class Product extends Model implements HasMedia
 
 
     //register media collections
-    public function registerMediaCollections(): void
-    {
-        // Main image (single image only)
-        $this->addMediaCollection('main_image')
-            ->singleFile() // Enforce only one image
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
-            ->registerMediaConversions(function (Media $media) {
-                $this->addMediaConversion('thumb')
-                    ->width(150)
-                    ->height(150)
-                    ->sharpen(10);
+public function registerMediaCollections(?Media $media = null): void
+{
+    // Main image (single image only)
+    $this->addMediaCollection('main_image')
+        ->singleFile()
+        ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
+        ->registerMediaConversions(function (Media $media) {
+            // JPG
+            $this->addMediaConversion('thumb')
+                ->format('jpg')
+                ->width(150)
+                ->height(150)
+                ->sharpen(10)
+                ->nonQueued();
 
-                $this->addMediaConversion('medium')
-                    ->width(400)
-                    ->height(400);
+            $this->addMediaConversion('medium')
+                ->format('jpg')
+                ->width(400)
+                ->height(400)
+                ->nonQueued();
 
-                $this->addMediaConversion('large')
-                    ->width(800)
-                    ->height(800);
-            });
+            $this->addMediaConversion('large')
+                ->format('jpg')
+                ->width(800)
+                ->height(800)
+                ->nonQueued();
 
-        // Product gallery (multiple images)
-        $this->addMediaCollection('product_images')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
-            ->registerMediaConversions(function (Media $media) {
-                $this->addMediaConversion('thumb')
-                    ->width(150)
-                    ->height(150);
+            // WebP
+            $this->addMediaConversion('thumb_webp')
+                ->format('webp')
+                ->width(150)
+                ->height(150)
+                ->sharpen(10)
+                ->nonQueued();
 
-                $this->addMediaConversion('medium')
-                    ->width(600)
-                    ->height(600);
+            $this->addMediaConversion('medium_webp')
+                ->format('webp')
+                ->width(400)
+                ->height(400)
+                ->nonQueued();
 
-                $this->addMediaConversion('zoom')
-                    ->width(1200)
-                    ->height(1200)
-                    ->quality(85);
-            });
-    }
+            $this->addMediaConversion('large_webp')
+                ->format('webp')
+                ->width(800)
+                ->height(800)
+                ->nonQueued();
+
+            // AVIF
+            $this->addMediaConversion('thumb_avif')
+                ->format('avif')
+                ->width(150)
+                ->height(150)
+                ->sharpen(10)
+                ->nonQueued();
+
+            $this->addMediaConversion('medium_avif')
+                ->format('avif')
+                ->width(400)
+                ->height(400)
+                ->nonQueued();
+
+            $this->addMediaConversion('large_avif')
+                ->format('avif')
+                ->width(800)
+                ->height(800)
+                ->nonQueued();
+        });
+
+    // Product gallery (multiple images)
+    $this->addMediaCollection('product_images')
+        ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
+        ->registerMediaConversions(function (Media $media) {
+            // JPG
+            $this->addMediaConversion('thumb')
+                ->format('jpg')
+                ->width(150)
+                ->height(150)
+                ->nonQueued();
+
+            $this->addMediaConversion('medium')
+                ->format('jpg')
+                ->width(600)
+                ->height(600)
+                ->nonQueued();
+
+            $this->addMediaConversion('zoom')
+                ->format('jpg')
+                ->width(1200)
+                ->height(1200)
+                ->quality(85)
+                ->nonQueued();
+
+            // WebP
+            $this->addMediaConversion('thumb_webp')
+                ->format('webp')
+                ->width(150)
+                ->height(150)
+                ->nonQueued();
+
+            $this->addMediaConversion('medium_webp')
+                ->format('webp')
+                ->width(600)
+                ->height(600)
+                ->nonQueued();
+
+            $this->addMediaConversion('zoom_webp')
+                ->format('webp')
+                ->width(1200)
+                ->height(1200)
+                ->quality(85)
+                ->nonQueued();
+
+            // AVIF
+            $this->addMediaConversion('thumb_avif')
+                ->format('avif')
+                ->width(150)
+                ->height(150)
+                ->nonQueued();
+
+            $this->addMediaConversion('medium_avif')
+                ->format('avif')
+                ->width(600)
+                ->height(600)
+                ->nonQueued();
+
+            $this->addMediaConversion('zoom_avif')
+                ->format('avif')
+                ->width(1200)
+                ->height(1200)
+                ->quality(85)
+                ->nonQueued();
+        });
+}
 
 
 }

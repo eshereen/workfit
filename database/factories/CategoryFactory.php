@@ -1,7 +1,7 @@
 <?php
 
 namespace Database\Factories;
-
+use App\Models\Category; 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,7 +20,7 @@ class CategoryFactory extends Factory
 
         return [
             'name' => $this->faker->randomElement([
-                'Man',
+                'Men',
                 'Women',
                 'Kids',
                
@@ -28,5 +28,17 @@ class CategoryFactory extends Factory
             'description' => $this->faker->paragraph(3),
             'parent_id' => null, // Will be set in seeder for subcategories
         ];
+    }
+      public function configure()
+    {
+        return $this->afterCreating(function (Category $category) {
+            // Array of placeholder image URLs (you can add more URLs here)
+         $mainImage = public_path('imgs/' . $this->faker->numberBetween(1, 6) . '.jpg');
+
+$category->addMedia($mainImage)
+    ->preservingOriginal()
+    ->toMediaCollection('main_image');
+
+        });
     }
 }

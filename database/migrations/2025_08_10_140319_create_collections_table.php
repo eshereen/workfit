@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('collections', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-        
-            $table->foreignId('brand_id')->constrained('brands');     
             $table->string('slug')->unique()->index();
             $table->text('description')->nullable();
             $table->boolean('active')->default(true);

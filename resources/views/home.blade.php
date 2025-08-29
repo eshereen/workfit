@@ -5,8 +5,15 @@
     <section class="relative -top-28 left-0 right-0 h-screen overflow-hidden">
         <!-- Video Background -->
         <div class="video-container">
-            <video autoplay muted loop playsinline poster="poster.jpg" class="w-full h-full object-cover">
-                <source src="videos/workfit.mp4" type="video/mp4">
+            <!-- Desktop Video (hidden on mobile) -->
+            <video autoplay muted loop playsinline  class="hidden md:block w-full h-full object-cover">
+                <source src="videos/workfit-lg.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <!-- Mobile Video (hidden on desktop) -->
+            <video autoplay muted loop playsinline  class="block md:hidden w-full h-full object-cover">
+                <source src="videos/workfit-mobile.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -20,10 +27,10 @@
                 <h1 class="text-4xl md:text-6xl font-bold mb-4 slide-in">WORKFIT</h1>
                 <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto fade-in">Premium activewear designed for performance and style</p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4 fade-in">
-                    <a href="{{ route('categories.index', 'women') }}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors uppercase">
+                    <a href="{{ route('categories.index', 'women') }}" class="w-2/3 mx-auto bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors uppercase">
                         SHOP WOMEN
                     </a>
-                    <a href="{{ route('categories.index', 'men') }}" class="bg-white hover:bg-gray-100 text-black font-bold py-3 px-8 transition-colors">
+                    <a href="{{ route('categories.index', 'men') }}" class="w-2/3 mx-auto bg-white hover:bg-gray-100 text-black font-bold py-3 px-8 transition-colors">
                         SHOP MEN
                     </a>
                 </div>
@@ -40,7 +47,7 @@
 
     <!-- Full-width Lifestyle Banner -->
     <section class="relative h-96 overflow-hidden animate-on-scroll">
-        <img src="https://images.unsplash.com/photo-1607962837359-5e7e89f86776?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lifestyle Banner" class="w-full h-full object-cover">
+        <img src="https://images.unsplash.com/photo-1607962837359-5e7e89f86776?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" loading="lazy" alt="Lifestyle Banner" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
             <div class="text-center text-white px-4">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">SUMMER COLLECTION</h2>
@@ -77,7 +84,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 h-screen">
                 <!-- RUN Block -->
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://images.unsplash.com/photo-1679216129631-fbcec034558c?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Run" class="w-full h-full object-cover hover-zoom">
+                    <img src="https://images.unsplash.com/photo-1679216129631-fbcec034558c?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" loading="lazy" alt="Run" class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">RUN</h3>
                         <p class="text-white text-center px-4 mb-4">Lightweight gear for your daily runs</p>
@@ -87,7 +94,7 @@
 
                 <!-- TRAIN Block -->
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://images.unsplash.com/photo-1646072508263-af94f0218bf0?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Train" class="w-full h-full object-cover hover-zoom">
+                    <img src="https://images.unsplash.com/photo-1646072508263-af94f0218bf0?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" loading="lazy" alt="Train" class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">TRAIN</h3>
                         <p class="text-white text-center px-4 mb-4">Durable apparel for intense workouts</p>
@@ -97,7 +104,7 @@
 
                 <!-- REC Block -->
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://images.unsplash.com/photo-1715192383684-24c6614d2b54?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Rec" class="w-full h-full object-cover hover-zoom">
+                    <img src="https://images.unsplash.com/photo-1715192383684-24c6614d2b54?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" loading="lazy" alt="Rec" class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">REC</h3>
                         <p class="text-white text-center px-4 mb-4">Comfortable styles for recovery days</p>
@@ -130,7 +137,7 @@
 
     <!-- Full-width Lifestyle Banner 2 -->
     <section class="relative h-96 overflow-hidden animate-on-scroll">
-        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lifestyle Banner" class="w-full h-full object-cover">
+        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" loading="lazy" alt="Lifestyle Banner" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
             <div class="text-center text-white px-4">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">NEW ARRIVALS</h2>

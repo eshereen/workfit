@@ -1,6 +1,7 @@
 <?php
 
 namespace Database\Factories;
+use App\Models\Subcategory; 
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -27,5 +28,19 @@ class SubcategoryFactory extends Factory
             'description' => $this->faker->paragraph(3),
 
         ];
+    }
+      public function configure()
+    {
+        return $this->afterCreating(function (Subcategory $subcategory) {
+            // Array of placeholder image URLs (you can add more URLs here)
+           $mainImage = public_path('imgs/' . $this->faker->numberBetween(1, 6) . '.jpg');
+
+$subcategory->addMedia($mainImage)
+    ->preservingOriginal()
+    ->toMediaCollection('main_image');
+
+
+         
+        });
     }
 }
