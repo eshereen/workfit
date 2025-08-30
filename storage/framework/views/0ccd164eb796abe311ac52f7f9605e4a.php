@@ -9,15 +9,16 @@
     <!-- Livewire Styles -->
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::styles(); ?>
 
-    <link rel="stylesheet" href="<?php echo e(asset('css/app.css')); ?>">    </link>
-    <script src="https://cdn.tailwindcss.com"></script>
+   </link>
+  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    </link>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 <!--Favicons-->
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="manifest" href="/site.webmanifest">
-    
+
      <script>
         tailwind.config = {
             theme: {
@@ -36,7 +37,7 @@
 
     <?php echo $__env->make('layouts.navbar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    
+
 
     <!-- Notification System -->
     <div id="notification-container" class="fixed top-4 right-4 z-50 p-4 text-white"></div>
@@ -49,7 +50,7 @@
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scripts(); ?>
 
 
-    <script src="<?php echo e(asset('js/app.js') . '?v=' . filemtime(public_path('js/app.js'))); ?>"></script>
+
 
     <!-- Notification System Script -->
     <script>
