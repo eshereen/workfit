@@ -72,7 +72,7 @@ function initEnhancements() {
     // Generic demo form submission handling (kept from previous code)
     var forms = document.querySelectorAll('form');
     forms.forEach(function (form) {
-        form.addEventListener('click', function (e) {
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
             alert('Thank you for your submission!');
             form.reset();
