@@ -46,9 +46,7 @@ class ProductResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255),
+             
                 SpatieMediaLibraryFileUpload::make('main_image')
                     ->collection('main_image')
                     ->imageEditor()
@@ -86,8 +84,7 @@ class ProductResource extends Resource
                     ->sortable(),
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('slug')
-                    ->searchable(),
+
                 TextColumn::make('price')
                     ->money()
                     ->sortable(),
@@ -128,7 +125,8 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+                   RelationManagers\VariantsRelationManager::class,
+
         ];
     }
 
