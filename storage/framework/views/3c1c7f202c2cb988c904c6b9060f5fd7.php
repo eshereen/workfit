@@ -1,5 +1,4 @@
-@extends('layouts.app')
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="bg-white text-black font-sans antialiased" x-data="{
     mobileMenuOpen: false,
     cartItems: 0,
@@ -194,4 +193,6 @@
         </div>
 
     </section>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/shereenelshayp/Herd/workfit/resources/views/location.blade.php ENDPATH**/ ?>
