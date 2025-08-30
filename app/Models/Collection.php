@@ -24,10 +24,13 @@ class Collection extends Model implements HasMedia
         return 'slug';
     }
 
-  public function products()
-{
-    return $this->belongsToMany(Product::class, 'collection_products', 'collection_id', 'product_id');
-}
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'collection_products', 'collection_id', 'product_id')
+            ->using(CollectionProduct::class)
+            ->withTimestamps();
+    }
+
 
      //register media collections
     public function registerMediaCollections(): void

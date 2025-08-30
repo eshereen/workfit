@@ -2,20 +2,30 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\CreateAction;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
+use Filament\Actions\ViewAction;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\RestoreAction;
+use Filament\Tables\Columns\TextColumn;
+
 use App\Filament\Resources\ProductResource;
+
 use Filament\Resources\RelationManagers\RelationManager;
 
 class VariantsRelationManager extends RelationManager
 {
     protected static string $relationship = 'variants';
 
-    protected static ?string $relatedResource = ProductResource::class;
     protected static ?string $recordTitleAttribute = 'sku';
 
     public function form(Schema $schema): Schema    {
@@ -68,9 +78,9 @@ class VariantsRelationManager extends RelationManager
                     'style' => 'background-color: ' . (config('colors')[$state] ?? '#ccc') . '; color: white; padding: 2px 2px; border-radius: 30px; width:30px;height:30px;',
                 ]),
 
-                TextColumn::make('stock')->sortable(),
-                TextColumn::make('price')->money('USD'),
-                TextColumn::make('created_at')
+            TextColumn::make('stock')->sortable(),
+            TextColumn::make('price')->money('USD'),
+            TextColumn::make('created_at')
                 ->dateTime()
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
@@ -85,6 +95,25 @@ class VariantsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make(),
+            ])
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+
+                ]),
             ]);
     }
+
+    public function isReadOnly(): bool
+{
+    return false;
+}
+
 }

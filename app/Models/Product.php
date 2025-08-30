@@ -24,6 +24,10 @@ class Product extends Model implements HasMedia
         'active' => 'boolean',
 
     ];
+    public function __toString(): string
+{
+    return $this->name ?? 'Unnamed Product';
+}
 
      public function category()
     {
@@ -34,10 +38,12 @@ class Product extends Model implements HasMedia
     {
         return $this->belongsTo(Subcategory::class);
     }
-   public function collections()
-{
-    return $this->belongsToMany(Collection::class, 'collection_products', 'product_id', 'collection_id');
-}
+    public function collections()
+    {
+        return $this->belongsToMany(Collection::class, 'collection_products', 'product_id', 'collection_id')
+            ->using(CollectionProduct::class)
+            ->withTimestamps();
+    }
 
     public function variants()
     {

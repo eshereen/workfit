@@ -45,9 +45,7 @@ class CollectionResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255),
+
                 Textarea::make('description')
                     ->columnSpanFull(),
                 Toggle::make('active')
@@ -93,9 +91,11 @@ class CollectionResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+
+            return [
+                'variants' => RelationManagers\ProductsRelationManager::class,
+            ];
+
     }
 
     public static function getPages(): array
@@ -106,5 +106,9 @@ class CollectionResource extends Resource
             'view' => ViewCollection::route('/{record}'),
             'edit' => EditCollection::route('/{record}/edit'),
         ];
+    }
+    public static function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return true;
     }
 }

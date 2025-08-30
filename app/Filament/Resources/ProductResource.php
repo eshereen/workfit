@@ -32,6 +32,7 @@ use App\Filament\Resources\ProductResource\Pages\CreateProduct;
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar-square';
 
@@ -46,7 +47,7 @@ class ProductResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-             
+
                 SpatieMediaLibraryFileUpload::make('main_image')
                     ->collection('main_image')
                     ->imageEditor()
