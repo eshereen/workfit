@@ -22,20 +22,26 @@ use Filament\Resources\RelationManagers\RelationManager;
 class ProductsRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $recordTitleAttribute = 'order_id';
     protected static ?string $relatedResource = ProductResource::class;
 
     public function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                TextColumn::make('order_id')
+                    ->label('Order ID')
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('product.name')
                     ->label('Product Name')
                     ->sortable()
                     ->searchable(),
 
                 TextColumn::make('price')
                     ->money('USD')
+                    ->label('Product Price')
                     ->sortable()
                     ->toggleable(),
             ])
