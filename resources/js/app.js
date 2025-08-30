@@ -69,9 +69,14 @@ function initEnhancements() {
         });
     });
 
-    // Generic demo form submission handling (kept from previous code)
+    // Generic demo form submission handling (only for non-Livewire forms)
     var forms = document.querySelectorAll('form');
     forms.forEach(function (form) {
+        // Skip Livewire forms
+        if (form.hasAttribute('wire:submit') || form.hasAttribute('wire:submit.prevent')) {
+            return;
+        }
+
         form.addEventListener('submit', function (e) {
             e.preventDefault();
             alert('Thank you for your submission!');
