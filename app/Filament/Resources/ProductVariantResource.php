@@ -2,26 +2,27 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
-use App\Filament\Resources\ProductVariantResource\Pages\CreateProductVariant;
-use App\Filament\Resources\ProductVariantResource\Pages\ViewProductVariant;
-use App\Filament\Resources\ProductVariantResource\Pages\EditProductVariant;
-use App\Filament\Resources\ProductVariantResource\Pages;
-use App\Filament\Resources\ProductVariantResource\RelationManagers;
-use App\Models\ProductVariant;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use App\Models\ProductVariant;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ProductVariantResource\Pages;
+use App\Filament\Resources\ProductVariantResource\RelationManagers;
+use App\Filament\Resources\ProductVariantResource\Pages\EditProductVariant;
+use App\Filament\Resources\ProductVariantResource\Pages\ViewProductVariant;
+use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
+use App\Filament\Resources\ProductVariantResource\Pages\CreateProductVariant;
 
 class ProductVariantResource extends Resource
 {
@@ -33,9 +34,9 @@ class ProductVariantResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('product_id')
+                Select::make('product.name')
                     ->required()
-                    ->numeric(),
+                    ->relationship('product','name'),
                 TextInput::make('color')
                     ->maxLength(255),
                 TextInput::make('size')
@@ -66,6 +67,9 @@ class ProductVariantResource extends Resource
             ->columns([
                 TextColumn::make('product_id')
                     ->numeric()
+                    ->sortable(),
+                    TextColumn::make('product.name')
+                  
                     ->sortable(),
                 TextColumn::make('color')
                     ->searchable(),
