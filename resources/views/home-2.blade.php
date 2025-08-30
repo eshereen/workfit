@@ -652,9 +652,14 @@
                 });
             });
 
-            // Form submission handling
+            // Form submission handling (only for non-Livewire forms)
             const forms = document.querySelectorAll('form');
             forms.forEach(form => {
+                // Skip Livewire forms
+                if (form.hasAttribute('wire:submit') || form.hasAttribute('wire:submit.prevent')) {
+                    return;
+                }
+
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
                     // Add your form submission logic here
