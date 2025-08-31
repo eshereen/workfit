@@ -22,7 +22,7 @@
                 sunday: '2pm - 1am',
             },
             type: 'flagship',
-         
+
             image: 'https://lh3.googleusercontent.com/p/AF1QipOrysemYW1kz7aVSOr-7zyLQJujcGq2zB_h-E77=w408-h408-k-no'
         },
         {
@@ -40,7 +40,7 @@
                 sunday: '2pm - 12am',
             },
             type: 'retail',
-         
+
             image: 'https://lh3.googleusercontent.com/p/AF1QipMayxQ5Fw3RuLdqOvPJ343MZnUrJJY27eBIB2G6=w408-h408-k-no'
         },
         {
@@ -58,7 +58,7 @@
                sunday: 'Closed',
             },
             type: 'mall',
-        
+
             image: 'https://lh3.googleusercontent.com/gps-cs-s/AC9h4nroAbUzy2gVpSANEzF4UvGQjGYIUOhAzE_msOb8wJ7ghMFg9rTrEb5wNwfLem917krhVkrR_LTrPbhExDi0Ie7iOJOpPhWXNG6iPZ3d19alK2WNQpUKKkTnke8vWLYgq8Vc6-wA=w408-h306-k-no'
         },
     ],
@@ -104,7 +104,6 @@
     <!-- Hero Section -->
     <section class="relative h-96 overflow-hidden mt-16">
         <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Workfit Locations" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-black bg-opacity-60"></div>
         <div class="relative z-10 h-full flex items-center justify-center">
             <div class="text-center text-white px-4">
                 <div class="flex justify-center mb-4">

@@ -32,12 +32,12 @@
 
        <!-- Icons -->
        <div class="flex items-center flex-1 space-x-4 justify-end relative z-[1001]">
-           <a href="{{ route('location') }}" class="font-xs uppercase hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Location</a>
+           <a href="{{ route('location') }}" class=" hidden lg:block font-xs uppercase hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Location</a>
 
            <!-- Currency Selector -->
            @include('components.currency-selector')
 
-           <a href="/login" class="font-xs hover:text-red-600 uppercase transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Account</a>
+           <a href="{{ route('login') }}" class=" hidden lg:block font-xs hover:text-red-600 uppercase transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Account</a>
 
             <!-- Cart and Wishlist Counts -->
             @livewire('cart-wishlist-counts')
@@ -55,11 +55,14 @@
 <!-- Mobile Menu (moved outside header) -->
 <div id="mobileMenu" class="md:hidden fixed top-16 left-0 right-0 z-[1090] bg-white py-4 px-4 shadow-lg hidden">
    <nav class="flex flex-col space-y-4">
+    <a href="{{route('home')}}" class="font-medium hover:text-red-600 transition-colors uppercase">Home</a>
        <a href="{{route('categories.index', 'women')}}" class="font-medium hover:text-red-600 transition-colors uppercase">Women</a>
-    
+
        <a href="{{route('categories.index', 'men')}}" class="font-medium hover:text-red-600 transition-colors">MEN</a>
        <a href="{{ route('categories.all') }}" class="font-medium hover:text-red-600 transition-colors">CATEGORIES</a>
        <a href="{{ route('collections.index') }}" class="font-medium hover:text-red-600 transition-colors">COLLECTIONS</a>
+            <a href="{{ route('location') }}" class="font-medium hover:text-red-600 transition-colors uppercase{{ request()->routeIs('home') ? 'text-white uppercase group-hover:text-gray-900' : 'text-gray-900' }}">Location</a>
+              <a href="{{ route('login') }}" class="font-medium hover:text-red-600 transition-colors uppercase">Account</a>
 
    </nav>
 </div>

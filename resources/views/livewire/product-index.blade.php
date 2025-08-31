@@ -153,7 +153,7 @@
 
 <!-- Variant Selection Modal -->
 @if($showVariantModal)
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" wire:key="variant-modal-{{ $selectedProduct?->id ?? 'none' }}">
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" wire:key="variant-modal-{{ $selectedProduct?->id ?? 'none' }}">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-xl font-bold">Select Options</h3>

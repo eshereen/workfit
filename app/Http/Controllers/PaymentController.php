@@ -127,7 +127,7 @@ class PaymentController extends Controller
     public function handlePaymobCallback(Request $request)
     {
         try {
-            Log::info('Paymob callback received', [
+            Log::info('chePaymob callback received', [
                 'query_params' => $request->query(),
                 'all_params' => $request->all(),
                 'method' => $request->method()
@@ -199,18 +199,22 @@ class PaymentController extends Controller
             Log::info('Paymob callback: Payment status evaluation', [
                 'status_param' => $statusParam,
                 'paymob_success' => $success,
-                'paymob_error_occurred' => $errorOccurred,
-                'final_success' => $paymentSuccessful
+                'paymob_error_occured' => $errorOccurred,
+                'final_success_decision' => $paymentSuccessful // Log the final decision
             ]);
 
             if ($paymentSuccessful) {
+                Log::info('Paymob callback: Entering successful payment block', ['order_id' => $order->id]);
+
                 // Update payment status
                 $payment = $order->payments()->latest()->first();
                 if ($payment) {
+                    Log::info('Paymob callback: Updating payment status to succeeded', ['payment_id' => $payment->id]);
                     $payment->update(['status' => 'succeeded']);
                 }
 
                 // Update order status
+                Log::info('Paymob callback: Updating order status to paid/processing', ['order_id' => $order->id]);
                 $order->update([
                     'payment_status' => 'paid',
                     'status' => 'processing'
@@ -224,9 +228,11 @@ class PaymentController extends Controller
                 return redirect()->route('thankyou', ['order' => $order->id])
                                ->with('success', 'Payment completed successfully!');
             } else {
+                Log::warning('Paymob callback: Entering failed payment block', ['order_id' => $order->id]);
                 // Payment failed
                 $payment = $order->payments()->latest()->first();
                 if ($payment) {
+                    Log::warning('Paymob callback: Updating payment status to failed', ['payment_id' => $payment->id]);
                     $payment->update(['status' => 'failed']);
                 }
 
@@ -239,7 +245,7 @@ class PaymentController extends Controller
                     'order_id' => $order->id,
                     'status_param' => $statusParam,
                     'paymob_success' => $success,
-                    'paymob_error_occurred' => $errorOccurred
+                    'paymob_error_occured' => $errorOccurred
                 ]);
 
                 return redirect()->route('checkout')->with('error', 'Payment failed. Please try again.');
@@ -248,7 +254,8 @@ class PaymentController extends Controller
         } catch (Exception $e) {
             Log::error('Paymob callback error: ' . $e->getMessage(), [
                 'exception' => $e,
-                'request' => $request->all()
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString(), // Add full trace
             ]);
             return redirect()->route('checkout')->with('error', 'Payment verification failed');
         }

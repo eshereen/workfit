@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Hero Section with Video Background -->
     <section class="relative -top-28 left-0 right-0 h-screen overflow-hidden">
         <!-- Video Background -->
@@ -26,10 +24,10 @@
                 <h1 class="text-4xl md:text-6xl font-bold mb-4 slide-in">WORKFIT</h1>
                 <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto fade-in">Premium activewear designed for performance and style</p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4 fade-in">
-                    <a href="{{ route('categories.index', 'women') }}" class="w-2/3 mx-auto bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors uppercase">
+                    <a href="<?php echo e(route('categories.index', 'women')); ?>" class="w-2/3 mx-auto bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors uppercase">
                         SHOP WOMEN
                     </a>
-                    <a href="{{ route('categories.index', 'men') }}" class="w-2/3 mx-auto bg-white hover:bg-gray-100 text-black font-bold py-3 px-8 transition-colors">
+                    <a href="<?php echo e(route('categories.index', 'men')); ?>" class="w-2/3 mx-auto bg-white hover:bg-gray-100 text-black font-bold py-3 px-8 transition-colors">
                         SHOP MEN
                     </a>
                 </div>
@@ -41,7 +39,22 @@
     <section class="px-4">
          <h1 class="text-center  font-bold text-5xl mb-2">Just Arrived</h1>
          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
-        @livewire('product-index')
+        <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('product-index');
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-0', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
     </section>
 
     <!-- Full-width Lifestyle Banner -->
@@ -58,7 +71,7 @@
                 <p class="text-xl mb-6 max-w-2xl mx-auto">
                     Stay cool and stylish with our latest summer essentials
                 </p>
-                <a href="{{ route('collections.index') }}"
+                <a href="<?php echo e(route('collections.index')); ?>"
                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
                     SHOP NOW
                 </a>
@@ -70,11 +83,26 @@
     <!-- Product Grid - Women's Collection -->
     <section class="py-16 px-4">
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $kids->name }}'S COLLECTION</h2>
+            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase"><?php echo e($kids->name); ?>'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $kids->description }}</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($kids->description); ?></p>
 
-           @livewire('product-index',['products'=>$kids->products->take(8)])
+           <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('product-index',['products'=>$kids->products->take(8)]);
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-1', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
 
 
 
@@ -96,7 +124,7 @@
                     <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">RUN</h3>
                         <p class="text-white text-center px-4 mb-4">Lightweight gear for your daily runs</p>
-                        <a href="{{ route('collections.index') }}" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
+                        <a href="<?php echo e(route('collections.index')); ?>" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
                     </div>
                 </div>
 
@@ -106,7 +134,7 @@
                     <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">TRAIN</h3>
                         <p class="text-white text-center px-4 mb-4">Durable apparel for intense workouts</p>
-                        <a href="{{ route('collections.index') }}" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
+                        <a href="<?php echo e(route('collections.index')); ?>" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
                     </div>
                 </div>
 
@@ -116,7 +144,7 @@
                     <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">REC</h3>
                         <p class="text-white text-center px-4 mb-4">Comfortable styles for recovery days</p>
- <a href="{{route('collections.index')}}" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
+ <a href="<?php echo e(route('collections.index')); ?>" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
                     </div>
                 </div>
             </div>
@@ -127,17 +155,32 @@
 
      <section class="py-16 px-4">
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $men->name }}'S COLLECTION</h2>
+            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase"><?php echo e($men->name); ?>'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $men->description }}</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($men->description); ?></p>
 
-           @livewire('product-index',['products'=>$men->products->take(8)])
+           <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('product-index',['products'=>$men->products->take(8)]);
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-2', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
 
 
 
             <div class="text-center mt-12 animate-on-scroll">
                 <button class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
-                    VIEW ALL {{ $men->name }}'S
+                    VIEW ALL <?php echo e($men->name); ?>'S
                 </button>
             </div>
         </div>
@@ -162,9 +205,26 @@
         <div class="container mx-auto">
             <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">Featured COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $men->description }}</p>
-           @livewire('product-index',['products'=>$featured])
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($men->description); ?></p>
+           <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('product-index',['products'=>$featured]);
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-3', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
         </div>
     </section>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/shereenelshayp/Herd/workfit/resources/views/home.blade.php ENDPATH**/ ?>

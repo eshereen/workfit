@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+
     <!-- Livewire Styles -->
     @livewireStyles
    </link>
-  
+   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    </link>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 <!--Favicons-->
@@ -32,7 +34,7 @@
     </script>
 
 </head>
-<body class="bg-white text-black font-sans antialiased">
+<body class="bg-white text-gray-950 antialiased">
 
     @include('layouts.navbar')
 

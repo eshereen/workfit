@@ -26,79 +26,81 @@
     </div>
 
     <!-- Active Filters Display -->
-    @if(count($selectedCategories) > 0 || count($selectedSubcategories) > 0)
+    <!--[if BLOCK]><![endif]--><?php if(count($selectedCategories) > 0 || count($selectedSubcategories) > 0): ?>
         <div class="bg-gray-50 p-4 rounded-lg">
             <div class="flex items-center gap-2 flex-wrap">
                 <span class="text-sm font-medium text-gray-700">Showing products for:</span>
-                @foreach($selectedCategories as $categoryId)
-                    @php
+                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $selectedCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoryId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $category = \App\Models\Category::find($categoryId);
-                    @endphp
-                    @if($category)
+                    ?>
+                    <!--[if BLOCK]><![endif]--><?php if($category): ?>
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                            Category: {{ $category->name }}
+                            Category: <?php echo e($category->name); ?>
+
                         </span>
-                    @endif
-                @endforeach
-                @foreach($selectedSubcategories as $subcategoryId)
-                    @php
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $selectedSubcategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcategoryId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $subcategory = \App\Models\Subcategory::find($subcategoryId);
-                    @endphp
-                    @if($subcategory)
+                    ?>
+                    <!--[if BLOCK]><![endif]--><?php if($subcategory): ?>
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                            Subcategory: {{ $subcategory->name }}
+                            Subcategory: <?php echo e($subcategory->name); ?>
+
                         </span>
-                    @endif
-                @endforeach
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
             </div>
         </div>
-    @endif
+    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Products Grid -->
-    @if($products->count() > 0)
+    <!--[if BLOCK]><![endif]--><?php if($products->count() > 0): ?>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($products as $product)
+            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div  class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <!-- Product Image -->
-                    <a href="{{ route('product.show', $product->slug) }}" class="relative group">
-                        @if($product->media->count() > 0)
+                    <a href="<?php echo e(route('product.show', $product->slug)); ?>" class="relative group">
+                        <!--[if BLOCK]><![endif]--><?php if($product->media->count() > 0): ?>
                             <img
-                                src="{{ $product->getFirstMediaUrl('main_image','medium') }}"
+                                src="<?php echo e($product->getFirstMediaUrl('main_image','medium')); ?>"
                                 loading="lazy"
-                                alt="{{ $product->name }}"
+                                alt="<?php echo e($product->name); ?>"
                                 class="w-full h-64 object-cover"
                             >
-                        @else
+                        <?php else: ?>
                             <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
                                 <span class="text-gray-400">No Image</span>
                             </div>
-                        @endif
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                         <!-- Quick Actions Overlay -->
                         <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 flex items-center justify-center">
                             <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2">
-                                @if($product->variants->count() > 0)
+                                <!--[if BLOCK]><![endif]--><?php if($product->variants->count() > 0): ?>
                                     <button
-                                        wire:click="openVariantModal({{ $product->id }})"
+                                        wire:click="openVariantModal(<?php echo e($product->id); ?>)"
                                         class="bg-white text-gray-900 px-4 py-2 rounded-full hover:bg-red-600 hover:text-white transition-colors"
                                     >
                                         <i class="fas fa-eye mr-2"></i>View Options
                                     </button>
-                                @else
+                                <?php else: ?>
                                     <button
-                                        wire:click="addSimpleProductToCart({{ $product->id }})"
+                                        wire:click="addSimpleProductToCart(<?php echo e($product->id); ?>)"
                                         class="bg-white text-gray-900 px-4 py-2 rounded-full hover:bg-red-600 hover:text-white transition-colors"
                                     >
                                         <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
                                     </button>
-                                @endif
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
                         </a>
 
                         <!-- Wishlist Button -->
                         <button
-                            wire:click="toggleWishlist({{ $product->id }})"
-                            class="absolute top-3 right-3 p-2 rounded-full bg-white shadow-md hover:bg-red-600 hover:text-white transition-colors {{ in_array($product->id, $wishlistProductIds) ? 'text-red-600' : 'text-gray-400' }}"
+                            wire:click="toggleWishlist(<?php echo e($product->id); ?>)"
+                            class="absolute top-3 right-3 p-2 rounded-full bg-white shadow-md hover:bg-red-600 hover:text-white transition-colors <?php echo e(in_array($product->id, $wishlistProductIds) ? 'text-red-600' : 'text-gray-400'); ?>"
                         >
                             <i class="fas fa-heart"></i>
                         </button>
@@ -106,93 +108,94 @@
 
                     <!-- Product Info -->
                     <div class="p-4">
-                        <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ $product->name }}</h3>
+                        <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2"><?php echo e($product->name); ?></h3>
 
-                        @if($product->category)
-                            <p class="text-sm text-gray-600 mb-2">{{ $product->category->name }}</p>
-                        @endif
+                        <!--[if BLOCK]><![endif]--><?php if($product->category): ?>
+                            <p class="text-sm text-gray-600 mb-2"><?php echo e($product->category->name); ?></p>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                         <!-- Price -->
                         <div class="flex items-center gap-2 mb-3">
-                            <span class="text-lg font-bold text-gray-900">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->price), 2) }}</span>
+                            <span class="text-lg font-bold text-gray-900"><?php echo e($currencySymbol); ?><?php echo e(number_format($this->convertPrice($product->price), 2)); ?></span>
 
-                            @if($product->compare_price && $product->compare_price > $product->price)
-                                <span class="text-sm text-gray-500 line-through">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->compare_price), 2) }}</span>
-                            @endif
+                            <!--[if BLOCK]><![endif]--><?php if($product->compare_price && $product->compare_price > $product->price): ?>
+                                <span class="text-sm text-gray-500 line-through"><?php echo e($currencySymbol); ?><?php echo e(number_format($this->convertPrice($product->compare_price), 2)); ?></span>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
 
                         <!-- Variant Colors (if any) -->
-                        @if($product->variants->count() > 0)
+                        <!--[if BLOCK]><![endif]--><?php if($product->variants->count() > 0): ?>
                             <div class="flex gap-2 mb-3">
-                                @foreach($product->variants->take(5) as $variant)
-                                    @if($variant->color)
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $product->variants->take(5); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $variant): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <!--[if BLOCK]><![endif]--><?php if($variant->color): ?>
                                         <div
                                             class="w-4 h-4 rounded-full border border-gray-300"
-                                            style="background-color: {{ $this->getColorCode($variant->color) }}"
-                                            title="{{ ucfirst($variant->color) }}"
+                                            style="background-color: <?php echo e($this->getColorCode($variant->color)); ?>"
+                                            title="<?php echo e(ucfirst($variant->color)); ?>"
                                         ></div>
-                                    @endif
-                                @endforeach
-                                @if($product->variants->count() > 5)
-                                    <span class="text-xs text-gray-500">+{{ $product->variants->count() - 5 }} more</span>
-                                @endif
+                                    <?php endif; ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php if($product->variants->count() > 5): ?>
+                                    <span class="text-xs text-gray-500">+<?php echo e($product->variants->count() - 5); ?> more</span>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
-                        @endif
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                         <!-- Action Buttons -->
                         <div class="flex gap-2">
-                            @if($product->variants->count() > 0)
+                            <!--[if BLOCK]><![endif]--><?php if($product->variants->count() > 0): ?>
                                 <button
-                                    wire:click="openVariantModal({{ $product->id }})"
+                                    wire:click="openVariantModal(<?php echo e($product->id); ?>)"
                                     class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
                                 >
                                     View Options
                                 </button>
-                            @else
+                            <?php else: ?>
                                 <button
-                                    wire:click="addSimpleProductToCart({{ $product->id }})"
+                                    wire:click="addSimpleProductToCart(<?php echo e($product->id); ?>)"
                                     class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
                                 >
                                     Add to Cart
                                 </button>
-                            @endif
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                     </div>
                 </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
         </div>
 
         <!-- Pagination -->
         <div class="mt-8">
-            {{ $products->links() }}
+            <?php echo e($products->links()); ?>
+
         </div>
-    @else
+    <?php else: ?>
         <!-- No Products Found -->
         <div class="text-center py-12">
             <div class="text-gray-500">
                 <i class="fas fa-search text-6xl mb-4"></i>
                 <h3 class="text-xl font-semibold mb-2">No products found</h3>
                 <p class="text-gray-600">
-                    @if($search)
-                        No products match your search "{{ $search }}"
-                    @elseif(count($selectedCategories) > 0 || count($selectedSubcategories) > 0)
+                    <?php if($search): ?>
+                        No products match your search "<?php echo e($search); ?>"
+                    <?php elseif(count($selectedCategories) > 0 || count($selectedSubcategories) > 0): ?>
                         No products found for the selected filters
-                    @else
+                    <?php else: ?>
                         No products found in this category.
-                    @endif
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                 </p>
             </div>
         </div>
-    @endif
+    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Variant Selection Modal -->
-    @if($showVariantModal && $selectedProduct)
+    <!--[if BLOCK]><![endif]--><?php if($showVariantModal && $selectedProduct): ?>
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
                 <div class="p-6">
                     <!-- Modal Header -->
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold">{{ $selectedProduct->name }}</h3>
+                        <h3 class="text-lg font-semibold"><?php echo e($selectedProduct->name); ?></h3>
                         <button
                             wire:click="$set('showVariantModal', false)"
                             class="text-gray-400 hover:text-gray-600"
@@ -202,44 +205,46 @@
                     </div>
 
                     <!-- Product Image -->
-                    @if($selectedProduct->media->count() > 0)
+                    <!--[if BLOCK]><![endif]--><?php if($selectedProduct->media->count() > 0): ?>
                         <img
-                            src="{{ $selectedProduct->getFirstMediaUrl('main_image','medium') }}"
-                            alt="{{ $selectedProduct->name }}"
+                            src="<?php echo e($selectedProduct->getFirstMediaUrl('main_image','medium')); ?>"
+                            alt="<?php echo e($selectedProduct->name); ?>"
                             class="w-full h-48 object-cover rounded-lg mb-4"
                         >
-                    @endif
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                     <!-- Variant Selection -->
-                    @if($selectedProduct->variants->count() > 0)
+                    <!--[if BLOCK]><![endif]--><?php if($selectedProduct->variants->count() > 0): ?>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Select Variant:</label>
                             <div class="grid grid-cols-2 gap-2">
-                                @foreach($selectedProduct->variants as $variant)
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $selectedProduct->variants; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $variant): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <button
-                                        wire:click="selectVariant({{ $variant->id }})"
-                                        class="p-3 border rounded-lg text-left hover:border-red-500 transition-colors {{ $selectedVariantId == $variant->id ? 'border-red-500 bg-red-50' : 'border-gray-300' }}"
+                                        wire:click="selectVariant(<?php echo e($variant->id); ?>)"
+                                        class="p-3 border rounded-lg text-left hover:border-red-500 transition-colors <?php echo e($selectedVariantId == $variant->id ? 'border-red-500 bg-red-50' : 'border-gray-300'); ?>"
                                     >
                                         <div class="flex items-center gap-2">
-                                            @if($variant->color)
+                                            <!--[if BLOCK]><![endif]--><?php if($variant->color): ?>
                                                 <div
                                                     class="w-4 h-4 rounded-full border border-gray-300"
-                                                    style="background-color: {{ $this->getColorCode($variant->color) }}"
+                                                    style="background-color: <?php echo e($this->getColorCode($variant->color)); ?>"
                                                 ></div>
-                                            @endif
-                                            <span class="text-sm font-medium">{{ $variant->name  }}</span>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                            <span class="text-sm font-medium"><?php echo e($variant->name); ?></span>
                                         </div>
                                         <div class="text-sm text-gray-600 mt-1">
-                                            {{ $currencySymbol }}{{ number_format($this->convertPrice($variant->price), 2) }}
+                                            <?php echo e($currencySymbol); ?><?php echo e(number_format($this->convertPrice($variant->price), 2)); ?>
+
                                         </div>
                                         <div class="text-xs text-gray-500 mt-1">
-                                            Stock: {{ $variant->stock }}
+                                            Stock: <?php echo e($variant->stock); ?>
+
                                         </div>
                                     </button>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
                         </div>
-                    @endif
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                     <!-- Quantity Selection -->
                     <div class="mb-4">
@@ -248,15 +253,17 @@
                             <button
                                 wire:click="decrementQty"
                                 class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                                {{ $quantity <= 1 ? 'disabled' : '' }}
+                                <?php echo e($quantity <= 1 ? 'disabled' : ''); ?>
+
                             >
                                 <i class="fas fa-minus text-sm"></i>
                             </button>
-                            <span class="text-lg font-medium w-12 text-center">{{ $quantity }}</span>
+                            <span class="text-lg font-medium w-12 text-center"><?php echo e($quantity); ?></span>
                             <button
                                 wire:click="incrementQty"
                                 class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                                {{ $quantity >= ($selectedVariant ? $selectedVariant->stock : 10) ? 'disabled' : '' }}
+                                <?php echo e($quantity >= ($selectedVariant ? $selectedVariant->stock : 10) ? 'disabled' : ''); ?>
+
                             >
                                 <i class="fas fa-plus text-sm"></i>
                             </button>
@@ -267,16 +274,19 @@
                     <button
                         wire:click="addToCart"
                         class="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        {{ !$selectedVariant ? 'disabled' : '' }}
+                        <?php echo e(!$selectedVariant ? 'disabled' : ''); ?>
+
                     >
-                        @if($selectedVariant)
-                            Add to Cart - {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedVariant->price), 2) }}
-                        @else
+                        <!--[if BLOCK]><![endif]--><?php if($selectedVariant): ?>
+                            Add to Cart - <?php echo e($currencySymbol); ?><?php echo e(number_format($this->convertPrice($selectedVariant->price), 2)); ?>
+
+                        <?php else: ?>
                             Select a variant first
-                        @endif
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                     </button>
                 </div>
             </div>
         </div>
-    @endif
+    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 </div>
+<?php /**PATH /Users/shereenelshayp/Herd/workfit/resources/views/livewire/category-products.blade.php ENDPATH**/ ?>

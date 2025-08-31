@@ -12,7 +12,7 @@
         </div>
 
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-0"></div>
 
         <!-- Hero Content -->
         <div class="relative z-10 h-full flex items-center justify-center hero-content">
@@ -38,10 +38,10 @@
             <div class="container mx-auto px-4 py-10">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   @foreach ($products as $product)
-                      
-                
+
+
                   <!-- Card -->
-                  <div 
+                  <div
                     class="bg-white shadow-md rounded-lg overflow-hidden cursor-pointer group h-96"
                     x-data="{ hover: false }"
                     @mouseenter="hover = true"
@@ -49,36 +49,36 @@
                   >
                     <!-- Image -->
                     <div class="relative h-64">
-                      <img 
+                      <img
                         :class="hover ? 'opacity-0' : 'opacity-100'"
-                        src="{{$product->getFirstMediaUrl('main_image', 'medium');}}" 
-                        alt="{{ $product->name }}" 
+                        src="{{$product->getFirstMediaUrl('main_image', 'medium');}}"
+                        alt="{{ $product->name }}"
                         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                       >
-                      <img 
+                      <img
                         :class="hover ? 'opacity-100' : 'opacity-0'"
-                        src="{{$product->getFirstMediaUrl('product_images', 'medium');}}" 
-                        alt="{{ $product->name }}" 
+                        src="{{$product->getFirstMediaUrl('product_images', 'medium');}}"
+                        alt="{{ $product->name }}"
                         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                       >
                     </div>
-              
+
                     <!-- Content -->
                     <div class="p-4 text-center">
                       <h3 class="text-sm font-medium text-gray-700">Tech Essential™ Relaxed Tee - Faded Grey</h3>
-              
+
                       <!-- Price / Sizes -->
                       <div class="mt-2">
-                        <p 
-                          x-show="!hover" 
+                        <p
+                          x-show="!hover"
                           class="text-gray-900 font-semibold"
                           x-transition
                         >
                          {{$product->price}}
                         </p>
-              
-                        <div 
-                          x-show="hover" 
+
+                        <div
+                          x-show="hover"
                           class="flex justify-center gap-2 text-xs font-medium text-gray-600"
                           x-transition
                         >
@@ -92,13 +92,13 @@
                   <!-- /Card -->
                   @endforeach
                   <!-- Repeat more cards as needed -->
-              
+
                 </div>
               </div>
-              
+
 
        <!--     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <!-- Category 1 
+                <!-- Category 1
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
                     <img src="https://picsum.photos/seed/workfit1/400/500.jpg" alt="Tops" class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -114,7 +114,7 @@
                     </div>
                 </div>
 
-                <!-- Category 3 
+                <!-- Category 3
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
                     <img src="https://picsum.photos/seed/workfit3/400/500.jpg" alt="Accessories" class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -122,7 +122,7 @@
                     </div>
                 </div>
 
-                <!-- Category 4 
+                <!-- Category 4
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
                     <img src="https://picsum.photos/seed/workfit4/400/500.jpg" alt="Sale" class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -469,4 +469,3 @@
         </div>
     </section>
 @endsection
-   

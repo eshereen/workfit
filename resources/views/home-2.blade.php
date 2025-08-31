@@ -160,7 +160,6 @@
         </video>
 
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
 
         <!-- Hero Content -->
         <div class="relative z-10 h-full flex items-center justify-center">

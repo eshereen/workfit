@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <section class="relative h-96 overflow-hidden mt-16">
         <img src=https://images.unsplash.com/photo-1631010231931-d2c396b444ec?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Shipping & Returns" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="absolute inset-0 bg-black/50"></div>
         <div class="relative z-10 h-full flex items-center justify-center">
             <div class="text-center text-white px-4">
                 <div class="flex justify-center mb-4">
@@ -480,8 +480,8 @@
                 </section>
             </div>
 
-          
-                          
+
+
             <!-- Contact Section -->
             <section class="py-12 px-4 bg-gray-100 animate-on-scroll">
                 <div class="container mx-auto">

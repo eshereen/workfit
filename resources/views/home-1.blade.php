@@ -468,7 +468,7 @@
             <!-- Run Banner -->
             <div class="category-banner relative h-80 rounded-lg overflow-hidden cursor-pointer">
                 <img src="https://picsum.photos/seed/run/600/400.jpg" alt="Run" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div class="absolute inset-0 bg-black opacity-40 flex items-center justify-center">
                     <div class="text-center text-white">
                         <h3 class="text-2xl font-bold mb-2">Run</h3>
                         <p class="mb-4">Performance running gear</p>
@@ -482,7 +482,7 @@
             <!-- Train Banner -->
             <div class="category-banner relative h-80 rounded-lg overflow-hidden cursor-pointer">
                 <img src="https://picsum.photos/seed/train/600/400.jpg" alt="Train" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div class="absolute inset-0 bg-black opacity-40 flex items-center justify-center">
                     <div class="text-center text-white">
                         <h3 class="text-2xl font-bold mb-2">Train</h3>
                         <p class="mb-4">Gym and training essentials</p>
@@ -496,7 +496,7 @@
             <!-- Rec Banner -->
             <div class="category-banner relative h-80 rounded-lg overflow-hidden cursor-pointer">
                 <img src="https://picsum.photos/seed/rec/600/400.jpg" alt="Recover" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div class="absolute inset-0 bg-black opacity-40 flex items-center justify-center">
                     <div class="text-center text-white">
                         <h3 class="text-2xl font-bold mb-2">Recover</h3>
                         <p class="mb-4">Comfort for rest days</p>
