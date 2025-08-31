@@ -69,26 +69,7 @@ function initEnhancements() {
         });
     });
 
-    // Generic demo form submission handling (only for non-Livewire forms)
-    var forms = document.querySelectorAll('form');
-    console.log('[app.js] Found forms:', forms.length);
-    forms.forEach(function (form, index) {
-        var wireSubmit = form.getAttribute('wire:submit');
-        console.log('[app.js] Form', index, 'wire:submit attribute:', wireSubmit);
-
-        // Skip Livewire forms
-        if (wireSubmit && wireSubmit.includes('prevent')) {
-            console.log('[app.js] Skipping Livewire form:', index);
-            return;
-        }
-
-        console.log('[app.js] Adding submit listener to form:', index);
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            alert('Thank you for your submission!');
-            form.reset();
-        });
-    });
+    // Note: Removed demo form submission handler to avoid interfering with Livewire forms
 }
 
 function initScrollEffects() {
