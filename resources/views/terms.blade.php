@@ -226,13 +226,28 @@
                 });
             });
 
-            // Form submission handling
+            // Form submission handling (only for non-Livewire forms)
             const forms = document.querySelectorAll('form');
             forms.forEach(form => {
+                // Skip Livewire forms
+                const wireSubmit = form.getAttribute('wire:submit');
+                if (wireSubmit && wireSubmit.includes('prevent')) {
+                    return;
+                }
+
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    // Add your form submission logic here
-                    alert('Thank you for your submission!');
+                    // Visible success feedback
+                    if (typeof showNotification === 'function') {
+                        showNotification('Thank you for your submission!', 'success');
+                    } else {
+                        const msg = document.createElement('div');
+                        msg.className = 'mt-3 rounded-md bg-green-50 p-3 text-sm text-green-700';
+                        msg.textContent = 'Thank you for your submission!';
+                        form.parentNode.insertBefore(msg, form.nextSibling);
+                        setTimeout(() => msg.remove(), 3000);
+                    }
+
                     form.reset();
                 });
             });
