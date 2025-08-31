@@ -6,13 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//images.unsplash.com">
+
+    <!-- Resource hints for critical resources -->
+    <link rel="preload" href="/videos/workfit-lg.mp4" as="video" type="video/mp4">
+    <link rel="preload" href="/videos/workfit-mobile.mp4" as="video" type="video/mp4">
 
     <!-- Livewire Styles -->
     @livewireStyles
    </link>
-   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    </link>
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 <!--Favicons-->
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">

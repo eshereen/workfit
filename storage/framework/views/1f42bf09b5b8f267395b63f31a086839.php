@@ -4,22 +4,23 @@
         <!-- Video Background -->
         <div class="video-container">
             <!-- Desktop Video (hidden on mobile) -->
-            <video autoplay muted loop playsinline  class="hidden md:block w-full h-full object-cover">
+            <video autoplay muted loop playsinline preload="none" class="hidden md:block w-full h-full object-cover" poster="/imgs/video-poster.jpg">
                 <source src="videos/workfit-lg.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
 
             <!-- Mobile Video (hidden on desktop) -->
-            <video autoplay muted loop playsinline  class="block md:hidden w-full h-full object-cover">
+            <video autoplay muted loop playsinline preload="none" class="block md:hidden w-full h-full object-cover" poster="/imgs/video-poster.jpg">
                 <source src="videos/workfit-mobile.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
 
         <!-- Overlay -->
-      <div class="absolute inset-0 bg-black/50"></div>
+        <div class="absolute inset-0 bg-black/50"></div>
+
         <!-- Hero Content -->
-        <div class="relative z-10 h-full flex items-center justify-center hero-content ">
+        <div class="relative z-10 h-full flex items-center justify-center hero-content">
             <div class="text-center text-white px-4">
                 <h1 class="text-4xl md:text-6xl font-bold mb-4 slide-in">WORKFIT</h1>
                 <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto fade-in">Premium activewear designed for performance and style</p>
@@ -120,7 +121,12 @@ if (isset($__slots)) unset($__slots);
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 h-screen">
                 <!-- RUN Block -->
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://images.unsplash.com/photo-1679216129631-fbcec034558c?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" loading="lazy" alt="Run" class="w-full h-full object-cover hover-zoom">
+                    <img src="https://images.unsplash.com/photo-1679216129631-fbcec034558c?q=70&w=600&auto=format&fit=crop"
+                         width="600"
+                         height="400"
+                         loading="lazy"
+                         alt="Run"
+                         class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">RUN</h3>
                         <p class="text-white text-center px-4 mb-4">Lightweight gear for your daily runs</p>
@@ -130,7 +136,12 @@ if (isset($__slots)) unset($__slots);
 
                 <!-- TRAIN Block -->
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://images.unsplash.com/photo-1646072508263-af94f0218bf0?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" loading="lazy" alt="Train" class="w-full h-full object-cover hover-zoom">
+                    <img src="https://images.unsplash.com/photo-1646072508263-af94f0218bf0?q=70&w=600&auto=format&fit=crop"
+                         width="600"
+                         height="400"
+                         loading="lazy"
+                         alt="Train"
+                         class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">TRAIN</h3>
                         <p class="text-white text-center px-4 mb-4">Durable apparel for intense workouts</p>
@@ -140,11 +151,16 @@ if (isset($__slots)) unset($__slots);
 
                 <!-- REC Block -->
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
-                    <img src="https://images.unsplash.com/photo-1715192383684-24c6614d2b54?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" loading="lazy" alt="Rec" class="w-full h-full object-cover hover-zoom">
+                    <img src="https://images.unsplash.com/photo-1715192383684-24c6614d2b54?q=70&w=600&auto=format&fit=crop"
+                         width="600"
+                         height="400"
+                         loading="lazy"
+                         alt="Rec"
+                         class="w-full h-full object-cover hover-zoom">
                     <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">REC</h3>
                         <p class="text-white text-center px-4 mb-4">Comfortable styles for recovery days</p>
- <a href="<?php echo e(route('collections.index')); ?>" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
+                        <a href="<?php echo e(route('collections.index')); ?>" class="text-white font-medium underline hover:text-red-400 transition-colors">SHOP NOW</a>
                     </div>
                 </div>
             </div>
@@ -188,7 +204,12 @@ if (isset($__slots)) unset($__slots);
 
     <!-- Full-width Lifestyle Banner 2 -->
     <section class="relative h-96 overflow-hidden animate-on-scroll">
-        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" loading="lazy" alt="Lifestyle Banner" class="w-full h-full object-cover">
+        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=70&w=800&auto=format&fit=crop"
+             width="800"
+             height="400"
+             loading="lazy"
+             alt="Lifestyle Banner"
+             class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
             <div class="text-center text-white px-4">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">NEW ARRIVALS</h2>

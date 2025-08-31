@@ -80,6 +80,39 @@ h1 {
     background-size: cover;
 }
 
+/* Performance optimizations */
+img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* Optimize animations for performance */
+@media (prefers-reduced-motion: reduce) {
+    .fade-in,
+    .slide-in,
+    .slide-in-left,
+    .slide-in-right,
+    .hover-zoom,
+    .animate-on-scroll {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Optimize video loading */
+video {
+    will-change: transform;
+}
+
+/* Optimize overlay performance */
+.bg-black\/50,
+.bg-black\/20,
+.bg-black\/25,
+.bg-black\/30,
+.bg-black\/40 {
+    will-change: opacity;
+}
+
 /* Custom styles for animations and transitions */
 .hover-zoom {
     transition: transform 0.3s ease;
@@ -106,8 +139,10 @@ h1 {
     opacity: 1;
 }
 
+/* Optimize animations and transitions */
 .fade-in {
     animation: fadeIn 0.5s ease-in-out;
+    will-change: opacity, transform;
 }
 
 @keyframes fadeIn {
@@ -117,6 +152,7 @@ h1 {
 
 .slide-in {
     animation: slideIn 0.7s ease-out;
+    will-change: transform;
 }
 
 @keyframes slideIn {
@@ -126,6 +162,7 @@ h1 {
 
 .slide-in-left {
     animation: slideInLeft 0.7s ease-out;
+    will-change: opacity, transform;
 }
 
 @keyframes slideInLeft {
@@ -135,11 +172,69 @@ h1 {
 
 .slide-in-right {
     animation: slideInRight 0.7s ease-out;
+    will-change: opacity, transform;
 }
 
 @keyframes slideInRight {
     from { opacity: 0; transform: translateX(50px); }
     to { opacity: 1; transform: translateX(0); }
+}
+
+/* Optimize hover effects */
+.hover-zoom {
+    transition: transform 0.3s ease;
+    will-change: transform;
+}
+
+.hover-zoom:hover {
+    transform: scale(1.05);
+}
+
+/* Optimize image containers */
+.product-image-container {
+    overflow: hidden;
+    contain: layout style paint;
+}
+
+/* Optimize overlay performance */
+.bg-black\/50,
+.bg-black\/20,
+.bg-black\/25,
+.bg-black\/30,
+.bg-black\/40,
+.bg-black.bg-opacity-50,
+.bg-black.bg-opacity-20,
+.bg-black.bg-opacity-25,
+.bg-black.bg-opacity-30,
+.bg-black.bg-opacity-40 {
+    will-change: opacity;
+    contain: layout style paint;
+}
+
+/* Optimize scroll animations */
+.animate-on-scroll {
+    will-change: opacity, transform;
+}
+
+/* Optimize video performance */
+video {
+    will-change: transform;
+    contain: layout style paint;
+}
+
+/* Optimize font rendering */
+body {
+    font-family: 'Poppins', sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom scrollbar */
