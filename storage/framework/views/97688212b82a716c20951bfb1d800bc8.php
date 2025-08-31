@@ -1,13 +1,13 @@
 <div class="bg-white rounded-lg shadow-md p-6 w-2/3">
     <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg font-semibold text-gray-900">Loyalty Points</h3>
-        <div class="text-2xl font-bold text-blue-600">
+        <div class="text-2xl font-bold text-gray-800">
             <?php echo e(number_format($loyaltyBalance)); ?> pts
         </div>
     </div>
 
     <div class="mb-6">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
@@ -15,7 +15,7 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-blue-700">
+                    <p class="text-sm text-green-700">
                         <strong>How it works:</strong> Earn 1 point for every $1 spent. Redeem 100 points for $1 off your next purchase.
                     </p>
                 </div>
@@ -27,7 +27,7 @@
         <div class="border-t pt-6">
             <button
                 wire:click="toggleRedeemForm"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+                class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
             >
                 <?php echo e($showRedeemForm ? 'Cancel Redemption' : 'Redeem Points'); ?>
 

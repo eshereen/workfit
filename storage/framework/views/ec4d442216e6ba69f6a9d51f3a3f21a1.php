@@ -53,8 +53,8 @@ if (isset($__slots)) unset($__slots);
             </div>
 
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h3>
-                <div class="space-y-3">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-8">Quick Actions</h3>
+                <div class="space-y-3 ">
                     <a href="<?php echo e(route('products.index')); ?>" class="block w-full text-center bg-white hover:bg-red-700 hover:text-white border-2 border-red-600 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-200">
                         Browse Products
                     </a>
