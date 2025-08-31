@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Illuminate\Support\Facades\Log;
 
 class SubscribeForm extends Component
 {
@@ -77,8 +78,25 @@ class SubscribeForm extends Component
             return;
         }
 
-        // Send verification email (queue in prod)
-        Mail::to($this->email)->queue(new NewsletterVerificationMail($newsletter, $plain));
+        // Send verification email (queue in prod when worker is running; otherwise sync send)
+        try {
+            $usingSyncQueue = config('queue.default') === 'sync';
+            if ($usingSyncQueue) {
+                Mail::to($this->email)->send(new NewsletterVerificationMail($newsletter, $plain));
+                Log::info('Newsletter verification email sent synchronously', ['email' => $this->email]);
+            } else {
+                Mail::to($this->email)->queue(new NewsletterVerificationMail($newsletter, $plain));
+                Log::info('Newsletter verification email queued', ['email' => $this->email]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Newsletter email dispatch failed', [
+                'email' => $this->email,
+                'error' => $e->getMessage(),
+            ]);
+            // Optional: surface a friendly error (kept silent to avoid leaking details)
+            $this->addError('email', 'We could not send the verification email right now. Please try again later.');
+            return;
+        }
 
         $this->reset(['email']);
         $this->submitted = true;
