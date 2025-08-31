@@ -2,7 +2,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-xl mx-auto my-16 px-4">
+    <div class="max-w-xl mx-auto my-40 px-4">
         <div class="text-center">
             <div class="mb-4">
                 <i class="fas fa-check-circle text-green-500 text-6xl"></i>
