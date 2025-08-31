@@ -254,9 +254,14 @@ $cancelUrl = route('payments.cancel', ['order' => $order->id]);
 $this->cartService->clearCart();
 DB::commit();
 
+            // Log final state before redirection
+            Log::info('CheckoutController: Final redirection decision', [
+                'validated_payment_method' => $validated['payment_method'],
+                'result_redirect_url' => $result['redirect_url'] ?? 'null',
+                'payment_requires_frontend_processing' => $result['requires_frontend_processing'] ?? false,
+            ]);
+
             // Handle different payment methods appropriately
-
-
             if ($validated['payment_method'] === 'cash_on_delivery') {
                 // COD should never redirect - go directly to thank you page
                 Log::info('COD payment completed, redirecting to thank you page', [
@@ -265,29 +270,44 @@ DB::commit();
                 ]);
                 return redirect()->route('thankyou', ['order' => $order->id])
                     ->with('success', 'Order placed successfully! Payment will be collected on delivery.');
-            } elseif (!empty($result['redirect_url'])) {
-                // Other payment methods (Paymob, PayPal) that need external redirect
-                Log::info('Authenticated checkout: Redirecting to external gateway', [
+            } elseif ($validated['payment_method'] === 'paymob' && !empty($result['redirect_url'])) {
+                // Paymob needs external redirect
+                Log::info('Authenticated checkout: Redirecting to Paymob gateway', [
                     'payment_method' => $validated['payment_method'],
                     'redirect_url' => $result['redirect_url']
                 ]);
                 return redirect()->away($result['redirect_url']);
-            }
-
-            // For PayPal credit card payments, redirect to our custom page
-            if (isset($result['requires_frontend_processing']) && $result['requires_frontend_processing']) {
-
+            } elseif ($validated['payment_method'] === 'paypal' && !empty($result['redirect_url'])) {
+                // PayPal (account or credit card requiring external redirect)
+                Log::info('Authenticated checkout: Redirecting to PayPal gateway', [
+                    'payment_method' => $validated['payment_method'],
+                    'redirect_url' => $result['redirect_url']
+                ]);
+                return redirect()->away($result['redirect_url']);
+            } elseif (isset($result['requires_frontend_processing']) && $result['requires_frontend_processing'] && !empty($result['redirect_url'])) {
+                // For PayPal credit card payments, redirect to our custom page if needed
+                Log::info('Authenticated checkout: Redirecting for frontend PayPal processing', [
+                    'payment_method' => $validated['payment_method'],
+                    'redirect_url' => $result['redirect_url']
+                ]);
                 return redirect()->to($result['redirect_url']);
+            } else {
+                // Fallback for unexpected scenarios where Paymob/PayPal was chosen but no redirect_url
+                Log::warning('Authenticated checkout: Payment method chosen but no redirect_url, falling back to thank you page.', [
+                    'payment_method' => $validated['payment_method'],
+                    'order_id' => $order->id,
+                    'result' => $result // Log full result for debugging
+                ]);
+                return redirect()->route('thankyou', ['order' => $order->id])
+                    ->with('error', 'Payment initiated, but no redirect was provided. Please check your order status.');
             }
-
-            // If we reach here, something went wrong - redirect to thank you page as fallback
-
-            return redirect()->route('thankyou', ['order' => $order->id])
-                ->with('success', 'Order placed successfully!');
 
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Error processing authenticated checkout: ' . $e->getMessage());
+            Log::error('Error processing authenticated checkout: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
 
             return back()->with('error', 'An error occurred while processing your order. Please try again.')
                         ->withInput();
@@ -407,34 +427,60 @@ if ($paymentType === 'credit_card') {
 $this->cartService->clearCart();
 DB::commit();
 
+            // Log final state before redirection
+            Log::info('CheckoutController: Guest checkout final redirection decision', [
+                'validated_payment_method' => $validated['payment_method'],
+                'result_redirect_url' => $result['redirect_url'] ?? 'null',
+                'payment_requires_frontend_processing' => $result['requires_frontend_processing'] ?? false,
+            ]);
+
             // Handle different payment methods appropriately
-
-
             if ($validated['payment_method'] === 'cash_on_delivery') {
                 // COD should never redirect - go directly to thank you page
-
+                Log::info('Guest checkout: COD payment completed, redirecting to thank you page', [
+                    'payment_method' => $validated['payment_method'],
+                    'order_id' => $order->id
+                ]);
                 return redirect()->route('thankyou', ['order' => $order->id])
                     ->with('success', 'Order placed successfully! Payment will be collected on delivery.');
-            } elseif (!empty($result['redirect_url'])) {
-                // Other payment methods (Paymob, PayPal) that need external redirect
-
+            } elseif ($validated['payment_method'] === 'paymob' && !empty($result['redirect_url'])) {
+                // Paymob needs external redirect
+                Log::info('Guest checkout: Redirecting to Paymob gateway', [
+                    'payment_method' => $validated['payment_method'],
+                    'redirect_url' => $result['redirect_url']
+                ]);
                 return redirect()->away($result['redirect_url']);
-            }
-
-            // For PayPal credit card payments, redirect to our custom page
-            if (isset($result['requires_frontend_processing']) && $result['requires_frontend_processing']) {
+            } elseif ($validated['payment_method'] === 'paypal' && !empty($result['redirect_url'])) {
+                // PayPal (account or credit card requiring external redirect)
+                Log::info('Guest checkout: Redirecting to PayPal gateway', [
+                    'payment_method' => $validated['payment_method'],
+                    'redirect_url' => $result['redirect_url']
+                ]);
+                return redirect()->away($result['redirect_url']);
+            } elseif (isset($result['requires_frontend_processing']) && $result['requires_frontend_processing'] && !empty($result['redirect_url'])) {
+                // For PayPal credit card payments, redirect to our custom page if needed
+                Log::info('Guest checkout: Redirecting for frontend PayPal processing', [
+                    'payment_method' => $validated['payment_method'],
+                    'redirect_url' => $result['redirect_url']
+                ]);
                 return redirect()->to($result['redirect_url']);
+            } else {
+                // Fallback for unexpected scenarios where Paymob/PayPal was chosen but no redirect_url
+                Log::warning('Guest checkout: Payment method chosen but no redirect_url, falling back to thank you page.', [
+                    'payment_method' => $validated['payment_method'],
+                    'order_id' => $order->id,
+                    'result' => $result // Log full result for debugging
+                ]);
+                return redirect()->route('thankyou', ['order' => $order->id])
+                    ->with('error', 'Payment initiated, but no redirect was provided. Please check your order status.');
             }
-
-            // If we reach here, something went wrong - redirect to thank you page as fallback
-
-            return redirect()->route('thankyou', ['order' => $order->id])
-                ->with('success', 'Order placed successfully!');
-
 
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Error processing guest checkout: ' . $e->getMessage());
+            Log::error('Error processing guest checkout: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
 
             return back()->with('error', 'An error occurred while processing your order. Please try again.')
                         ->withInput();
@@ -845,7 +891,7 @@ DB::commit();
                     ])
                 ]);
 
-         
+
 
                 // Redirect to thank you page
                 return redirect()->route('thankyou', ['order' => $payment->order_id])
