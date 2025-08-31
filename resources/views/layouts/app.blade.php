@@ -19,7 +19,8 @@
     <!-- Livewire Styles -->
     @livewireStyles
    </link>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+   <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+
 
     <!-- Preload critical CSS -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
