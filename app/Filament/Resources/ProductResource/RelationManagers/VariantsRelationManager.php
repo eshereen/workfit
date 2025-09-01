@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -29,13 +31,13 @@ class VariantsRelationManager extends RelationManager
     protected static ?string $recordTitleAttribute = 'sku';
 
     public function form(Schema $schema): Schema    {
-        return $schema->schema([
-            Forms\Components\TextInput::make('sku')
+        return $schema->components([
+            TextInput::make('sku')
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->maxLength(64),
 
-            Forms\Components\Select::make('size')
+            Select::make('size')
                 ->options([
                     'XS' => 'XS',
                     'S' => 'S',
@@ -45,19 +47,19 @@ class VariantsRelationManager extends RelationManager
                 ])
                 ->required(),
 
-                Forms\Components\Select::make('color')
+                Select::make('color')
                 ->label('Color')
                 ->options(array_keys(config('colors'))) // show only the names as options
                 ->searchable()
                 ->required(),
 
-            Forms\Components\TextInput::make('stock')
+            TextInput::make('stock')
                 ->numeric()
                 ->minValue(0)
                 ->default(0)
                 ->required(),
 
-            Forms\Components\TextInput::make('price')
+            TextInput::make('price')
                 ->numeric()
                 ->step('0.01')
                 ->prefix('USD'),

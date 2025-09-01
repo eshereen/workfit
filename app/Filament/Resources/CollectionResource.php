@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\CollectionResource\RelationManagers\ProductsRelationManager;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Collection;
@@ -93,7 +94,7 @@ class CollectionResource extends Resource
     {
 
             return [
-                'variants' => RelationManagers\ProductsRelationManager::class,
+                'variants' => ProductsRelationManager::class,
             ];
 
     }

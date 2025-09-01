@@ -2,6 +2,9 @@
 
 namespace App\Livewire;
 
+use App\Models\Category;
+use App\Models\Subcategory;
+use App\Models\Product;
 use App\Models\Collection as CollectionModel;
 use Livewire\Component;
 
@@ -90,7 +93,7 @@ class CollectionFilters extends Component
     {
         if (!$this->collection) {
             // If no specific collection, get categories from all active products
-            return \App\Models\Category::where('active', true)
+            return Category::where('active', true)
                 ->withCount('products')
                 ->orderBy('name')
                 ->get();
@@ -107,7 +110,7 @@ class CollectionFilters extends Component
     {
         if (!$this->collection) {
             // If no specific collection, get subcategories from all active products
-            return \App\Models\Subcategory::where('category_id', $categoryId)
+            return Subcategory::where('category_id', $categoryId)
                 ->where('active', true)
                 ->withCount('products')
                 ->orderBy('name')
@@ -141,7 +144,7 @@ class CollectionFilters extends Component
     {
         if (!$this->collection) {
             // If no specific collection, get count from all active products
-            return \App\Models\Product::where('category_id', $categoryId)
+            return Product::where('category_id', $categoryId)
                 ->where('active', true)
                 ->count();
         }
@@ -155,7 +158,7 @@ class CollectionFilters extends Component
     {
         if (!$this->collection) {
             // If no specific collection, get count from all active products
-            return \App\Models\Product::where('subcategory_id', $subcategoryId)
+            return Product::where('subcategory_id', $subcategoryId)
                 ->where('active', true)
                 ->count();
         }

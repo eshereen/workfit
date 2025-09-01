@@ -2,6 +2,7 @@
 
 namespace App\Payments\Gateways;
 
+use Exception;
 use RuntimeException;
 use App\Models\Order;
 use App\Models\Payment;
@@ -136,7 +137,7 @@ class PaymobGateway implements PaymentGateway
             // Primary method: Use Laravel's url() helper
             $successUrl = url('/api/paymob/callback') . '?order_id=' . $order->id . '&status=success';
             $failureUrl = url('/api/paymob/callback') . '?order_id=' . $order->id . '&status=failure';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Fallback method: Manual URL construction
             $appUrl = config('app.url');
             $baseUrl = rtrim($appUrl, '/'); // Remove any trailing slashes

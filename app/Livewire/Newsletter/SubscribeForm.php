@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Newsletter;
 
+use Throwable;
 use App\Mail\NewsletterVerificationMail;
 use App\Models\Country;
 use App\Models\Newsletter;
@@ -88,7 +89,7 @@ class SubscribeForm extends Component
                 Mail::to($this->email)->queue(new NewsletterVerificationMail($newsletter, $plain));
                 Log::info('Newsletter verification email queued', ['email' => $this->email]);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Newsletter email dispatch failed', [
                 'email' => $this->email,
                 'error' => $e->getMessage(),

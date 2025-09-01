@@ -2,8 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
+
 use App\Models\Category;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
@@ -17,12 +16,9 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\CategoryResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Filament\Resources\CategoryResource\Pages\EditCategory;
 use App\Filament\Resources\CategoryResource\Pages\ViewCategory;
 use App\Filament\Resources\CategoryResource\Pages\CreateCategory;
@@ -38,24 +34,26 @@ class CategoryResource extends Resource
     {
         return $schema
             ->components([
+                Section::make('Category Details')
+                ->schema([
                 SpatieMediaLibraryFileUpload::make('main_image')
                 ->collection('main_image')
                 ->imageEditor()
-                ->disk('public'),
-                TextInput::make('name')
+                ->disk('public')->columnSpanFull(),
+              TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255),
-                Textarea::make('description')
-                    ->columnSpanFull(),
-                TextInput::make('parent_id')
-                    ->numeric(),
+
+                Textarea::make('description'),
+                ])->columns(2)->columnSpanFull(),
+                Section::make('Category Status')
+                ->schema([
                 Toggle::make('featured')
                     ->required(),
                 Toggle::make('active')
-                    ->required(),
+                    ->required()
+            ])->columns(2)
+                ->columnSpanFull()
             ]);
     }
 
@@ -68,11 +66,7 @@ class CategoryResource extends Resource
                     ->circular(),
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('slug')
-                    ->searchable(),
-                TextColumn::make('parent_id')
-                    ->numeric()
-                    ->sortable(),
+
                 IconColumn::make('featured')
                     ->boolean(),
                 IconColumn::make('active')
