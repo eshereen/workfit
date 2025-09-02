@@ -354,7 +354,8 @@ class ProductIndex extends Component
         $cacheKey = $this->buildCacheKey();
 
         // Try to get from cache first with shorter cache time for better performance
-        $products = cache()->remember($cacheKey, 180, function () {
+        $cacheTime = request()->routeIs('home') ? 60 : 180; // Shorter cache for home page
+        $products = cache()->remember($cacheKey, $cacheTime, function () {
             // Optimized eager loading with specific selects
             $with = [
                 'category:id,name,slug',

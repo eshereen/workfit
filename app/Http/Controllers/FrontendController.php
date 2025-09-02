@@ -12,24 +12,74 @@ class FrontendController extends Controller
    public function index()
    {
     $title = 'WorkFit|Home';
-      $categories = Category::with(['products'])->get();
-      $products = Product::with(['variants', 'category','subcategory','media'])
-        ->where('active', true)
-        ->where('featured', true)
-       ->orderBy('created_at','desc')
-       ->take(12);
 
-        $featured = Product::with(['variants', 'category','subcategory','media'])
-        ->where('active', true)
-        ->where('featured', true)
+      // Optimized queries with caching and limits
+      $categories = cache()->remember('home_categories', 1800, function () {
+          return Category::withCount(['products' => function ($query) {
+              $query->where('active', true);
+          }])->where('active', true)->take(4)->get();
+      });
 
-        ->take(8);
+      // Single featured products query with optimization
+      $featured = cache()->remember('home_featured_products', 900, function () {
+          return Product::with(['category:id,name,slug', 'media' => function ($query) {
+              $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                    ->whereIn('collection_name', ['main_image'])
+                    ->whereNotNull('disk')
+                    ->limit(1);
+          }])
+          ->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured', 'created_at')
+          ->where('active', true)
+          ->where('featured', true)
+          ->orderBy('created_at', 'desc')
+          ->take(8)
+          ->get();
+      });
 
-        $men = Category::with(['products'])->where('name','Men')->first();
-        $women = Category::with(['products'])->where('name','Women')->first();
-        $kids = Category::with(['products'])->where('name','Kids')->first();
+      // Optimized category queries with product limits
+      $men = cache()->remember('home_men_category', 1800, function () {
+          return Category::with(['products' => function ($query) {
+              $query->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured')
+                    ->where('active', true)
+                    ->with(['media' => function ($q) {
+                        $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                          ->whereIn('collection_name', ['main_image'])
+                          ->whereNotNull('disk')
+                          ->limit(1);
+                    }])
+                    ->take(8);
+          }])->where('name', 'Men')->first();
+      });
 
-        return view('home',compact('products','men','women','kids','featured','categories'));
+      $women = cache()->remember('home_women_category', 1800, function () {
+          return Category::with(['products' => function ($query) {
+              $query->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured')
+                    ->where('active', true)
+                    ->with(['media' => function ($q) {
+                        $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                          ->whereIn('collection_name', ['main_image'])
+                          ->whereNotNull('disk')
+                          ->limit(1);
+                    }])
+                    ->take(8);
+          }])->where('name', 'Women')->first();
+      });
+
+      $kids = cache()->remember('home_kids_category', 1800, function () {
+          return Category::with(['products' => function ($query) {
+              $query->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured')
+                    ->where('active', true)
+                    ->with(['media' => function ($q) {
+                        $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                          ->whereIn('collection_name', ['main_image'])
+                          ->whereNotNull('disk')
+                          ->limit(1);
+                    }])
+                    ->take(8);
+          }])->where('name', 'Kids')->first();
+      });
+
+      return view('home', compact('men', 'women', 'kids', 'featured', 'categories'));
 
 
    }

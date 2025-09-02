@@ -4,13 +4,13 @@
         <!-- Video Background -->
         <div class="video-container">
             <!-- Desktop Video (hidden on mobile) -->
-            <video autoplay muted loop playsinline preload="none" class="hidden md:block w-full h-full object-cover" poster="/imgs/video-poster.jpg">
+            <video autoplay muted loop playsinline preload="metadata" class="hidden md:block w-full h-full object-cover" poster="/imgs/video-poster.jpg">
                 <source src="videos/workfit-lg.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
 
             <!-- Mobile Video (hidden on desktop) -->
-            <video autoplay muted loop playsinline preload="none" class="block md:hidden w-full h-full object-cover" poster="/imgs/video-poster.jpg">
+            <video autoplay muted loop playsinline preload="metadata" class="block md:hidden w-full h-full object-cover" poster="/imgs/video-poster.jpg">
                 <source src="videos/workfit-mobile.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -36,26 +36,60 @@
         </div>
     </section>
 
-    <!-- Featured Categories -->
+    <!-- Featured Products -->
     <section class="px-4">
-         <h1 class="text-center  font-bold text-5xl mb-2">Just Arrived</h1>
+         <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
-        <?php
-$__split = function ($name, $params = []) {
-    return [$name, $params];
-};
-[$__name, $__params] = $__split('product-index');
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-0', $__slots ?? [], get_defined_vars());
+        <!-- Featured Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <?php $__currentLoopData = $featured; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
+                <div class="relative overflow-hidden aspect-[4/5] product-image-container" style="cursor: pointer;">
+                    <a href="<?php echo e(route('product.show', $product->slug)); ?>" class="block relative w-full h-full">
+                        
+                        <?php
+                            $mainImage = $product->getFirstMediaUrl('main_image') ?: '/imgs/workfit.png';
+                        ?>
+                        <img src="<?php echo e($mainImage); ?>"
+                             alt="<?php echo e($product->name); ?>"
+                             class="w-full h-full object-cover main-image"
+                             width="400"
+                             height="400"
+                             loading="lazy">
+                    </a>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <a href="<?php echo e(route('product.show', $product->slug)); ?>"
+                               class="font-semibold text-lg hover:text-red-600">
+                                <?php echo e($product->name); ?>
 
-echo $__html;
+                            </a>
+                            <p class="text-gray-600 text-sm"><?php echo e($product->category->name ?? 'Uncategorized'); ?></p>
+                        </div>
+                        <?php if($product->compare_price > 0): ?>
+                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">
+                            -<?php echo e(round((($product->compare_price - $product->price) / $product->compare_price) * 100)); ?>%
+                        </span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="mt-3 flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-lg">$<?php echo e(number_format($product->price, 2)); ?></span>
+                            <?php if($product->compare_price > 0): ?>
+                            <span class="text-sm text-gray-500 line-through ml-2">
+                                $<?php echo e(number_format($product->compare_price, 2)); ?>
 
-unset($__html);
-unset($__name);
-unset($__params);
-unset($__split);
-if (isset($__slots)) unset($__slots);
-?>
+                            </span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
     </section>
 
     <!-- Full-width Lifestyle Banner -->
@@ -94,7 +128,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$kids->products->take(8)]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-1', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-0', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 
@@ -181,7 +215,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$men->products->take(8)]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-2', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-1', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 
@@ -233,7 +267,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$featured]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-3', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-2', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 

@@ -15,21 +15,36 @@ class CountryCurrencyService
     public function detectCountry()
     {
         $ip = request()->ip();
+        
+        // Skip detection for localhost/development
+        if (in_array($ip, ['127.0.0.1', '::1', 'localhost'])) {
+            return [
+                'country_code' => 'US',
+                'country_name' => 'United States',
+                'currency_code' => 'USD'
+            ];
+        }
+        
         // Cache detection per IP to avoid repeated slow lookups
         return Cache::remember("detected_country_{$ip}", now()->addDay(), function () use ($ip) {
             Log::info("CountryCurrencyService: Detecting country for IP: {$ip}");
 
-            $location = Location::get($ip);
-            Log::info("CountryCurrencyService: Location result", ['location' => $location]);
+            try {
+                // Set a timeout to prevent hanging
+                $location = Location::get($ip);
+                Log::info("CountryCurrencyService: Location result", ['location' => $location]);
 
-            if ($location) {
-                $result = [
-                    'country_code' => $location->countryCode,
-                    'country_name' => $location->countryName,
-                    'currency_code' => $this->mapCountryToCurrency($location->countryCode)
-                ];
-                Log::info("CountryCurrencyService: Detection successful", $result);
-                return $result;
+                if ($location) {
+                    $result = [
+                        'country_code' => $location->countryCode,
+                        'country_name' => $location->countryName,
+                        'currency_code' => $this->mapCountryToCurrency($location->countryCode)
+                    ];
+                    Log::info("CountryCurrencyService: Detection successful", $result);
+                    return $result;
+                }
+            } catch (Exception $e) {
+                Log::error("CountryCurrencyService: Location detection failed: " . $e->getMessage());
             }
 
             Log::warning("CountryCurrencyService: Could not detect location for IP: {$ip}");

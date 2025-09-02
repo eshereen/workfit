@@ -15,11 +15,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Users
-        User::factory(10)->create();
+        //User::factory(10)->create();
 
         User::factory()->create([
             'name' => 'admin',
-            'email' => 'admin@admin.com',
+            'email' => 'admin@workfit.medsite.dev',
             'password' => bcrypt('password'), // Ensure to set a password securely
             'is_admin' => true,
         ]);
@@ -34,32 +34,32 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Categories + Subcategories
-        $categories = Category::factory(5)
-            ->has(Subcategory::factory()->count(3))
-            ->create();
+        // $categories = Category::factory(5)
+        //     ->has(Subcategory::factory()->count(3))
+        //     ->create();
 
-        $categories->load('subcategories');
+        // $categories->load('subcategories');
 
-        // Products + Variants
-        $products = Product::factory(50)
-            ->hasVariants(3)
-            ->create([
-                'category_id' => fn() => $categories->random()->id,
-                'subcategory_id' => fn($attributes) =>
-                    optional($categories->find($attributes['category_id']))
-                        ?->subcategories
-                        ->random()
-                        ->id,
-            ]);
+        // // Products + Variants
+        // $products = Product::factory(50)
+        //     ->hasVariants(3)
+        //     ->create([
+        //         'category_id' => fn() => $categories->random()->id,
+        //         'subcategory_id' => fn($attributes) =>
+        //             optional($categories->find($attributes['category_id']))
+        //                 ?->subcategories
+        //                 ->random()
+        //                 ->id,
+        //     ]);
 
-        // Collections + Attach Products
-        $collections = Collection::factory(5)->create();
+        // // Collections + Attach Products
+        // $collections = Collection::factory(5)->create();
 
-        $collections->each(function ($collection) use ($products) {
-            $collection->products()->syncWithoutDetaching(
-                $products->random(3)->pluck('id')
-            );
-        });
+        // $collections->each(function ($collection) use ($products) {
+        //     $collection->products()->syncWithoutDetaching(
+        //         $products->random(3)->pluck('id')
+        //     );
+        // });
 
         // Other seeders
         $this->call(CountriesTableSeeder::class);
