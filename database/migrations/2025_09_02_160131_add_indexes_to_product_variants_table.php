@@ -12,17 +12,42 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('product_variants', function (Blueprint $table) {
-            // Make columns shorter to avoid index key length errors
-            $table->string('color', 50)->change();
-            $table->string('size', 50)->change();
+            // Add individual indexes for better query performance (safer approach)
+            try {
+                $table->index(['product_id'], 'product_variants_product_id_index');
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
 
-            // Add indexes for better query performance
-            $table->index(['product_id', 'color'], 'product_variants_product_color_index');
-            $table->index(['product_id', 'size'], 'product_variants_product_size_index');
-            $table->index(['product_id', 'color', 'size'], 'product_variants_product_color_size_index');
-            $table->index(['stock'], 'product_variants_stock_index');
-            $table->index(['sku'], 'product_variants_sku_index');
-            $table->index(['price'], 'product_variants_price_index');
+            try {
+                $table->index(['color'], 'product_variants_color_index');
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+
+            try {
+                $table->index(['size'], 'product_variants_size_index');
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+
+            try {
+                $table->index(['stock'], 'product_variants_stock_index');
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+
+            try {
+                $table->index(['sku'], 'product_variants_sku_index');
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+
+            try {
+                $table->index(['price'], 'product_variants_price_index');
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
         });
     }
 
@@ -32,17 +57,42 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('product_variants', function (Blueprint $table) {
-            // Drop indexes
-            $table->dropIndex('product_variants_product_color_index');
-            $table->dropIndex('product_variants_product_size_index');
-            $table->dropIndex('product_variants_product_color_size_index');
-            $table->dropIndex('product_variants_stock_index');
-            $table->dropIndex('product_variants_sku_index');
-            $table->dropIndex('product_variants_price_index');
+            // Drop indexes safely
+            try {
+                $table->dropIndex('product_variants_product_id_index');
+            } catch (\Exception $e) {
+                // Index might not exist
+            }
 
-            // Roll back column length changes
-            $table->string('color', 255)->change();
-            $table->string('size', 255)->change();
+            try {
+                $table->dropIndex('product_variants_color_index');
+            } catch (\Exception $e) {
+                // Index might not exist
+            }
+
+            try {
+                $table->dropIndex('product_variants_size_index');
+            } catch (\Exception $e) {
+                // Index might not exist
+            }
+
+            try {
+                $table->dropIndex('product_variants_stock_index');
+            } catch (\Exception $e) {
+                // Index might not exist
+            }
+
+            try {
+                $table->dropIndex('product_variants_sku_index');
+            } catch (\Exception $e) {
+                // Index might not exist
+            }
+
+            try {
+                $table->dropIndex('product_variants_price_index');
+            } catch (\Exception $e) {
+                // Index might not exist
+            }
         });
     }
 };
