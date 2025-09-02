@@ -31,10 +31,7 @@ class VariantsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema    {
         return $schema->components([
-            TextInput::make('sku')
-                ->required()
-                ->unique(ignoreRecord: true)
-                ->maxLength(64),
+
 
             Select::make('size')
                 ->options([
@@ -43,6 +40,8 @@ class VariantsRelationManager extends RelationManager
                     'M' => 'M',
                     'L' => 'L',
                     'XL' => 'XL',
+                    'XXL' => 'XXL',
+                    'XXXL' => 'XXXL',
                 ])
                 ->required(),
 

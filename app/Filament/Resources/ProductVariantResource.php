@@ -41,10 +41,7 @@ class ProductVariantResource extends Resource
                     ->maxLength(255),
                 TextInput::make('size')
                     ->maxLength(255),
-                TextInput::make('sku')
-                    ->label('SKU')
-                    ->required()
-                    ->maxLength(255),
+             
                 TextInput::make('stock')
                     ->required()
                     ->numeric()
@@ -69,7 +66,7 @@ class ProductVariantResource extends Resource
                     ->numeric()
                     ->sortable(),
                     TextColumn::make('product.name')
-                  
+
                     ->sortable(),
                 TextColumn::make('color')
                     ->searchable(),
