@@ -12,6 +12,8 @@ use App\Observers\OrderObserver;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use App\Models\OrderItem;
+use App\Observers\OrderItemObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
          Schema::defaultStringLength(191);
         // Temporarily disabled to debug 502 on checkout (emails in observer)
          Order::observe(OrderObserver::class);
+        OrderItem::observe(OrderItemObserver::class);
 
         // Share categories with all views
         View::composer('*', function ($view) {

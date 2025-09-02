@@ -168,7 +168,8 @@ class CheckoutController extends Controller
         try {
             DB::beginTransaction();
 
-
+            // Validate stock availability before creating order
+            $this->validateStockAvailability($cart);
 
             // Create or update customer
             $customer = $this->createOrUpdateCustomer($user, $validated);
@@ -307,6 +308,8 @@ DB::commit();
             Log::error('Error processing authenticated checkout: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
 
             return back()->with('error', 'An error occurred while processing your order. Please try again.')
@@ -480,6 +483,9 @@ DB::commit();
             Log::error('Error processing guest checkout: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
+
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
 
             return back()->with('error', 'An error occurred while processing your order. Please try again.')
@@ -682,6 +688,60 @@ DB::commit();
         }
 
 
+    }
+
+    /**
+     * Validate stock availability for all cart items
+     */
+    protected function validateStockAvailability($cart)
+    {
+        foreach ($cart as $item) {
+            $productId = null;
+            if (strpos($item['id'], '-') !== false) {
+                $parts = explode('-', $item['id']);
+                $productId = (int) $parts[0];
+            } else {
+                $productId = (int) $item['id'];
+            }
+
+            $variantId = $item['attributes']['variant_id'] ?? null;
+            $requestedQuantity = $item['quantity'];
+
+            if ($variantId) {
+                // Check variant stock
+                $variant = \App\Models\ProductVariant::find($variantId);
+                if (!$variant) {
+                    throw new \Exception("Product variant not found: {$variantId}");
+                }
+
+                if ($variant->stock < $requestedQuantity) {
+                    $product = \App\Models\Product::find($productId);
+                    $availableStock = $variant->stock;
+                    
+                    if ($availableStock == 0) {
+                        throw new \Exception("Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is out of stock.");
+                    } else {
+                        throw new \Exception("Only {$availableStock} items available for '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}). Please select fewer quantity.");
+                    }
+                }
+            } else {
+                // Check product stock for simple products
+                $product = \App\Models\Product::find($productId);
+                if (!$product) {
+                    throw new \Exception("Product not found: {$productId}");
+                }
+
+                if ($product->quantity < $requestedQuantity) {
+                    $availableStock = $product->quantity;
+                    
+                    if ($availableStock == 0) {
+                        throw new \Exception("Product '{$product->name}' is out of stock.");
+                    } else {
+                        throw new \Exception("Only {$availableStock} items available for '{$product->name}'. Please select fewer quantity.");
+                    }
+                }
+            }
+        }
     }
 
     /**

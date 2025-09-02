@@ -47,7 +47,7 @@ class VariantsRelationManager extends RelationManager
 
                 Select::make('color')
                 ->label('Color')
-                ->options(array_keys(config('colors'))) // show only the names as options
+                ->options(array_combine(array_keys(config('colors')), array_keys(config('colors')))) // key => value both as color names
                 ->searchable()
                 ->required(),
 
@@ -72,11 +72,24 @@ class VariantsRelationManager extends RelationManager
                 TextColumn::make('size')->badge(),
                 TextColumn::make('color')
                 ->label('Color')
-                ->formatStateUsing(fn ($state) => $state) // show the color name
-                ->badge()
-                ->extraAttributes(fn ($state) => [
-                    'style' => 'background-color: ' . (config('colors')[$state] ?? '#ccc') . '; color: white; padding: 2px 2px; border-radius: 30px; width:30px;height:30px;',
-                ]),
+                ->formatStateUsing(function ($state) {
+                    // Debug: Log the state value
+                    \Log::info('Color state value:', ['state' => $state, 'type' => gettype($state)]);
+                    
+                    // If state is a number, get the color name from config keys
+                    if (is_numeric($state)) {
+                        $colorKeys = array_keys(config('colors'));
+                        $colorName = $colorKeys[$state - 1] ?? 'Unknown';
+                    } else {
+                        $colorName = $state;
+                    }
+                    
+                    $colorCode = config('colors')[$colorName] ?? '#ccc';
+                    $textColor = $this->getContrastColor($colorCode);
+                    
+                    return "<span style='background-color: {$colorCode}; color: {$textColor}; padding: 4px 8px; border-radius: 4px; display: inline-block;'>{$colorName}</span>";
+                })
+                ->html(),
 
             TextColumn::make('stock')->sortable(),
             TextColumn::make('price')->money('USD'),
@@ -115,5 +128,25 @@ class VariantsRelationManager extends RelationManager
 {
     return false;
 }
+
+    /**
+     * Get contrast color (black or white) for better text readability
+     */
+    private function getContrastColor($hexColor)
+    {
+        // Remove # if present
+        $hexColor = ltrim($hexColor, '#');
+        
+        // Convert to RGB
+        $r = hexdec(substr($hexColor, 0, 2));
+        $g = hexdec(substr($hexColor, 2, 2));
+        $b = hexdec(substr($hexColor, 4, 2));
+        
+        // Calculate luminance
+        $luminance = (0.299 * $r + 0.587 * $g + 0.114 * $b) / 255;
+        
+        // Return black for light colors, white for dark colors
+        return $luminance > 0.5 ? '#000000' : '#FFFFFF';
+    }
 
 }
