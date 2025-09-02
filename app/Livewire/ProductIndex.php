@@ -363,7 +363,8 @@ class ProductIndex extends Component
                     $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
                           ->whereIn('collection_name', ['main_image', 'product_images'])
                           ->whereNotNull('disk')
-                          ->limit(2); // Only load first 2 images for performance
+                          ->orderBy('collection_name', 'asc')
+                          ->orderBy('id', 'asc');
                 }
             ];
 

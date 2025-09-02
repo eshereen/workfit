@@ -55,8 +55,13 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach($products as $product)
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
-                        <div class="relative overflow-hidden aspect-[4/5] product-image-container" style="cursor: pointer;">
-                <a href="{{ route('product.show', $product->slug) }}" class="block relative w-full h-full">
+            <div class="relative overflow-hidden aspect-[4/5] product-image-container" 
+                 style="cursor: pointer;"                             
+                 onmouseenter="this.querySelector('.main-image').style.opacity='0'; this.querySelector('.gallery-image').style.opacity='1';"
+                 onmouseleave="this.querySelector('.main-image').style.opacity='1'; this.querySelector('.gallery-image').style.opacity='0';"
+                 onclick="window.location.href='{{ route('product.show', $product->slug) }}'">
+                
+                <div class="block relative w-full h-full">
                     {{-- Main image --}}
                     @php
                         $mainImage = $product->getFirstMediaUrl('main_image') ?: '/imgs/workfit.png';
@@ -64,6 +69,7 @@
                     <img src="{{ $mainImage }}"
                          alt="{{ $product->name }}"
                          class="w-full h-full object-cover transition-opacity duration-500 main-image"
+                         style="opacity: 1; transition: opacity 0.5s ease;"
                          width="400"
                          height="400"
                          loading="lazy">
@@ -75,20 +81,21 @@
                     @if($galleryImage && $galleryImage !== $mainImage)
                         <img src="{{ $galleryImage }}"
                              alt="{{ $product->name }}"
-                             class="absolute top-0 left-0 w-full h-full object-cover gallery-image"
-                             style="opacity: 0; z-index: 2;"
+                             class="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 gallery-image"
+                             style="opacity: 0; z-index: 2; transition: opacity 0.5s ease;"
                              width="400"
                              height="400"
                              loading="lazy">
                     @endif
-                </a>
+                </div>
+
                 <!-- Wishlist Button -->
                 @auth
-                <div class="">
+                <div class="absolute top-2 right-2 z-20">
                     <button wire:click="toggleWishlist({{ $product->id }})"
                             wire:loading.attr="disabled"
                             wire:target="toggleWishlist({{ $product->id }})"
-                            class="absolute top-1 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors z-10"
+                            class="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
                             data-product-id="{{ $product->id }}"
                             title="{{ in_array($product->id, $wishlistProductIds) ? 'Remove from Wishlist' : 'Add to Wishlist' }}">
                         <svg class="w-5 h-5 {{ in_array($product->id, $wishlistProductIds) ? 'text-red-500 fill-current' : 'text-gray-600' }}"
@@ -106,7 +113,7 @@
                     </span>
                 </div>
                 @else
-                <a href="{{ route('login') }}" class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors z-10" title="Login to add to wishlist">
+                <a href="{{ route('login') }}" class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors z-20" title="Login to add to wishlist">
                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                     </svg>
@@ -148,6 +155,8 @@
                     </button>
                     @else
                     <button wire:click="addSimpleProductToCart({{ $product->id }}, 1)"
+                            wire:loading.attr="disabled"
+                            wire:target="addSimpleProductToCart({{ $product->id }}, 1)"
                             class="add-to-cart bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />

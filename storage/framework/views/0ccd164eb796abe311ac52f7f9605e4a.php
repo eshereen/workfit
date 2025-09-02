@@ -32,27 +32,32 @@
 
                 /* Product image hover effect */
         .product-image-container {
-            position: relative;
+            position: relative !important;
         }
 
         .product-image-container .main-image {
-            opacity: 1;
-            transition: opacity 0.5s ease;
-            z-index: 1;
+            opacity: 1 !important;
+            transition: opacity 0.5s ease !important;
+            z-index: 1 !important;
         }
 
         .product-image-container .gallery-image {
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            z-index: 2;
+            opacity: 0 !important;
+            transition: opacity 0.5s ease !important;
+            z-index: 2 !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
         }
 
         .product-image-container:hover .main-image {
-            opacity: 0;
+            opacity: 0 !important;
         }
 
         .product-image-container:hover .gallery-image {
-            opacity: 1;
+            opacity: 1 !important;
         }
     </style>
 
@@ -137,25 +142,51 @@
             });
 
             // Product image hover effect (JavaScript backup)
-            document.querySelectorAll('.product-image-container').forEach(container => {
-                const mainImage = container.querySelector('.main-image');
-                const galleryImage = container.querySelector('.gallery-image');
+            function initializeHoverEffect() {
+                const containers = document.querySelectorAll('.product-image-container');
+                
+                containers.forEach((container) => {
+                    const mainImage = container.querySelector('.main-image');
+                    const galleryImage = container.querySelector('.gallery-image');
 
-                if (mainImage && galleryImage) {
-                    // Ensure gallery image is hidden initially
-                    galleryImage.style.opacity = '0';
-
-                    container.addEventListener('mouseenter', function() {
-                        mainImage.style.opacity = '0';
-                        galleryImage.style.opacity = '1';
-                    });
-
-                    container.addEventListener('mouseleave', function() {
-                        mainImage.style.opacity = '1';
+                    if (mainImage && galleryImage) {
+                        // Ensure gallery image is hidden initially
                         galleryImage.style.opacity = '0';
-                    });
-                }
-            });
+                        galleryImage.style.display = 'block';
+
+                        // Remove existing event listeners to prevent duplicates
+                        if (container._hoverEnter) {
+                            container.removeEventListener('mouseenter', container._hoverEnter);
+                        }
+                        if (container._hoverLeave) {
+                            container.removeEventListener('mouseleave', container._hoverLeave);
+                        }
+
+                        // Create new event handlers
+                        container._hoverEnter = function() {
+                            mainImage.style.opacity = '0';
+                            galleryImage.style.opacity = '1';
+                        };
+
+                        container._hoverLeave = function() {
+                            mainImage.style.opacity = '1';
+                            galleryImage.style.opacity = '0';
+                        };
+
+                        // Add event listeners
+                        container.addEventListener('mouseenter', container._hoverEnter);
+                        container.addEventListener('mouseleave', container._hoverLeave);
+                    }
+                });
+            }
+
+            // Initialize hover effect
+            initializeHoverEffect();
+
+            // Re-initialize after Livewire updates
+            document.addEventListener('livewire:navigated', initializeHoverEffect);
+            document.addEventListener('livewire:updated', initializeHoverEffect);
+            document.addEventListener('livewire:load', initializeHoverEffect);
         });
     </script>
 

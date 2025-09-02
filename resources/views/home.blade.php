@@ -36,57 +36,11 @@
     </section>
 
     <!-- Featured Products -->
-    <section class="px-10">
+    <section class="px-4">
          <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
-
-        <!-- Featured Products Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-10">
-            @foreach($featured as $product)
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
-                <div class="relative overflow-hidden aspect-[4/5] product-image-container" style="cursor: pointer;">
-                    <a href="{{ route('product.show', $product->slug) }}" class="block relative w-full h-full">
-                        {{-- Main image --}}
-                        @php
-                            $mainImage = $product->getFirstMediaUrl('main_image') ?: '/imgs/workfit.png';
-                        @endphp
-                        <img src="{{ $mainImage }}"
-                             alt="{{ $product->name }}"
-                             class="w-full h-full object-cover main-image"
-                             width="400"
-                             height="400"
-                             loading="lazy">
-                    </a>
-                </div>
-                <div class="p-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <a href="{{ route('product.show', $product->slug) }}"
-                               class="font-semibold text-lg hover:text-red-600">
-                                {{ $product->name }}
-                            </a>
-                            <p class="text-gray-600 text-sm">{{ $product->category->name ?? 'Uncategorized' }}</p>
-                        </div>
-                        @if($product->compare_price > 0)
-                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">
-                            -{{ round((($product->compare_price - $product->price) / $product->compare_price) * 100) }}%
-                        </span>
-                        @endif
-                    </div>
-                    <div class="mt-3 flex items-center justify-between">
-                        <div>
-                            <span class="font-bold text-lg">${{ number_format($product->price, 2) }}</span>
-                            @if($product->compare_price > 0)
-                            <span class="text-sm text-gray-500 line-through ml-2">
-                                ${{ number_format($product->compare_price, 2) }}
-                            </span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
+        
+        @livewire('product-index')
     </section>
 
     <!-- Full-width Lifestyle Banner -->
