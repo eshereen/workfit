@@ -72,111 +72,82 @@ class Product extends Model implements HasMedia
         return 0;
     }
 
-
-    //register media collections
+// Register media collections
 public function registerMediaCollections(?Media $media = null): void
 {
-    // Main image (single image only)
+    // Main image (single file)
     $this->addMediaCollection('main_image')
         ->singleFile()
-        ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
+        ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
         ->registerMediaConversions(function (Media $media) {
-            // JPG
-            $this->addMediaConversion('thumb')
-                ->format('jpg')
-                ->width(150)
-                ->height(150)
-                ->sharpen(10)
-                ->nonQueued();
-
-            $this->addMediaConversion('medium')
-                ->format('jpg')
-                ->width(400)
-                ->height(400)
-                ->nonQueued();
-
-            $this->addMediaConversion('large')
-                ->format('jpg')
-                ->width(800)
-                ->height(800)
-                ->nonQueued();
-
-            // WebP
+            
+            // Always keep original (JPG/PNG/etc.)
+            // Convert optimized versions:
+            
+            // WebP versions
             $this->addMediaConversion('thumb_webp')
                 ->format('webp')
                 ->width(150)
                 ->height(150)
                 ->sharpen(10)
+                ->quality(85) // balance quality & compression
                 ->nonQueued();
 
             $this->addMediaConversion('medium_webp')
                 ->format('webp')
                 ->width(400)
                 ->height(400)
+                ->quality(85)
                 ->nonQueued();
 
             $this->addMediaConversion('large_webp')
                 ->format('webp')
                 ->width(800)
                 ->height(800)
+                ->quality(85)
                 ->nonQueued();
 
-            // AVIF
+            // AVIF (optional — smaller but more CPU heavy)
             $this->addMediaConversion('thumb_avif')
                 ->format('avif')
                 ->width(150)
                 ->height(150)
-                ->sharpen(10)
+                ->quality(80)
                 ->nonQueued();
 
             $this->addMediaConversion('medium_avif')
                 ->format('avif')
                 ->width(400)
                 ->height(400)
+                ->quality(80)
                 ->nonQueued();
 
             $this->addMediaConversion('large_avif')
                 ->format('avif')
                 ->width(800)
                 ->height(800)
+                ->quality(80)
                 ->nonQueued();
         });
 
     // Product gallery (multiple images)
     $this->addMediaCollection('product_images')
-        ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
+        ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
         ->registerMediaConversions(function (Media $media) {
-            // JPG
-            $this->addMediaConversion('thumb')
-                ->format('jpg')
-                ->width(150)
-                ->height(150)
-                ->nonQueued();
-
-            $this->addMediaConversion('medium')
-                ->format('jpg')
-                ->width(600)
-                ->height(600)
-                ->nonQueued();
-
-            $this->addMediaConversion('zoom')
-                ->format('jpg')
-                ->width(1200)
-                ->height(1200)
-                ->quality(85)
-                ->nonQueued();
-
-            // WebP
+            
+            // WebP versions
             $this->addMediaConversion('thumb_webp')
                 ->format('webp')
                 ->width(150)
                 ->height(150)
+                ->quality(85)
                 ->nonQueued();
 
             $this->addMediaConversion('medium_webp')
                 ->format('webp')
                 ->width(600)
                 ->height(600)
+                ->quality(85)
                 ->nonQueued();
 
             $this->addMediaConversion('zoom_webp')
@@ -186,27 +157,30 @@ public function registerMediaCollections(?Media $media = null): void
                 ->quality(85)
                 ->nonQueued();
 
-            // AVIF
+            // AVIF versions (optional)
             $this->addMediaConversion('thumb_avif')
                 ->format('avif')
                 ->width(150)
                 ->height(150)
+                ->quality(80)
                 ->nonQueued();
 
             $this->addMediaConversion('medium_avif')
                 ->format('avif')
                 ->width(600)
                 ->height(600)
+                ->quality(80)
                 ->nonQueued();
 
             $this->addMediaConversion('zoom_avif')
                 ->format('avif')
                 ->width(1200)
                 ->height(1200)
-                ->quality(85)
+                ->quality(80)
                 ->nonQueued();
         });
 }
+
 
 
 }
