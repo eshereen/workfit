@@ -217,12 +217,12 @@ class CartService
 
     public function getShippingCost()
     {
-        return $this->isEmpty() ? 0 : 10.00; // Example flat rate
+        return 0; // Free shipping
     }
 
     public function getTaxAmount()
     {
-        return $this->isEmpty() ? 0 : $this->getSubtotal() * 0.1; // Example 10% tax
+        return 0; // No tax
     }
 
     public function isEmpty()
