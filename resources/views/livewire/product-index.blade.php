@@ -67,7 +67,9 @@
                              class="w-full h-full object-cover"
                              width="800"
                              height="800"
-                             loading="lazy">
+                             loading="lazy"
+                             decoding="async"
+                             fetchpriority="high">
                     </picture>
 
                     {{-- Gallery image (if exists) --}}
@@ -87,7 +89,8 @@
                                  class="w-full h-full object-cover"
                                  width="800"
                                  height="800"
-                                 loading="lazy">
+                                 loading="lazy"
+                                 decoding="async">
                         </picture>
                     @endif
                 </a>

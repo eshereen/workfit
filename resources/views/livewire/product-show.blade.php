@@ -17,16 +17,16 @@
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Product Images -->
                 <div class="lg:w-1/2" x-data="{
-            currentImage: '{{ $product->getFirstMediaUrl('main_image', 'large') }}',
+            currentImage: '{{ $product->getFirstMediaUrl('main_image') }}',
             images: [
                 {
-                    large: '{{ $product->getFirstMediaUrl('main_image', 'large') }}',
-                    medium: '{{ $product->getFirstMediaUrl('main_image', 'medium') }}'
+                    large: '{{ $product->getFirstMediaUrl('main_image') }}',
+                    medium: '{{ $product->getFirstMediaUrl('main_image', 'medium_webp') }}'
                 },
                 @foreach($product->getMedia('product_images') as $image)
                 {
-                    large: '{{ $image->getUrl('zoom') }}',
-                    medium: '{{ $image->getUrl('medium') }}'
+                    large: '{{ $image->getUrl('zoom_webp') }}',
+                    medium: '{{ $image->getUrl('medium_webp') }}'
                 },
                 @endforeach
             ]
@@ -36,7 +36,7 @@ x-data="{
    zoom: false,
    zoomX: 0,
    zoomY: 0,
-   image: '{{ $product->getFirstMediaUrl('main_image', 'large') }}',
+   image: '{{ $product->getFirstMediaUrl('main_image') }}',
    zoomW: 0,
    zoomH: 0
 }"
@@ -48,9 +48,19 @@ x-data="{
 @mouseleave="zoom = false">
 
 <!-- Main image -->
-<img :src="image"
-    alt="{{ $product->name }}"
-    class="w-full h-auto cursor-zoom-in select-none">
+<picture class="w-full h-auto cursor-zoom-in select-none">
+    {{-- Modern formats first --}}
+    <source :srcset="image.replace('large', 'large_avif')" type="image/avif">
+    <source :srcset="image.replace('large', 'large_webp')" type="image/webp">
+    {{-- Fallback for older browsers --}}
+    <img :src="image"
+         alt="{{ $product->name }}"
+         class="w-full h-auto"
+         width="800"
+         height="800"
+         decoding="async"
+         fetchpriority="high">
+</picture>
 
 <!-- Zoom overlay -->
 <div x-show="zoom"
@@ -69,9 +79,19 @@ x-data="{
                     <div class="border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors"
                          :class="currentImage === image.large ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'"
                          @click="currentImage = image.large">
-                        <img :src="image.medium"
-                             alt="{{ $product->name }}"
-                             class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
+                        <picture class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
+                            {{-- Modern formats first --}}
+                            <source :srcset="image.medium.replace('medium', 'medium_avif')" type="image/avif">
+                            <source :srcset="image.medium.replace('medium', 'medium_webp')" type="image/webp">
+                            {{-- Fallback for older browsers --}}
+                            <img :src="image.medium"
+                                 alt="{{ $product->name }}"
+                                 class="w-full h-24 object-cover"
+                                 width="150"
+                                 height="150"
+                                 loading="lazy"
+                                 decoding="async">
+                        </picture>
                     </div>
                 </template>
             </div>

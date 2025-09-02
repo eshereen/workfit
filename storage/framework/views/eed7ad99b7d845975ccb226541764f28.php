@@ -63,15 +63,40 @@
                 <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div  class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                         <!-- Product Image -->
-                        <div class="relative group">
-                            <a href="<?php echo e(route('product.show', $product->slug)); ?>" class="block relative z-10">
+                        <div class="relative group" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                            <a href="<?php echo e(route('product.show', $product->slug)); ?>" class="block relative z-10 w-full h-64">
                                 <!--[if BLOCK]><![endif]--><?php if($product->media->count() > 0): ?>
-                                    <img
-                                        src="<?php echo e($product->getFirstMediaUrl('main_image','medium')); ?>"
-                                        loading="lazy"
-                                        alt="<?php echo e($product->name); ?>"
-                                        class="w-full h-64 object-cover"
-                                    >
+                                    
+                                    <picture class="w-full h-full transition-opacity duration-500"
+                                             :class="hover ? 'opacity-0' : 'opacity-100'">
+                                        
+                                        <source srcset="<?php echo e($product->getFirstMediaUrl('main_image', 'large_avif')); ?>" type="image/avif">
+                                        <source srcset="<?php echo e($product->getFirstMediaUrl('main_image', 'large_webp')); ?>" type="image/webp">
+                                        
+                                        <img src="<?php echo e($product->getFirstMediaUrl('main_image')); ?>"
+                                             alt="<?php echo e($product->name); ?>"
+                                             class="w-full h-full object-cover"
+                                             loading="lazy">
+                                    </picture>
+
+                                    
+                                    <?php
+                                        $galleryImage = $product->getFirstMediaUrl('product_images');
+                                    ?>
+
+                                    <!--[if BLOCK]><![endif]--><?php if($galleryImage): ?>
+                                        <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
+                                                 :class="hover ? 'opacity-100' : 'opacity-0'">
+                                            
+                                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'large_avif')); ?>" type="image/avif">
+                                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'large_webp')); ?>" type="image/webp">
+                                            
+                                            <img src="<?php echo e($galleryImage); ?>"
+                                                 alt="<?php echo e($product->name); ?>"
+                                                 class="w-full h-full object-cover"
+                                                 loading="lazy">
+                                        </picture>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                 <?php else: ?>
                                     <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
                                         <span class="text-gray-400">No Image</span>
@@ -289,7 +314,7 @@
 
                         >
                             <?php if($selectedVariant): ?>
-                                Add to Cart - 
+                                Add to Cart -
                                 <!--[if BLOCK]><![endif]--><?php if($selectedVariant->price && $selectedVariant->price > 0): ?>
                                     <?php echo e($currencySymbol); ?><?php echo e(number_format($this->convertPrice($selectedVariant->price), 2)); ?>
 
@@ -306,4 +331,5 @@
             </div>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     </div>
-</div><?php /**PATH /Users/shereenelshayp/Herd/workfit/resources/views/livewire/category-products.blade.php ENDPATH**/ ?>
+</div>
+<?php /**PATH /Users/shereenelshayp/Herd/workfit/resources/views/livewire/category-products.blade.php ENDPATH**/ ?>

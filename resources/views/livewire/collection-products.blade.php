@@ -67,15 +67,47 @@
             @foreach($products as $product)
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <!-- Product Image -->
-                    <div class="relative group">
-                        <a href="{{ route('product.show', $product->slug) }}" class="block relative z-10">
+                    <div class="relative group" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                        <a href="{{ route('product.show', $product->slug) }}" class="block relative z-10 w-full h-64">
                             @if($product->media->count() > 0)
-                                <img
-                                    src="{{ $product->getFirstMediaUrl('main_image','medium') }}"
-                                    loading="lazy"
-                                    alt="{{ $product->name }}"
-                                    class="w-full h-64 object-cover"
-                                >
+                                {{-- Main image --}}
+                                <picture class="w-full h-full transition-opacity duration-500"
+                                         :class="hover ? 'opacity-0' : 'opacity-100'">
+                                    {{-- Modern formats first --}}
+                                    <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
+                                    <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
+                                    {{-- Fallback for older browsers --}}
+                                    <img src="{{ $product->getFirstMediaUrl('main_image') }}"
+                                         alt="{{ $product->name }}"
+                                         class="w-full h-full object-cover"
+                                         width="800"
+                                         height="800"
+                                         loading="lazy"
+                                         decoding="async"
+                                         fetchpriority="high">
+                                </picture>
+
+                                {{-- Gallery image (if exists) --}}
+                                @php
+                                    $galleryImage = $product->getFirstMediaUrl('product_images');
+                                @endphp
+
+                                @if($galleryImage)
+                                    <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
+                                             :class="hover ? 'opacity-100' : 'opacity-0'">
+                                        {{-- Modern formats first --}}
+                                        <source srcset="{{ $product->getFirstMediaUrl('product_images', 'zoom_avif') }}" type="image/avif">
+                                        <source srcset="{{ $product->getFirstMediaUrl('product_images', 'zoom_webp') }}" type="image/webp">
+                                        {{-- Fallback for older browsers --}}
+                                        <img src="{{ $galleryImage }}"
+                                             alt="{{ $product->name }}"
+                                             class="w-full h-full object-cover"
+                                             width="800"
+                                             height="800"
+                                             loading="lazy"
+                                             decoding="async">
+                                    </picture>
+                                @endif
                             @else
                                 <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
                                     <span class="text-gray-400">No Image</span>
@@ -283,7 +315,7 @@
                         {{ !$selectedVariant ? 'disabled' : '' }}
                     >
                         @if($selectedVariant)
-                            Add to Cart - 
+                            Add to Cart -
                             @if($selectedVariant->price && $selectedVariant->price > 0)
                                 {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedVariant->price), 2) }}
                             @else

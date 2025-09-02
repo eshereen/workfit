@@ -69,7 +69,9 @@
                              class="w-full h-full object-cover"
                              width="800"
                              height="800"
-                             loading="lazy">
+                             loading="lazy"
+                             decoding="async"
+                             fetchpriority="high">
                     </picture>
 
                     
@@ -89,7 +91,8 @@
                                  class="w-full h-full object-cover"
                                  width="800"
                                  height="800"
-                                 loading="lazy">
+                                 loading="lazy"
+                                 decoding="async">
                         </picture>
                     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                 </a>

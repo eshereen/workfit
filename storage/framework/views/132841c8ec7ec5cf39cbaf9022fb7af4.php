@@ -19,16 +19,16 @@
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Product Images -->
                 <div class="lg:w-1/2" x-data="{
-            currentImage: '<?php echo e($product->getFirstMediaUrl('main_image', 'large')); ?>',
+            currentImage: '<?php echo e($product->getFirstMediaUrl('main_image')); ?>',
             images: [
                 {
-                    large: '<?php echo e($product->getFirstMediaUrl('main_image', 'large')); ?>',
-                    medium: '<?php echo e($product->getFirstMediaUrl('main_image', 'medium')); ?>'
+                    large: '<?php echo e($product->getFirstMediaUrl('main_image')); ?>',
+                    medium: '<?php echo e($product->getFirstMediaUrl('main_image', 'medium_webp')); ?>'
                 },
                 <?php $__currentLoopData = $product->getMedia('product_images'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 {
-                    large: '<?php echo e($image->getUrl('zoom')); ?>',
-                    medium: '<?php echo e($image->getUrl('medium')); ?>'
+                    large: '<?php echo e($image->getUrl('zoom_webp')); ?>',
+                    medium: '<?php echo e($image->getUrl('medium_webp')); ?>'
                 },
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             ]
@@ -38,7 +38,7 @@ x-data="{
    zoom: false,
    zoomX: 0,
    zoomY: 0,
-   image: '<?php echo e($product->getFirstMediaUrl('main_image', 'large')); ?>',
+   image: '<?php echo e($product->getFirstMediaUrl('main_image')); ?>',
    zoomW: 0,
    zoomH: 0
 }"
@@ -50,9 +50,19 @@ x-data="{
 @mouseleave="zoom = false">
 
 <!-- Main image -->
-<img :src="image"
-    alt="<?php echo e($product->name); ?>"
-    class="w-full h-auto cursor-zoom-in select-none">
+<picture class="w-full h-auto cursor-zoom-in select-none">
+    
+    <source :srcset="image.replace('large', 'large_avif')" type="image/avif">
+    <source :srcset="image.replace('large', 'large_webp')" type="image/webp">
+    
+    <img :src="image"
+         alt="<?php echo e($product->name); ?>"
+         class="w-full h-auto"
+         width="800"
+         height="800"
+         decoding="async"
+         fetchpriority="high">
+</picture>
 
 <!-- Zoom overlay -->
 <div x-show="zoom"
@@ -71,9 +81,19 @@ x-data="{
                     <div class="border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors"
                          :class="currentImage === image.large ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'"
                          @click="currentImage = image.large">
-                        <img :src="image.medium"
-                             alt="<?php echo e($product->name); ?>"
-                             class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
+                        <picture class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
+                            
+                            <source :srcset="image.medium.replace('medium', 'medium_avif')" type="image/avif">
+                            <source :srcset="image.medium.replace('medium', 'medium_webp')" type="image/webp">
+                            
+                            <img :src="image.medium"
+                                 alt="<?php echo e($product->name); ?>"
+                                 class="w-full h-24 object-cover"
+                                 width="150"
+                                 height="150"
+                                 loading="lazy"
+                                 decoding="async">
+                        </picture>
                     </div>
                 </template>
             </div>
