@@ -305,9 +305,19 @@ x-data="{
             @foreach($relatedProducts as $relatedProduct)
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
                 <a href="{{ route('product.show', $relatedProduct->slug) }}">
-                    <img src="{{ $relatedProduct->getFirstMediaUrl('main_image', 'medium') }}"
-                         alt="{{ $relatedProduct->name }}"
-                         class="w-full h-64 object-cover">
+                    <picture class="w-full h-64">
+                        {{-- Modern formats first --}}
+                        <source srcset="{{ $relatedProduct->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
+                        <source srcset="{{ $relatedProduct->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
+                        {{-- Fallback for older browsers --}}
+                        <img src="{{ $relatedProduct->getFirstMediaUrl('main_image') }}"
+                             alt="{{ $relatedProduct->name }}"
+                             class="w-full h-64 object-cover"
+                             width="400"
+                             height="400"
+                             loading="lazy"
+                             decoding="async">
+                    </picture>
                 </a>
                 <div class="p-4">
                     <a href="{{ route('product.show', $relatedProduct->slug) }}"

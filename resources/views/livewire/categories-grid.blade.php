@@ -20,11 +20,19 @@
                     <!-- Category Image -->
                     <div class="relative group">
                         @if($category->media->count() > 0)
-                            <img
-                                src="{{ $category->getFirstMediaUrl('main_image','medium') }}"
-                                alt="{{ $category->name }}"
-                                class="w-full h-64 object-cover"
-                            >
+                            <picture class="w-full h-64">
+                                {{-- Modern formats first --}}
+                                <source srcset="{{ $category->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
+                                <source srcset="{{ $category->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
+                                {{-- Fallback for older browsers --}}
+                                <img src="{{ $category->getFirstMediaUrl('main_image') }}"
+                                     alt="{{ $category->name }}"
+                                     class="w-full h-64 object-cover"
+                                     width="400"
+                                     height="400"
+                                     loading="lazy"
+                                     decoding="async">
+                            </picture>
                         @else
                             <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
                                 <span class="text-gray-400">No Image</span>
