@@ -4,16 +4,13 @@
         <!-- Video Background -->
         <div class="video-container">
             <!-- Desktop Video (hidden on mobile) -->
-            <video autoplay muted loop playsinline preload="metadata" class="hidden md:block w-full h-full object-cover" poster="/imgs/video-poster.jpg">
+            <video autoplay muted loop playsinline preload="metadata" class=" w-full h-full object-cover">
                 <source src="videos/workfit-lg.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
 
             <!-- Mobile Video (hidden on desktop) -->
-            <video autoplay muted loop playsinline preload="metadata" class="block md:hidden w-full h-full object-cover" poster="/imgs/video-poster.jpg">
-                <source src="videos/workfit-mobile.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
+        
         </div>
 
         <!-- Overlay -->
@@ -37,12 +34,12 @@
     </section>
 
     <!-- Featured Products -->
-    <section class="px-4">
+    <section class="px-10">
          <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
 
         <!-- Featured Products Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-10">
             <?php $__currentLoopData = $featured; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
                 <div class="relative overflow-hidden aspect-[4/5] product-image-container" style="cursor: pointer;">
@@ -115,7 +112,7 @@
     </section>
 
 
-    <!-- Product Grid - Women's Collection -->
+    <!-- Product Grid - Kids's Collection -->
     <section class="py-16 px-4">
         <div class="container mx-auto">
             <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase"><?php echo e($kids->name); ?>'S COLLECTION</h2>
