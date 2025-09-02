@@ -221,7 +221,7 @@ x-data="{
                         <label class="block text-sm font-medium text-gray-700 mb-2">Quantity:</label>
                         <div class="flex items-center border rounded-md overflow-hidden">
                             <button type="button"
-                                    onclick="decrementQuantity()"
+                                    wire:click="decrementQuantity"
                                     wire:loading.attr="disabled"
                                     wire:loading.class="opacity-50 cursor-not-allowed"
                                     class="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors <?php echo e($quantity <= 1 ? 'opacity-50 cursor-not-allowed' : ''); ?>"
@@ -233,14 +233,13 @@ x-data="{
                                 </svg>
                             </button>
                             <input type="number"
-                                   wire:model.defer="quantity"
+                                   wire:model.live="quantity"
                                    min="1"
                                    max="<?php echo e($selectedVariant ? min($selectedVariant->stock, 10) : min($product->quantity, 10)); ?>"
                                    class="w-16 text-center border-0 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                   id="quantity-input"
-                                   onchange="updateQuantityFromInput(this.value)">
+                                   id="quantity-input">
                             <button type="button"
-                                    onclick="incrementQuantity()"
+                                    wire:click="incrementQuantity"
                                     wire:loading.attr="disabled"
                                     wire:loading.class="opacity-50 cursor-not-allowed"
                                     class="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors <?php echo e($quantity >= ($selectedVariant ? min($selectedVariant->stock, 10) : min($product->quantity, 10)) ? 'opacity-50 cursor-not-allowed' : ''); ?>"
@@ -287,10 +286,14 @@ x-data="{
                             Adding...
                         </span>
                     </button>
+
+
                 <?php else: ?>
                     <button disabled class="w-full bg-gray-400 text-white py-3 px-6 rounded-lg font-semibold cursor-not-allowed">
                         Out of Stock
                     </button>
+
+
                 <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
 
@@ -314,9 +317,19 @@ x-data="{
             <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $relatedProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $relatedProduct): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
                 <a href="<?php echo e(route('product.show', $relatedProduct->slug)); ?>">
-                    <img src="<?php echo e($relatedProduct->getFirstMediaUrl('main_image', 'medium')); ?>"
-                         alt="<?php echo e($relatedProduct->name); ?>"
-                         class="w-full h-64 object-cover">
+                    <picture class="w-full h-64">
+                        
+                        <source srcset="<?php echo e($relatedProduct->getFirstMediaUrl('main_image', 'large_avif')); ?>" type="image/avif">
+                        <source srcset="<?php echo e($relatedProduct->getFirstMediaUrl('main_image', 'large_webp')); ?>" type="image/webp">
+                        
+                        <img src="<?php echo e($relatedProduct->getFirstMediaUrl('main_image')); ?>"
+                             alt="<?php echo e($relatedProduct->name); ?>"
+                             class="w-full h-64 object-cover"
+                             width="400"
+                             height="400"
+                             loading="lazy"
+                             decoding="async">
+                    </picture>
                 </a>
                 <div class="p-4">
                     <a href="<?php echo e(route('product.show', $relatedProduct->slug)); ?>"
@@ -333,69 +346,5 @@ x-data="{
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Product show page loaded, setting up quantity functions...');
 
-    // Initialize quantity input
-    initializeQuantityInput();
-});
-
-// Function to increment quantity
-function incrementQuantity() {
-    const input = document.getElementById('quantity-input');
-    const currentValue = parseInt(input.value) || 1;
-    const maxValue = parseInt(input.max) || 10;
-
-    if (currentValue < maxValue) {
-        const newValue = currentValue + 1;
-        input.value = newValue;
-
-        // Update Livewire component
-        window.Livewire.find('<?php echo e($_instance->getId()); ?>').set('quantity', newValue);
-
-        console.log('Quantity incremented to:', newValue);
-    } else {
-        console.log('Cannot increment - at maximum');
-    }
-}
-
-// Function to decrement quantity
-function decrementQuantity() {
-    const input = document.getElementById('quantity-input');
-    const currentValue = parseInt(input.value) || 1;
-
-    if (currentValue > 1) {
-        const newValue = currentValue - 1;
-        input.value = newValue;
-
-        // Update Livewire component
-        window.Livewire.find('<?php echo e($_instance->getId()); ?>').set('quantity', newValue);
-
-        console.log('Quantity decremented to:', newValue);
-    } else {
-        console.log('Cannot decrement - at minimum');
-    }
-}
-
-// Function to update quantity from input change
-function updateQuantityFromInput(value) {
-    const newValue = parseInt(value) || 1;
-
-    // Update Livewire component
-    window.Livewire.find('<?php echo e($_instance->getId()); ?>').set('quantity', newValue);
-
-    console.log('Quantity updated from input to:', newValue);
-}
-
-// Function to initialize quantity input
-function initializeQuantityInput() {
-    const input = document.getElementById('quantity-input');
-    if (input) {
-        console.log('Quantity input initialized with value:', input.value);
-    }
-}
-
-
-</script>
 <?php /**PATH /Users/shereenelshayp/Herd/workfit/resources/views/livewire/product-show.blade.php ENDPATH**/ ?>

@@ -203,7 +203,7 @@ class ProductShow extends Component
 
 
 
-    public function selectVariant($variantId)
+        public function selectVariant($variantId)
     {
         $this->selectedVariantId = $variantId;
         $this->selectedVariant = $this->product->variants->find($variantId);
@@ -217,6 +217,24 @@ class ProductShow extends Component
         }
     }
 
+    public function incrementQuantity()
+    {
+        $maxQuantity = $this->selectedVariant
+            ? min($this->selectedVariant->stock, 10)
+            : min($this->product->quantity, 10);
+
+        if ($this->quantity < $maxQuantity) {
+            $this->quantity++;
+        }
+    }
+
+    public function decrementQuantity()
+    {
+        if ($this->quantity > 1) {
+            $this->quantity--;
+        }
+    }
+
     public function addToCart()
     {
         Log::info('addToCart called', [
@@ -224,7 +242,9 @@ class ProductShow extends Component
             'product_name' => $this->product->name,
             'quantity' => $this->quantity,
             'selected_variant_id' => $this->selectedVariantId,
-            'has_variants' => $this->product->variants->isNotEmpty()
+            'selected_variant' => $this->selectedVariant ? $this->selectedVariant->id : null,
+            'has_variants' => $this->product->variants->isNotEmpty(),
+            'variants_count' => $this->product->variants->count()
         ]);
 
         $this->validate();
@@ -306,7 +326,7 @@ class ProductShow extends Component
             ]);
 
             // Redirect to cart page after successful add to cart
-            return redirect()->route('cart.index')->with('success', 'Product added to cart successfully!');
+            return redirect()->route('cart.index');
 
         } catch (Exception $e) {
             Log::error('Error adding product to cart', [

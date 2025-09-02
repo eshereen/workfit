@@ -14,7 +14,9 @@
 
         </div>
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-<!--[if BLOCK]><![endif]--><?php if(request()->routeIs('products.index')): ?>
+
+
+    <!--[if BLOCK]><![endif]--><?php if(request()->routeIs('products.index')): ?>
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-red-600">Shop</h1>
         <div class="flex items-center space-x-4">
@@ -77,14 +79,20 @@
                     
                     <?php
                         $galleryImage = $product->getFirstMediaUrl('product_images');
+                        $galleryImageAvif = $product->getFirstMediaUrl('product_images', 'large_avif');
+                        $galleryImageWebp = $product->getFirstMediaUrl('product_images', 'large_webp');
                     ?>
 
-                    <!--[if BLOCK]><![endif]--><?php if($galleryImage): ?>
+                    <!--[if BLOCK]><![endif]--><?php if($galleryImage && $galleryImage !== $product->getFirstMediaUrl('main_image')): ?>
                         <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
                                  :class="hover ? 'opacity-100' : 'opacity-0'">
                             
-                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'large_avif')); ?>" type="image/avif">
-                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'large_webp')); ?>" type="image/webp">
+                            <!--[if BLOCK]><![endif]--><?php if($galleryImageAvif && $galleryImageAvif !== $galleryImage): ?>
+                                <source srcset="<?php echo e($galleryImageAvif); ?>" type="image/avif">
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <!--[if BLOCK]><![endif]--><?php if($galleryImageWebp && $galleryImageWebp !== $galleryImage): ?>
+                                <source srcset="<?php echo e($galleryImageWebp); ?>" type="image/webp">
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                             
                             <img src="<?php echo e($galleryImage); ?>"
                                  alt="<?php echo e($product->name); ?>"
@@ -155,7 +163,7 @@
                         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                     </div>
 
-                    <!--[if BLOCK]><![endif]--><?php if($product->variants->isNotEmpty()): ?>
+                    <!--[if BLOCK]><![endif]--><?php if($product->has_variants): ?>
                     <button wire:click="openVariantModal(<?php echo e($product->id); ?>)"
                             class="add-to-cart bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -198,7 +206,7 @@
 
         <!--[if BLOCK]><![endif]--><?php if($selectedProduct): ?>
         <!-- Variant Options -->
-        <!--[if BLOCK]><![endif]--><?php if($selectedProduct->variants->isNotEmpty()): ?>
+        <!--[if BLOCK]><![endif]--><?php if($selectedProduct->variants && $selectedProduct->variants->isNotEmpty()): ?>
         <div class="mb-4">
             <?php
                 $colors = $selectedProduct->variants->unique('color')->pluck('color');

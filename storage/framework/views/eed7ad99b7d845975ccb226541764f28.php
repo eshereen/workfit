@@ -76,7 +76,11 @@
                                         <img src="<?php echo e($product->getFirstMediaUrl('main_image')); ?>"
                                              alt="<?php echo e($product->name); ?>"
                                              class="w-full h-full object-cover"
-                                             loading="lazy">
+                                             width="800"
+                                             height="800"
+                                             loading="lazy"
+                                             decoding="async"
+                                             fetchpriority="high">
                                     </picture>
 
                                     
@@ -88,13 +92,16 @@
                                         <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
                                                  :class="hover ? 'opacity-100' : 'opacity-0'">
                                             
-                                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'large_avif')); ?>" type="image/avif">
-                                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'large_webp')); ?>" type="image/webp">
+                                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'zoom_avif')); ?>" type="image/avif">
+                                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'zoom_webp')); ?>" type="image/webp">
                                             
                                             <img src="<?php echo e($galleryImage); ?>"
                                                  alt="<?php echo e($product->name); ?>"
                                                  class="w-full h-full object-cover"
-                                                 loading="lazy">
+                                                 width="800"
+                                                 height="800"
+                                                 loading="lazy"
+                                                 decoding="async">
                                         </picture>
                                     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                 <?php else: ?>

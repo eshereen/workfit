@@ -12,7 +12,9 @@
             {{ session('error') }}
         </div>
     @endif
-@if(request()->routeIs('products.index'))
+
+
+    @if(request()->routeIs('products.index'))
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-red-600">Shop</h1>
         <div class="flex items-center space-x-4">
@@ -75,14 +77,20 @@
                     {{-- Gallery image (if exists) --}}
                     @php
                         $galleryImage = $product->getFirstMediaUrl('product_images');
+                        $galleryImageAvif = $product->getFirstMediaUrl('product_images', 'large_avif');
+                        $galleryImageWebp = $product->getFirstMediaUrl('product_images', 'large_webp');
                     @endphp
 
-                    @if($galleryImage)
+                    @if($galleryImage && $galleryImage !== $product->getFirstMediaUrl('main_image'))
                         <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
                                  :class="hover ? 'opacity-100' : 'opacity-0'">
                             {{-- Modern formats first --}}
-                            <source srcset="{{ $product->getFirstMediaUrl('product_images', 'large_avif') }}" type="image/avif">
-                            <source srcset="{{ $product->getFirstMediaUrl('product_images', 'large_webp') }}" type="image/webp">
+                            @if($galleryImageAvif && $galleryImageAvif !== $galleryImage)
+                                <source srcset="{{ $galleryImageAvif }}" type="image/avif">
+                            @endif
+                            @if($galleryImageWebp && $galleryImageWebp !== $galleryImage)
+                                <source srcset="{{ $galleryImageWebp }}" type="image/webp">
+                            @endif
                             {{-- Fallback for older browsers --}}
                             <img src="{{ $galleryImage }}"
                                  alt="{{ $product->name }}"
@@ -151,7 +159,7 @@
                         @endif
                     </div>
 
-                    @if($product->variants->isNotEmpty())
+                    @if($product->has_variants)
                     <button wire:click="openVariantModal({{ $product->id }})"
                             class="add-to-cart bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -193,7 +201,7 @@
 
         @if($selectedProduct)
         <!-- Variant Options -->
-        @if($selectedProduct->variants->isNotEmpty())
+        @if($selectedProduct->variants && $selectedProduct->variants->isNotEmpty())
         <div class="mb-4">
             @php
                 $colors = $selectedProduct->variants->unique('color')->pluck('color');

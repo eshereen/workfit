@@ -236,7 +236,7 @@ class CartService
             $cart = $this->getCart();
 
             $options = [
-                'image' => $product->getFirstMediaUrl('main_image', 'medium'),
+                'image' => $product->getFirstMediaUrl('main_image'),
                 'size' => $variant->size,
                 'color' => $variant->color,
                 'color_code' => $variant->color_code,
@@ -247,27 +247,51 @@ class CartService
             // Use variant price if available, otherwise product price
             $price = $variant->price ?? $product->price;
 
-            $newItem = [
-                'id' => $product->id . '-' . $variant->id,
-                'rowId' => uniqid('variant_'),
-                'name' => $product->name,
-                'price' => $price,
-                'quantity' => $quantity,
-                'attributes' => $options,
-                'associatedModel' => $product
-            ];
+            // Check if product with same variant already exists in cart
+            $existingItem = $cart->firstWhere('id', $product->id . '-' . $variant->id);
 
-            $cart->push($newItem);
+            if ($existingItem) {
+                // Update existing item quantity
+                $existingItem['quantity'] += $quantity;
+                $cart = $cart->map(function($item) use ($existingItem) {
+                    if ($item['id'] === $existingItem['id']) {
+                        return $existingItem;
+                    }
+                    return $item;
+                });
+
+                Log::info('Product with variant quantity updated in cart', [
+                    'product_id' => $product->id,
+                    'variant_id' => $variant->id,
+                    'old_quantity' => $existingItem['quantity'] - $quantity,
+                    'new_quantity' => $existingItem['quantity'],
+                    'cart_count' => $this->getCount()
+                ]);
+            } else {
+                // Add new item
+                $newItem = [
+                    'id' => $product->id . '-' . $variant->id,
+                    'rowId' => uniqid('variant_'),
+                    'name' => $product->name,
+                    'price' => $price,
+                    'quantity' => $quantity,
+                    'attributes' => $options,
+                    'associatedModel' => $product
+                ];
+
+                $cart->push($newItem);
+
+                Log::info('Product with variant added to cart', [
+                    'product_id' => $product->id,
+                    'variant_id' => $variant->id,
+                    'quantity' => $quantity,
+                    'cart_count' => $this->getCount()
+                ]);
+            }
+
             Session::put($this->getCartKey(), $cart);
 
-            Log::info('Product with variant added to cart', [
-                'product_id' => $product->id,
-                'variant_id' => $variant->id,
-                'quantity' => $quantity,
-                'cart_count' => $this->getCount()
-            ]);
-
-            return $newItem;
+            return $existingItem ?? $newItem;
         } catch (Exception $e) {
             Log::error('Error adding product with variant to cart', [
                 'product_id' => $product->id,

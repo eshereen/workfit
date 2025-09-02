@@ -215,7 +215,7 @@ x-data="{
                         <label class="block text-sm font-medium text-gray-700 mb-2">Quantity:</label>
                         <div class="flex items-center border rounded-md overflow-hidden">
                             <button type="button"
-                                    onclick="decrementQuantity()"
+                                    wire:click="decrementQuantity"
                                     wire:loading.attr="disabled"
                                     wire:loading.class="opacity-50 cursor-not-allowed"
                                     class="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors {{ $quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
@@ -226,14 +226,13 @@ x-data="{
                                 </svg>
                             </button>
                             <input type="number"
-                                   wire:model.defer="quantity"
+                                   wire:model.live="quantity"
                                    min="1"
                                    max="{{ $selectedVariant ? min($selectedVariant->stock, 10) : min($product->quantity, 10) }}"
                                    class="w-16 text-center border-0 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                   id="quantity-input"
-                                   onchange="updateQuantityFromInput(this.value)">
+                                   id="quantity-input">
                             <button type="button"
-                                    onclick="incrementQuantity()"
+                                    wire:click="incrementQuantity"
                                     wire:loading.attr="disabled"
                                     wire:loading.class="opacity-50 cursor-not-allowed"
                                     class="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors {{ $quantity >= ($selectedVariant ? min($selectedVariant->stock, 10) : min($product->quantity, 10)) ? 'opacity-50 cursor-not-allowed' : '' }}"
@@ -279,10 +278,14 @@ x-data="{
                             Adding...
                         </span>
                     </button>
+
+
                 @else
                     <button disabled class="w-full bg-gray-400 text-white py-3 px-6 rounded-lg font-semibold cursor-not-allowed">
                         Out of Stock
                     </button>
+
+
                 @endif
 
 
@@ -333,68 +336,4 @@ x-data="{
     @endif
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Product show page loaded, setting up quantity functions...');
 
-    // Initialize quantity input
-    initializeQuantityInput();
-});
-
-// Function to increment quantity
-function incrementQuantity() {
-    const input = document.getElementById('quantity-input');
-    const currentValue = parseInt(input.value) || 1;
-    const maxValue = parseInt(input.max) || 10;
-
-    if (currentValue < maxValue) {
-        const newValue = currentValue + 1;
-        input.value = newValue;
-
-        // Update Livewire component
-        @this.set('quantity', newValue);
-
-        console.log('Quantity incremented to:', newValue);
-    } else {
-        console.log('Cannot increment - at maximum');
-    }
-}
-
-// Function to decrement quantity
-function decrementQuantity() {
-    const input = document.getElementById('quantity-input');
-    const currentValue = parseInt(input.value) || 1;
-
-    if (currentValue > 1) {
-        const newValue = currentValue - 1;
-        input.value = newValue;
-
-        // Update Livewire component
-        @this.set('quantity', newValue);
-
-        console.log('Quantity decremented to:', newValue);
-    } else {
-        console.log('Cannot decrement - at minimum');
-    }
-}
-
-// Function to update quantity from input change
-function updateQuantityFromInput(value) {
-    const newValue = parseInt(value) || 1;
-
-    // Update Livewire component
-    @this.set('quantity', newValue);
-
-    console.log('Quantity updated from input to:', newValue);
-}
-
-// Function to initialize quantity input
-function initializeQuantityInput() {
-    const input = document.getElementById('quantity-input');
-    if (input) {
-        console.log('Quantity input initialized with value:', input.value);
-    }
-}
-
-
-</script>

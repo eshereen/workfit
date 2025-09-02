@@ -12,6 +12,7 @@ use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class ProductIndex extends Component
 {
@@ -36,7 +37,14 @@ class ProductIndex extends Component
     public function loadWishlist()
     {
         if (Auth::check()) {
-            $this->wishlistProductIds = Auth::user()->wishlist()->pluck('product_id')->toArray();
+            // Cache wishlist for better performance
+            $this->wishlistProductIds = cache()->remember(
+                'user_wishlist_' . Auth::id(),
+                600, // 10 minutes cache
+                function () {
+                    return Auth::user()->wishlist()->pluck('product_id')->toArray();
+                }
+            );
         } else {
             $this->wishlistProductIds = [];
         }
@@ -70,6 +78,9 @@ class ProductIndex extends Component
         try {
             $this->loadWishlist();
             $this->loadCurrencyInfo();
+
+            // Check currency change once on mount
+            $this->checkCurrencyChange();
         } catch (Exception $e) {
             // Handle wishlist loading error silently
         }
@@ -132,13 +143,14 @@ class ProductIndex extends Component
                 $this->selectedProduct->converted_price = $currencyService->convertFromUSD($this->selectedProduct->price, $this->currencyCode);
             }
 
-            // Convert variant prices
+            // Convert variant prices with bulk processing
             if ($this->selectedProduct->variants) {
-                foreach ($this->selectedProduct->variants as $variant) {
+                $this->selectedProduct->variants->transform(function ($variant) use ($currencyService) {
                     if ($variant->price) {
                         $variant->converted_price = $currencyService->convertFromUSD($variant->price, $this->currencyCode);
                     }
-                }
+                    return $variant;
+                });
             }
         } catch (Exception $e) {
             // Handle conversion error silently
@@ -183,6 +195,9 @@ class ProductIndex extends Component
                 $this->wishlistProductIds[] = $productId;
             }
 
+            // Clear wishlist cache
+            cache()->forget('user_wishlist_' . Auth::id());
+
             // Emit events
             $this->dispatch('wishlistUpdated');
             $this->dispatch('showNotification', [
@@ -201,7 +216,17 @@ class ProductIndex extends Component
 
     public function openVariantModal($productId)
     {
-        $this->selectedProduct = Product::with('variants')->find($productId);
+        // Cache product with variants for better performance
+        $this->selectedProduct = cache()->remember(
+            'product_with_variants_' . $productId,
+            300, // 5 minutes cache
+            function () use ($productId) {
+                return Product::with(['variantsOptimized'])
+                    ->select('id', 'name', 'slug', 'price', 'compare_price')
+                    ->find($productId);
+            }
+        );
+
         $this->selectedVariantId = null;
         $this->selectedVariant = null;
         $this->quantity = 1;
@@ -273,13 +298,23 @@ class ProductIndex extends Component
         }
     }
 
+
+
     public function addSimpleProductToCart($productId, $quantity = 1)
     {
+        Log::info('addSimpleProductToCart called', [
+            'product_id' => $productId,
+            'quantity' => $quantity
+        ]);
+
+
+
         try {
             $cartService = app(CartService::class);
             $product = Product::find($productId);
 
             if (!$product) {
+                Log::warning('Product not found for cart addition', ['product_id' => $productId]);
                 $this->dispatch('showNotification', [
                     'message' => 'Product not found.',
                     'type' => 'error'
@@ -289,6 +324,12 @@ class ProductIndex extends Component
 
             $cartService->addItem($product, $quantity);
 
+            Log::info('Simple product added to cart successfully', [
+                'product_id' => $productId,
+                'product_name' => $product->name,
+                'quantity' => $quantity
+            ]);
+
             $this->dispatch('cartUpdated');
             $this->dispatch('showNotification', [
                 'message' => 'Product added to cart successfully!',
@@ -296,6 +337,10 @@ class ProductIndex extends Component
             ]);
 
         } catch (Exception $e) {
+            Log::error('Error adding simple product to cart', [
+                'product_id' => $productId,
+                'error' => $e->getMessage()
+            ]);
             $this->dispatch('showNotification', [
                 'message' => 'Error adding product to cart: ' . $e->getMessage(),
                 'type' => 'error'
@@ -305,54 +350,152 @@ class ProductIndex extends Component
 
     public function render()
     {
-        // Check if currency has changed since last render
-        $this->checkCurrencyChange();
+        // Build cache key for this specific query
+        $cacheKey = $this->buildCacheKey();
 
-        // Only eager-load what's needed on home page to reduce payload
-        $with = ['category', 'media'];
-        if (!request()->routeIs('home')) {
-            $with[] = 'subcategory';
-            $with[] = 'variants';
-        }
+        // Try to get from cache first
+        $products = cache()->remember($cacheKey, 300, function () {
+            // Optimized eager loading with specific selects
+            $with = [
+                'category:id,name,slug',
+                'media' => function ($query) {
+                    $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                          ->whereIn('collection_name', ['main_image', 'product_images'])
+                          ->whereNotNull('disk');
+                }
+            ];
 
-        $query = Product::with($with)
-            ->where('active', true);
+                        // Always load variants for product index pages to avoid N+1 queries
+            if (!request()->routeIs('home')) {
+                $with[] = 'subcategory:id,name,slug';
+            }
 
-        if ($this->search) {
-            $query->where('name', 'like', '%' . $this->search . '%');
-        }
+            // Always load variants to prevent N+1 queries
+            $with[] = 'variants:id,product_id,color,size,price,stock';
 
-        if ($this->category) {
-            $query->where('category_id', $this->category);
-        }
+            $query = Product::with($with)
+                ->select('id', 'name', 'slug', 'description', 'price', 'compare_price', 'category_id', 'subcategory_id', 'active', 'featured', 'created_at')
+                ->where('active', true);
 
-        switch ($this->sortBy) {
-            case 'price_low':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'newest':
-            default:
-                $query->latest();
-                break;
-        }
+            // Optimized search with full-text search if available
+            if ($this->search) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                      ->orWhere('description', 'like', '%' . $this->search . '%');
+                });
+            }
 
-        $perPage = request()->routeIs('home') ? 8 : 12;
-        $products = $query->paginate($perPage);
+            if ($this->category) {
+                $query->where('category_id', $this->category);
+            }
 
-        // Convert product prices to current currency
-        $this->convertProductPrices($products);
+            // Optimized sorting
+            switch ($this->sortBy) {
+                case 'price_low':
+                    $query->orderBy('price', 'asc')->orderBy('created_at', 'desc');
+                    break;
+                case 'price_high':
+                    $query->orderBy('price', 'desc')->orderBy('created_at', 'desc');
+                    break;
+                case 'newest':
+                default:
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
+
+            $perPage = request()->routeIs('home') ? 8 : 12;
+            return $query->paginate($perPage);
+        });
+
+        // Convert product prices to current currency (optimized)
+        $this->convertProductPricesOptimized($products);
+
+        // Pre-compute variants data to avoid N+1 queries
+        $this->precomputeVariantsData($products);
 
         return view('livewire.product-index', [
             'products' => $products
         ]);
     }
 
+        /**
+     * Build a unique cache key for the current query
+     */
+    protected function buildCacheKey()
+    {
+        $params = [
+            'search' => $this->search,
+            'sort' => $this->sortBy,
+            'category' => $this->category,
+            'page' => request()->get('page', 1),
+            'per_page' => request()->routeIs('home') ? 8 : 12,
+            'route' => request()->route()->getName(),
+            'currency' => $this->currencyCode
+        ];
+
+        $cacheKey = 'products_index_' . md5(serialize($params));
+
+        // Track cache keys for cleanup
+        $keys = Cache::get('product_index_cache_keys', []);
+        if (!in_array($cacheKey, $keys)) {
+            $keys[] = $cacheKey;
+            Cache::put('product_index_cache_keys', $keys, 3600);
+        }
+
+        return $cacheKey;
+    }
+
+        /**
+     * Optimized price conversion with bulk processing
+     */
+    protected function convertProductPricesOptimized($products)
+    {
+        if ($this->currencyCode === 'USD') {
+            return; // No conversion needed
+        }
+
+        try {
+            $currencyService = app(CountryCurrencyService::class);
+
+            // Bulk convert all prices at once
+            $products->getCollection()->transform(function ($product) use ($currencyService) {
+                if ($product->price) {
+                    $product->converted_price = $currencyService->convertFromUSD($product->price, $this->currencyCode);
+                }
+                if ($product->compare_price && $product->compare_price > 0) {
+                    $product->converted_compare_price = $currencyService->convertFromUSD($product->compare_price, $this->currencyCode);
+                }
+                return $product;
+            });
+        } catch (Exception $e) {
+            // Handle conversion error silently
+        }
+    }
+
+    /**
+     * Pre-compute variants data to avoid N+1 queries
+     */
+    protected function precomputeVariantsData($products)
+    {
+        $products->getCollection()->transform(function ($product) {
+            // Add computed properties to avoid individual queries
+            $product->has_variants = $product->variants && $product->variants->isNotEmpty();
+            $product->variants_count = $product->variants ? $product->variants->count() : 0;
+
+            // Pre-compute unique colors if variants exist
+            if ($product->has_variants) {
+                $product->unique_colors = $product->variants->unique('color')->pluck('color');
+                $product->first_variant = $product->variants->first();
+            }
+
+            return $product;
+        });
+    }
+
     protected function checkCurrencyChange()
     {
         try {
+            // Use the already cached currency info from the service
             $currencyService = app(CountryCurrencyService::class);
             $currentInfo = $currencyService->getCurrentCurrencyInfo();
 
@@ -365,10 +508,29 @@ class ProductIndex extends Component
                 $this->currencyCode = $currentInfo['currency_code'];
                 $this->currencySymbol = $currentInfo['currency_symbol'];
                 $this->isAutoDetected = $currentInfo['is_auto_detected'];
+
+                // Clear product cache when currency changes
+                $this->clearProductCache();
             }
         } catch (Exception $e) {
             // Handle error silently
         }
+    }
+
+    /**
+     * Clear product cache when currency changes
+     */
+    protected function clearProductCache()
+    {
+        // Clear all product index caches
+        $keys = Cache::get('product_index_cache_keys', []);
+        foreach ($keys as $key) {
+            Cache::forget($key);
+        }
+        Cache::forget('product_index_cache_keys');
+
+        // Clear currency cache to force refresh
+        Cache::forget("currency_info_{$this->currencyCode}");
     }
 
     /**
@@ -378,6 +540,33 @@ class ProductIndex extends Component
     {
         $colors = config('colors');
         return $colors[$colorName] ?? '#808080'; // Default to gray if color not found
+    }
+
+    /**
+     * Safely get media URL with error handling
+     */
+    protected function getSafeMediaUrl($product, $collectionName = 'main_image', $conversionName = '')
+    {
+        try {
+            if (!$product->media || $product->media->isEmpty()) {
+                return null;
+            }
+
+            $media = $product->media->where('collection_name', $collectionName)->first();
+            if (!$media || !$media->disk) {
+                return null;
+            }
+
+            return $product->getFirstMediaUrl($collectionName, $conversionName);
+        } catch (Exception $e) {
+            Log::warning('Failed to get media URL', [
+                'product_id' => $product->id,
+                'collection' => $collectionName,
+                'conversion' => $conversionName,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
     }
 
     /**

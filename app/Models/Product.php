@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class Product extends Model implements HasMedia
 {
@@ -50,6 +52,89 @@ class Product extends Model implements HasMedia
         return $this->hasMany(ProductVariant::class);
     }
 
+    /**
+     * Get variants with optimized loading
+     */
+    public function variantsOptimized()
+    {
+        return $this->hasMany(ProductVariant::class)
+            ->select('id', 'product_id', 'color', 'size', 'sku', 'stock', 'price', 'weight')
+            ->orderBy('color')
+            ->orderBy('size');
+    }
+
+    /**
+     * Get variants in stock
+     */
+    public function variantsInStock()
+    {
+        return $this->hasMany(ProductVariant::class)->where('stock', '>', 0);
+    }
+
+    /**
+     * Get unique colors for this product
+     */
+    public function getUniqueColors()
+    {
+        return ProductVariant::getUniqueColorsForProduct($this->id);
+    }
+
+    /**
+     * Get unique sizes for this product
+     */
+    public function getUniqueSizes()
+    {
+        return ProductVariant::getUniqueSizesForProduct($this->id);
+    }
+
+    /**
+     * Get variants by color
+     */
+    public function getVariantsByColor($color)
+    {
+        return ProductVariant::getVariantsByColorAndSize($this->id, $color);
+    }
+
+    /**
+     * Get variant by color and size
+     */
+    public function getVariantByColorAndSize($color, $size)
+    {
+        return ProductVariant::getVariantsByColorAndSize($this->id, $color, $size)->first();
+    }
+
+    /**
+     * Check if product has variants
+     */
+    public function getHasVariantsAttribute()
+    {
+        // If variants are already loaded, use the collection
+        if ($this->relationLoaded('variants') || $this->relationLoaded('variantsOptimized')) {
+            return $this->variants && $this->variants->isNotEmpty();
+        }
+
+        // Otherwise, use cached query
+        return cache()->remember("product_has_variants_{$this->id}", 1800, function () {
+            return $this->variants()->exists();
+        });
+    }
+
+    /**
+     * Get variants count
+     */
+    public function getVariantsCountAttribute()
+    {
+        // If variants are already loaded, use the collection
+        if ($this->relationLoaded('variants') || $this->relationLoaded('variantsOptimized')) {
+            return $this->variants ? $this->variants->count() : 0;
+        }
+
+        // Otherwise, use cached query
+        return cache()->remember("product_variants_count_{$this->id}", 1800, function () {
+            return $this->variants()->count();
+        });
+    }
+
 
 
     public function wishlists()
@@ -72,6 +157,33 @@ class Product extends Model implements HasMedia
         return 0;
     }
 
+    /**
+     * Safely get media URL with error handling
+     */
+    public function getSafeMediaUrl($collectionName = 'main_image', $conversionName = '')
+    {
+        try {
+            if (!$this->media || $this->media->isEmpty()) {
+                return null;
+            }
+
+            $media = $this->media->where('collection_name', $collectionName)->first();
+            if (!$media || !$media->disk) {
+                return null;
+            }
+
+            return $this->getFirstMediaUrl($collectionName, $conversionName);
+        } catch (Exception $e) {
+            Log::warning('Failed to get media URL for product', [
+                'product_id' => $this->id,
+                'collection' => $collectionName,
+                'conversion' => $conversionName,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
 // Register media collections
 public function registerMediaCollections(?Media $media = null): void
 {
@@ -80,10 +192,10 @@ public function registerMediaCollections(?Media $media = null): void
         ->singleFile()
         ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
         ->registerMediaConversions(function (Media $media) {
-            
+
             // Always keep original (JPG/PNG/etc.)
             // Convert optimized versions:
-            
+
             // WebP versions
             $this->addMediaConversion('thumb_webp')
                 ->format('webp')
@@ -134,7 +246,7 @@ public function registerMediaCollections(?Media $media = null): void
     $this->addMediaCollection('product_images')
         ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
         ->registerMediaConversions(function (Media $media) {
-            
+
             // WebP versions
             $this->addMediaConversion('thumb_webp')
                 ->format('webp')

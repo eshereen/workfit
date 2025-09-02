@@ -103,23 +103,28 @@ class CountryCurrencyService
     public function getCurrentCurrencyInfo()
     {
         $currencyCode = $this->getPreferredCurrency();
-        $country = null;
 
-        // Find the country for this currency
-        if (Session::has('preferred_country_id')) {
-            $country = Country::find(Session::get('preferred_country_id'));
-        } else {
-            // Try to find a country with this currency
+        // Cache the currency info to avoid repeated queries
+        return cache()->remember("currency_info_{$currencyCode}", 300, function () use ($currencyCode) {
+            $country = null;
 
-            $country = Country::select('id','code','currency_code','currency_sympol')->where('currency_code', $currencyCode)->first();
-        }
+            // Find the country for this currency
+            if (Session::has('preferred_country_id')) {
+                $country = Country::find(Session::get('preferred_country_id'));
+            } else {
+                // Try to find a country with this currency
+                $country = Country::select('id','code','currency_code','currency_sympol')
+                    ->where('currency_code', $currencyCode)
+                    ->first();
+            }
 
-        return [
-            'currency_code' => $currencyCode,
-            'currency_symbol' => $this->getCurrencySymbol($currencyCode),
-            'country' => $country,
-            'is_auto_detected' => !Session::has('preferred_currency'),
-        ];
+            return [
+                'currency_code' => $currencyCode,
+                'currency_symbol' => $this->getCurrencySymbol($currencyCode),
+                'country' => $country,
+                'is_auto_detected' => !Session::has('preferred_currency'),
+            ];
+        });
     }
 
     public function convertFromUSD($amount, $currencyCode)

@@ -54,7 +54,7 @@
 
 
     <!-- Notification System -->
-    <div id="notification-container" class="fixed top-4 right-4 z-50 p-4 text-white"></div>
+    <div id="notification-container" class="fixed top-4 right-4 z-[9999] p-4 text-white" style="pointer-events: none;"></div>
 
     @yield('content')
 
@@ -67,28 +67,49 @@
 
     <!-- Notification System Script -->
     <script>
-        // Global function to show notifications
+                // Global function to show notifications
         function showNotification(message, type = 'success') {
             const container = document.getElementById('notification-container');
-            const notification = document.createElement('div');
 
-            notification.className = `notification mb-4 p-4 rounded-lg shadow-lg text-white transform translate-x-full ${
+            if (!container) {
+                return;
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification mb-4 p-4 rounded-lg shadow-lg transform translate-x-full transition-all duration-300 ${
                 type === 'success' ? 'bg-green-500' : 'bg-red-500'
             }`;
-            notification.textContent = message;
+
+            // Create a span element for the text
+            const textSpan = document.createElement('span');
+            textSpan.textContent = message;
+            textSpan.style.color = 'white';
+            textSpan.style.fontSize = '18px';
+            textSpan.style.fontWeight = 'bold';
+            textSpan.style.display = 'block';
+            textSpan.style.textAlign = 'center';
+
+            notification.appendChild(textSpan);
+
+            notification.style.zIndex = '9999';
+            notification.style.minWidth = '300px';
+            notification.style.border = '3px solid black';
+            notification.style.backgroundColor = type === 'success' ? '#10B981' : '#EF4444';
+            notification.style.padding = '16px';
+            notification.style.marginBottom = '16px';
 
             container.appendChild(notification);
 
             // Show notification
             setTimeout(() => {
-                notification.classList.add('show');
                 notification.classList.remove('translate-x-full');
+                notification.style.transform = 'translateX(0)';
             }, 100);
 
             // Hide and remove notification
             setTimeout(() => {
-                notification.classList.add('hide');
-                notification.classList.remove('show');
+                notification.style.transform = 'translateX(100%)';
+                notification.style.opacity = '0';
                 setTimeout(() => {
                     if (container.contains(notification)) {
                         container.removeChild(notification);
@@ -97,10 +118,23 @@
             }, 3000);
         }
 
-        // Listen for Livewire notification events
+                // Listen for Livewire notification events
         document.addEventListener('livewire:init', () => {
             Livewire.on('showNotification', (data) => {
-                showNotification(data.message, data.type);
+                let message, type;
+
+                if (Array.isArray(data)) {
+                    message = data[0]?.message || data[0];
+                    type = data[0]?.type || 'success';
+                } else if (typeof data === 'object') {
+                    message = data.message;
+                    type = data.type || 'success';
+                } else {
+                    message = data;
+                    type = 'success';
+                }
+
+                showNotification(message, type);
             });
         });
     </script>
