@@ -353,19 +353,20 @@ class ProductIndex extends Component
         // Build cache key for this specific query
         $cacheKey = $this->buildCacheKey();
 
-        // Try to get from cache first
-        $products = cache()->remember($cacheKey, 300, function () {
+        // Try to get from cache first with shorter cache time for better performance
+        $products = cache()->remember($cacheKey, 180, function () {
             // Optimized eager loading with specific selects
             $with = [
                 'category:id,name,slug',
                 'media' => function ($query) {
                     $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
                           ->whereIn('collection_name', ['main_image', 'product_images'])
-                          ->whereNotNull('disk');
+                          ->whereNotNull('disk')
+                          ->limit(2); // Only load first 2 images for performance
                 }
             ];
 
-                        // Always load variants for product index pages to avoid N+1 queries
+            // Always load variants for product index pages to avoid N+1 queries
             if (!request()->routeIs('home')) {
                 $with[] = 'subcategory:id,name,slug';
             }

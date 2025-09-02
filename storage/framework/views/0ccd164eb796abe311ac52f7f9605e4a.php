@@ -8,13 +8,13 @@
 
     <!-- Performance optimizations -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="//images.unsplash.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
 
     <!-- Resource hints for critical resources -->
-    <link rel="preload" href="/videos/workfit-lg.mp4" as="video" type="video/mp4">
-    <link rel="preload" href="/videos/workfit-mobile.mp4" as="video" type="video/mp4">
+    <link rel="preload" href="/videos/workfit-lg.mp4" as="video" type="video/mp4" media="(min-width: 768px)">
+    <link rel="preload" href="/videos/workfit-mobile.mp4" as="video" type="video/mp4" media="(max-width: 767px)">
 
     <!-- Livewire Styles -->
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::styles(); ?>
@@ -22,6 +22,39 @@
    </link>
    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
 
+
+    <!-- Minimal critical CSS for performance -->
+    <style>
+        /* Only essential styles to prevent layout shift */
+        .loading-lazy { opacity: 0; transition: opacity 0.3s; }
+        .loading-lazy.loaded { opacity: 1; }
+        .aspect-\[4\/5\] { aspect-ratio: 4/5; }
+
+                /* Product image hover effect */
+        .product-image-container {
+            position: relative;
+        }
+
+        .product-image-container .main-image {
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            z-index: 1;
+        }
+
+        .product-image-container .gallery-image {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 2;
+        }
+
+        .product-image-container:hover .main-image {
+            opacity: 0;
+        }
+
+        .product-image-container:hover .gallery-image {
+            opacity: 1;
+        }
+    </style>
 
     <!-- Preload critical CSS -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -61,9 +94,70 @@
 
     <?php echo $__env->make('layouts.footer', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
+    <!-- Alpine.js for interactive components -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <!-- Livewire Scripts -->
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scripts(); ?>
 
+
+
+
+    <!-- Performance optimization script -->
+    <script>
+        // Lazy loading optimization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Intersection Observer for lazy loading
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.classList.add('loaded');
+                        observer.unobserve(img);
+                    }
+                });
+            });
+
+            // Observe all lazy images
+            document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+                img.classList.add('loading-lazy');
+                imageObserver.observe(img);
+            });
+
+            // Preload critical images
+            const criticalImages = document.querySelectorAll('img[fetchpriority="high"]');
+            criticalImages.forEach(img => {
+                if (img.src) {
+                    const link = document.createElement('link');
+                    link.rel = 'preload';
+                    link.as = 'image';
+                    link.href = img.src;
+                    document.head.appendChild(link);
+                }
+            });
+
+            // Product image hover effect (JavaScript backup)
+            document.querySelectorAll('.product-image-container').forEach(container => {
+                const mainImage = container.querySelector('.main-image');
+                const galleryImage = container.querySelector('.gallery-image');
+
+                if (mainImage && galleryImage) {
+                    // Ensure gallery image is hidden initially
+                    galleryImage.style.opacity = '0';
+
+                    container.addEventListener('mouseenter', function() {
+                        mainImage.style.opacity = '0';
+                        galleryImage.style.opacity = '1';
+                    });
+
+                    container.addEventListener('mouseleave', function() {
+                        mainImage.style.opacity = '1';
+                        galleryImage.style.opacity = '0';
+                    });
+                }
+            });
+        });
+    </script>
 
 
 

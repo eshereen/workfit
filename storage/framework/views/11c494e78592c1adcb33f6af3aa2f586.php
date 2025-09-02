@@ -57,51 +57,31 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
-            <div class="relative overflow-hidden aspect-[4/5]" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                        <div class="relative overflow-hidden aspect-[4/5] product-image-container" style="cursor: pointer;">
                 <a href="<?php echo e(route('product.show', $product->slug)); ?>" class="block relative w-full h-full">
                     
-                    <picture class="w-full h-full transition-opacity duration-500"
-                             :class="hover ? 'opacity-0' : 'opacity-100'">
-                        
-                        <source srcset="<?php echo e($product->getFirstMediaUrl('main_image', 'large_avif')); ?>" type="image/avif">
-                        <source srcset="<?php echo e($product->getFirstMediaUrl('main_image', 'large_webp')); ?>" type="image/webp">
-                        
-                        <img src="<?php echo e($product->getFirstMediaUrl('main_image')); ?>"
-                             alt="<?php echo e($product->name); ?>"
-                             class="w-full h-full object-cover"
-                             width="800"
-                             height="800"
-                             loading="lazy"
-                             decoding="async"
-                             fetchpriority="high">
-                    </picture>
+                    <?php
+                        $mainImage = $product->getFirstMediaUrl('main_image') ?: '/imgs/workfit.png';
+                    ?>
+                    <img src="<?php echo e($mainImage); ?>"
+                         alt="<?php echo e($product->name); ?>"
+                         class="w-full h-full object-cover transition-opacity duration-500 main-image"
+                         width="400"
+                         height="400"
+                         loading="lazy">
 
                     
                     <?php
                         $galleryImage = $product->getFirstMediaUrl('product_images');
-                        $galleryImageAvif = $product->getFirstMediaUrl('product_images', 'large_avif');
-                        $galleryImageWebp = $product->getFirstMediaUrl('product_images', 'large_webp');
                     ?>
-
-                    <!--[if BLOCK]><![endif]--><?php if($galleryImage && $galleryImage !== $product->getFirstMediaUrl('main_image')): ?>
-                        <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
-                                 :class="hover ? 'opacity-100' : 'opacity-0'">
-                            
-                            <!--[if BLOCK]><![endif]--><?php if($galleryImageAvif && $galleryImageAvif !== $galleryImage): ?>
-                                <source srcset="<?php echo e($galleryImageAvif); ?>" type="image/avif">
-                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-                            <!--[if BLOCK]><![endif]--><?php if($galleryImageWebp && $galleryImageWebp !== $galleryImage): ?>
-                                <source srcset="<?php echo e($galleryImageWebp); ?>" type="image/webp">
-                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-                            
-                            <img src="<?php echo e($galleryImage); ?>"
-                                 alt="<?php echo e($product->name); ?>"
-                                 class="w-full h-full object-cover"
-                                 width="800"
-                                 height="800"
-                                 loading="lazy"
-                                 decoding="async">
-                        </picture>
+                    <!--[if BLOCK]><![endif]--><?php if($galleryImage && $galleryImage !== $mainImage): ?>
+                        <img src="<?php echo e($galleryImage); ?>"
+                             alt="<?php echo e($product->name); ?>"
+                             class="absolute top-0 left-0 w-full h-full object-cover gallery-image"
+                             style="opacity: 0; z-index: 2;"
+                             width="400"
+                             height="400"
+                             loading="lazy">
                     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                 </a>
                 <!-- Wishlist Button -->

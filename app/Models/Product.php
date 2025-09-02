@@ -197,6 +197,13 @@ public function registerMediaCollections(?Media $media = null): void
             // Convert optimized versions:
 
             // WebP versions
+            $this->addMediaConversion('small_webp')
+                ->format('webp')
+                ->width(300)
+                ->height(300)
+                ->quality(85)
+                ->nonQueued();
+
             $this->addMediaConversion('thumb_webp')
                 ->format('webp')
                 ->width(150)

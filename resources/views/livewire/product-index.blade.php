@@ -55,51 +55,31 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach($products as $product)
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
-            <div class="relative overflow-hidden aspect-[4/5]" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                        <div class="relative overflow-hidden aspect-[4/5] product-image-container" style="cursor: pointer;">
                 <a href="{{ route('product.show', $product->slug) }}" class="block relative w-full h-full">
                     {{-- Main image --}}
-                    <picture class="w-full h-full transition-opacity duration-500"
-                             :class="hover ? 'opacity-0' : 'opacity-100'">
-                        {{-- Modern formats first --}}
-                        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
-                        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
-                        {{-- Fallback for older browsers --}}
-                        <img src="{{ $product->getFirstMediaUrl('main_image') }}"
-                             alt="{{ $product->name }}"
-                             class="w-full h-full object-cover"
-                             width="800"
-                             height="800"
-                             loading="lazy"
-                             decoding="async"
-                             fetchpriority="high">
-                    </picture>
+                    @php
+                        $mainImage = $product->getFirstMediaUrl('main_image') ?: '/imgs/workfit.png';
+                    @endphp
+                    <img src="{{ $mainImage }}"
+                         alt="{{ $product->name }}"
+                         class="w-full h-full object-cover transition-opacity duration-500 main-image"
+                         width="400"
+                         height="400"
+                         loading="lazy">
 
                     {{-- Gallery image (if exists) --}}
                     @php
                         $galleryImage = $product->getFirstMediaUrl('product_images');
-                        $galleryImageAvif = $product->getFirstMediaUrl('product_images', 'large_avif');
-                        $galleryImageWebp = $product->getFirstMediaUrl('product_images', 'large_webp');
                     @endphp
-
-                    @if($galleryImage && $galleryImage !== $product->getFirstMediaUrl('main_image'))
-                        <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
-                                 :class="hover ? 'opacity-100' : 'opacity-0'">
-                            {{-- Modern formats first --}}
-                            @if($galleryImageAvif && $galleryImageAvif !== $galleryImage)
-                                <source srcset="{{ $galleryImageAvif }}" type="image/avif">
-                            @endif
-                            @if($galleryImageWebp && $galleryImageWebp !== $galleryImage)
-                                <source srcset="{{ $galleryImageWebp }}" type="image/webp">
-                            @endif
-                            {{-- Fallback for older browsers --}}
-                            <img src="{{ $galleryImage }}"
-                                 alt="{{ $product->name }}"
-                                 class="w-full h-full object-cover"
-                                 width="800"
-                                 height="800"
-                                 loading="lazy"
-                                 decoding="async">
-                        </picture>
+                    @if($galleryImage && $galleryImage !== $mainImage)
+                        <img src="{{ $galleryImage }}"
+                             alt="{{ $product->name }}"
+                             class="absolute top-0 left-0 w-full h-full object-cover gallery-image"
+                             style="opacity: 0; z-index: 2;"
+                             width="400"
+                             height="400"
+                             loading="lazy">
                     @endif
                 </a>
                 <!-- Wishlist Button -->
