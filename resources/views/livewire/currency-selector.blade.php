@@ -197,7 +197,7 @@
             <!-- Reset to detected currency -->
             @if($isAutoDetected && $detectedCountry && $currentCurrency !== Session::get('detected_currency', 'USD'))
             <div class="border-t border-gray-100">
-                <button type="button" onclick="resetToDetected()" @click="open = false"
+                <button type="button" wire:click="resetToDetected()" @click="open = false"
                         class="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
                     <div class="flex items-center">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,19 +351,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.showNotification) {
                     window.showNotification(`Currency changed to ${currencyCode}`, 'success');
                 }
-                // Dispatch Livewire events so components re-read currency immediately
-                try {
-                    if (window.Livewire && window.Livewire.dispatch) {
-                        // Dispatch without payload to avoid Livewire unpack issues
-                        window.Livewire.dispatch('currencyChanged');
-                        window.Livewire.dispatch('currency-changed');
-                        window.Livewire.dispatch('global-currency-changed');
-                    }
-                } catch (e) {
-                    console.error('Error dispatching Livewire currency events:', e);
-                }
-                                                // Try Livewire refresh first, fallback to page reload
-                // Rely on Livewire events; avoid page reloads to prevent flicker
+                
+                // Force page reload to update navbar symbol
+                console.log('🔄 Reloading page to update navbar symbol');
+                window.location.reload();
+                
                 return;
             } else {
                 console.error('❌ Currency change failed:', data.message);
