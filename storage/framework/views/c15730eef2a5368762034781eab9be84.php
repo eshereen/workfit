@@ -20,11 +20,19 @@
                     <!-- Category Image -->
                     <div class="relative group">
                         <!--[if BLOCK]><![endif]--><?php if($category->media->count() > 0): ?>
-                            <img
-                                src="<?php echo e($category->getFirstMediaUrl('main_image','medium')); ?>"
-                                alt="<?php echo e($category->name); ?>"
-                                class="w-full h-64 object-cover"
-                            >
+                            <picture class="w-full h-64">
+                                
+                                <source srcset="<?php echo e($category->getFirstMediaUrl('main_image', 'large_avif')); ?>" type="image/avif">
+                                <source srcset="<?php echo e($category->getFirstMediaUrl('main_image', 'large_webp')); ?>" type="image/webp">
+                                
+                                <img src="<?php echo e($category->getFirstMediaUrl('main_image')); ?>"
+                                     alt="<?php echo e($category->name); ?>"
+                                     class="w-full h-64 object-cover"
+                                     width="400"
+                                     height="400"
+                                     loading="lazy"
+                                     decoding="async">
+                            </picture>
                         <?php else: ?>
                             <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
                                 <span class="text-gray-400">No Image</span>

@@ -25,6 +25,27 @@ class Category extends Model implements HasMedia
     {
         return $this->hasMany(Product::class);
     }
+
+    /**
+     * Get the optimized media URL for the category
+     * This method is cached to avoid N+1 queries
+     */
+    public function getOptimizedMediaUrl()
+    {
+        return cache()->remember("category_media_{$this->id}", 3600, function () {
+            return $this->getFirstMediaUrl('main_image', 'medium_webp');
+        });
+    }
+
+    /**
+     * Get active products count with caching
+     */
+    public function getActiveProductsCount()
+    {
+        return cache()->remember("category_products_count_{$this->id}", 1800, function () {
+            return $this->products()->where('active', true)->count();
+        });
+    }
      //register media collections
     // Register media collections
 public function registerMediaCollections(?Media $media = null): void
@@ -34,10 +55,10 @@ public function registerMediaCollections(?Media $media = null): void
         ->singleFile()
         ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
         ->registerMediaConversions(function (Media $media) {
-            
+
             // Always keep original (JPG/PNG/etc.)
             // Convert optimized versions:
-            
+
             // WebP versions
             $this->addMediaConversion('thumb_webp')
                 ->format('webp')
