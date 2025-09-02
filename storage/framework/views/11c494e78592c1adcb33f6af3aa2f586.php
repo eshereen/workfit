@@ -54,20 +54,44 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20"  x-data="{ hover: false }"
-        @mouseenter="hover = true"
-        @mouseleave="hover = false">
-            <div class="relative">
-                <a href="<?php echo e(route('product.show', $product->slug)); ?>">
-                    <img src="<?php echo e($product->getFirstMediaUrl('main_image', 'medium')); ?>"
-                         alt="<?php echo e($product->name); ?>"
-                         class="w-full h-64 object-cover"
-                         :class="hover ? 'opacity-100' : 'opacity-0'">
-                    <img src="<?php echo e($product->getFirstMediaUrl('product_images', 'medium')); ?>"
-                    loading="lazy"
-                         alt="<?php echo e($product->name); ?>"
-                         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-                          :class="hover ? 'opacity-0' : 'opacity-100'">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
+            <div class="relative overflow-hidden aspect-[4/5]" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                <a href="<?php echo e(route('product.show', $product->slug)); ?>" class="block relative w-full h-full">
+                    
+                    <picture class="w-full h-full transition-opacity duration-500"
+                             :class="hover ? 'opacity-0' : 'opacity-100'">
+                        
+                        <source srcset="<?php echo e($product->getFirstMediaUrl('main_image', 'large_avif')); ?>" type="image/avif">
+                        <source srcset="<?php echo e($product->getFirstMediaUrl('main_image', 'large_webp')); ?>" type="image/webp">
+                        
+                        <img src="<?php echo e($product->getFirstMediaUrl('main_image')); ?>"
+                             alt="<?php echo e($product->name); ?>"
+                             class="w-full h-full object-cover"
+                             width="800"
+                             height="800"
+                             loading="lazy">
+                    </picture>
+
+                    
+                    <?php
+                        $galleryImage = $product->getFirstMediaUrl('product_images');
+                    ?>
+
+                    <!--[if BLOCK]><![endif]--><?php if($galleryImage): ?>
+                        <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
+                                 :class="hover ? 'opacity-100' : 'opacity-0'">
+                            
+                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'large_avif')); ?>" type="image/avif">
+                            <source srcset="<?php echo e($product->getFirstMediaUrl('product_images', 'large_webp')); ?>" type="image/webp">
+                            
+                            <img src="<?php echo e($galleryImage); ?>"
+                                 alt="<?php echo e($product->name); ?>"
+                                 class="w-full h-full object-cover"
+                                 width="800"
+                                 height="800"
+                                 loading="lazy">
+                        </picture>
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                 </a>
                 <!-- Wishlist Button -->
                 <!--[if BLOCK]><![endif]--><?php if(auth()->guard()->check()): ?>

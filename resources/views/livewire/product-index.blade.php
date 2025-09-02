@@ -52,20 +52,44 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach($products as $product)
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20"  x-data="{ hover: false }"
-        @mouseenter="hover = true"
-        @mouseleave="hover = false">
-            <div class="relative">
-                <a href="{{ route('product.show', $product->slug) }}">
-                    <img src="{{ $product->getFirstMediaUrl('main_image', 'medium') }}"
-                         alt="{{ $product->name }}"
-                         class="w-full h-64 object-cover"
-                         :class="hover ? 'opacity-100' : 'opacity-0'">
-                    <img src="{{ $product->getFirstMediaUrl('product_images', 'medium') }}"
-                    loading="lazy"
-                         alt="{{ $product->name }}"
-                         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-                          :class="hover ? 'opacity-0' : 'opacity-100'">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
+            <div class="relative overflow-hidden aspect-[4/5]" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                <a href="{{ route('product.show', $product->slug) }}" class="block relative w-full h-full">
+                    {{-- Main image --}}
+                    <picture class="w-full h-full transition-opacity duration-500"
+                             :class="hover ? 'opacity-0' : 'opacity-100'">
+                        {{-- Modern formats first --}}
+                        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
+                        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
+                        {{-- Fallback for older browsers --}}
+                        <img src="{{ $product->getFirstMediaUrl('main_image') }}"
+                             alt="{{ $product->name }}"
+                             class="w-full h-full object-cover"
+                             width="800"
+                             height="800"
+                             loading="lazy">
+                    </picture>
+
+                    {{-- Gallery image (if exists) --}}
+                    @php
+                        $galleryImage = $product->getFirstMediaUrl('product_images');
+                    @endphp
+
+                    @if($galleryImage)
+                        <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
+                                 :class="hover ? 'opacity-100' : 'opacity-0'">
+                            {{-- Modern formats first --}}
+                            <source srcset="{{ $product->getFirstMediaUrl('product_images', 'large_avif') }}" type="image/avif">
+                            <source srcset="{{ $product->getFirstMediaUrl('product_images', 'large_webp') }}" type="image/webp">
+                            {{-- Fallback for older browsers --}}
+                            <img src="{{ $galleryImage }}"
+                                 alt="{{ $product->name }}"
+                                 class="w-full h-full object-cover"
+                                 width="800"
+                                 height="800"
+                                 loading="lazy">
+                        </picture>
+                    @endif
                 </a>
                 <!-- Wishlist Button -->
                 @auth
