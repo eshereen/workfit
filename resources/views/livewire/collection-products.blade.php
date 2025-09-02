@@ -65,36 +65,38 @@
     @if($products->count() > 0)
         <div class="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($products as $product)
-                <a href="{{ route('product.show', $product->slug) }}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <!-- Product Image -->
                     <div class="relative group">
-                        @if($product->media->count() > 0)
-                            <img
-                                src="{{ $product->getFirstMediaUrl('main_image','medium') }}"
-                                loading="lazy"
-                                alt="{{ $product->name }}"
-                                class="w-full h-64 object-cover"
-                            >
-                        @else
-                            <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-400">No Image</span>
-                            </div>
-                        @endif
+                        <a href="{{ route('product.show', $product->slug) }}" class="block relative z-10">
+                            @if($product->media->count() > 0)
+                                <img
+                                    src="{{ $product->getFirstMediaUrl('main_image','medium') }}"
+                                    loading="lazy"
+                                    alt="{{ $product->name }}"
+                                    class="w-full h-64 object-cover"
+                                >
+                            @else
+                                <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                                    <span class="text-gray-400">No Image</span>
+                                </div>
+                            @endif
+                        </a>
 
                         <!-- Quick Actions Overlay -->
-                        <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 flex items-center justify-center">
-                            <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2">
+                        <div class="absolute inset-0 bg-black/5  group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
+                            <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2 pointer-events-auto">
                                 @if($product->variants->count() > 0)
                                     <button
                                         wire:click="openVariantModal({{ $product->id }})"
-                                        class="bg-white text-gray-900 px-4 py-2 rounded-full hover:bg-red-600 hover:text-white transition-colors"
+                                        class="bg-white text-gray-900 px-4 py-2 rounded-full hover:bg-red-600 hover:text-white transition-colors pointer-events-auto"
                                     >
                                         <i class="fas fa-eye mr-2"></i>View Options
                                     </button>
                                 @else
                                     <button
                                         wire:click="addSimpleProductToCart({{ $product->id }})"
-                                        class="bg-white text-gray-900 px-4 py-2 rounded-full hover:bg-red-600 hover:text-white transition-colors"
+                                        class="bg-white text-gray-900 px-4 py-2 rounded-full hover:bg-red-600 hover:text-white transition-colors pointer-events-auto"
                                     >
                                         <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
                                     </button>
@@ -151,21 +153,21 @@
                             @if($product->variants->count() > 0)
                                 <button
                                     wire:click="openVariantModal({{ $product->id }})"
-                                    class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+                                    class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
                                 >
                                     View Options
                                 </button>
                             @else
                                 <button
                                     wire:click="addSimpleProductToCart({{ $product->id }})"
-                                    class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+                                    class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
                                 >
                                     Add to Cart
                                 </button>
                             @endif
                         </div>
                     </div>
-                </a>
+                </div>
             @endforeach
         </div>
 
@@ -194,7 +196,7 @@
 
     <!-- Variant Selection Modal -->
     @if($showVariantModal && $selectedProduct)
-        <div class="fixed inset-0 bg-black opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="fixed inset-0 bg-black/50  flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
                 <div class="p-6">
                     <!-- Modal Header -->
@@ -237,7 +239,11 @@
                                             <span class="text-sm font-medium">{{ $variant->name  }}</span>
                                         </div>
                                         <div class="text-sm text-gray-600 mt-1">
-                                            {{ $currencySymbol }}{{ number_format($this->convertPrice($variant->price), 2) }}
+                                            @if($variant->price && $variant->price > 0)
+                                                {{ $currencySymbol }}{{ number_format($this->convertPrice($variant->price), 2) }}
+                                            @else
+                                                {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedProduct->price), 2) }}
+                                            @endif
                                         </div>
                                         <div class="text-xs text-gray-500 mt-1">
                                             Stock: {{ $variant->stock }}
@@ -277,7 +283,12 @@
                         {{ !$selectedVariant ? 'disabled' : '' }}
                     >
                         @if($selectedVariant)
-                            Add to Cart - {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedVariant->price), 2) }}
+                            Add to Cart - 
+                            @if($selectedVariant->price && $selectedVariant->price > 0)
+                                {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedVariant->price), 2) }}
+                            @else
+                                {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedProduct->price), 2) }}
+                            @endif
                         @else
                             Select a variant first
                         @endif
