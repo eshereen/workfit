@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Traits;
 
 trait HasSku
@@ -14,48 +15,40 @@ trait HasSku
 
     public function generateSku(): string
     {
-        // Get category code with fallback
         $categoryCode = $this->getCategoryCode();
-
-        // Get subcategory code with fallback
         $subcategoryCode = $this->getSubcategoryCode();
-
-        // Get product code with fallback
         $productCode = $this->getProductCode();
-
-        // Generate unique identifier
         $uniqueId = $this->generateUniqueId();
 
         return "{$categoryCode}-{$subcategoryCode}-{$productCode}-{$uniqueId}";
     }
 
-    /**
-     * Get category code with fallback
-     */
     protected function getCategoryCode(): string
     {
-        if ($this->category && $this->category->exists) {
-            return strtoupper(substr(preg_replace('/[^A-Z0-9]/', '', $this->category->name), 0, 3));
+        if (!empty($this->category_id) && $this->category) {
+            return strtoupper(substr(
+                preg_replace('/[^A-Z0-9]/', '', $this->category->name),
+                0,
+                3
+            ));
         }
 
-        return 'GEN'; // Fallback for "General"
+        return 'GEN';
     }
 
-    /**
-     * Get subcategory code with fallback
-     */
     protected function getSubcategoryCode(): string
     {
-        if ($this->subcategory && $this->subcategory->exists) {
-            return strtoupper(substr(preg_replace('/[^A-Z0-9]/', '', $this->subcategory->name), 0, 3));
+        if (!empty($this->subcategory_id) && $this->subcategory) {
+            return strtoupper(substr(
+                preg_replace('/[^A-Z0-9]/', '', $this->subcategory->name),
+                0,
+                3
+            ));
         }
 
-        return 'GEN'; // Fallback for "General"
+        return 'GEN';
     }
 
-    /**
-     * Get product code with fallback
-     */
     protected function getProductCode(): string
     {
         if (!empty($this->name)) {
@@ -65,33 +58,23 @@ trait HasSku
             }
         }
 
-        return 'PRD'; // Fallback for "Product"
+        return 'PRD';
     }
 
-    /**
-     * Generate unique identifier for SKU
-     */
     protected function generateUniqueId(): string
     {
-        // Try to get the next sequential number for the same category
-        if ($this->category && $this->category->exists) {
-            $nextId = $this->getNextIdForCategory($this->category->id);
+        if (!empty($this->category_id)) {
+            $nextId = $this->getNextIdForCategory($this->category_id);
         } else {
-            // Fallback to overall product count
             $nextId = static::count() + 1;
         }
 
         return str_pad($nextId, 3, '0', STR_PAD_LEFT);
     }
 
-    /**
-     * Get next sequential ID for products in the same category
-     */
     protected function getNextIdForCategory($categoryId): int
     {
-        // Count products with the same category
         $count = static::where('category_id', $categoryId)->count();
-
         return $count + 1;
     }
 }

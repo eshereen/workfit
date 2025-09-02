@@ -2,17 +2,18 @@
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-use App\Filament\Resources\OrderItems\OrderItemResource;
-use Filament\Actions\CreateAction;
 use Filament\Tables\Table;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Actions\AttachAction;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
+use App\Filament\Resources\OrderItems\OrderItemResource;
+use Filament\Resources\RelationManagers\RelationManager;
 
 class ItemsRelationManager extends RelationManager
 {
@@ -27,11 +28,13 @@ class ItemsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('product.name'),
+                TextColumn::make('product.variants.sku'),
                 TextColumn::make('quantity'),
                 TextColumn::make('price'),
             ])
             ->headerActions([
                 CreateAction::make(),
+             
             ])
             ->recordActions([
                 ViewAction::make(),

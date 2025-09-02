@@ -12,14 +12,8 @@ class CollectionProductInfolist
     {
         return $schema
             ->components([
-                Select::make('collection.name')
-                    ->relatinship('collection','name'),
-               Select::make('product.name')
-                    ->relationship('product','name'),
-                TextEntry::make('created_at')
-                    ->dateTime(),
-                TextEntry::make('updated_at')
-                    ->dateTime(),
+
+
             ]);
     }
 }

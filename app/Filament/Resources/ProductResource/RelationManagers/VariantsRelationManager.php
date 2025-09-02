@@ -20,7 +20,6 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Tables\Columns\TextColumn;
 
-use App\Filament\Resources\ProductResource;
 
 use Filament\Resources\RelationManagers\RelationManager;
 

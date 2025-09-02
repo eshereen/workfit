@@ -2,30 +2,32 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\OrderResource\Pages\ListOrders;
-use App\Filament\Resources\OrderResource\Pages\CreateOrder;
-use App\Filament\Resources\OrderResource\Pages\ViewOrder;
-use App\Filament\Resources\OrderResource\Pages\EditOrder;
-use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
-use App\Models\Order;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Order;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\OrderResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\OrderResource\Pages\EditOrder;
+use App\Filament\Resources\OrderResource\Pages\ViewOrder;
+use App\Filament\Resources\OrderResource\Pages\ListOrders;
+use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Filament\Resources\OrderResource\Pages\CreateOrder;
+use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 
 class OrderResource extends Resource
 {
@@ -37,6 +39,8 @@ class OrderResource extends Resource
     {
         return $schema
             ->components([
+                Section::make('Order Details')
+                ->schema([
                 TextInput::make('order_number')
                     ->required()
                     ->maxLength(255),
@@ -44,12 +48,15 @@ class OrderResource extends Resource
                     ->numeric(),
                 TextInput::make('customer_id')
                     ->numeric(),
+                ])->columns(3)->columnSpanFull(),
+                Section::make('Customer Details')
+                ->schema([
                 TextInput::make('first_name')
                     ->maxLength(255),
                 TextInput::make('last_name')
                     ->maxLength(255),
-                TextInput::make('country_id')
-                    ->numeric(),
+                Select::make('country.name')
+                    ->relationship('country', 'name'),
                 TextInput::make('state')
                     ->maxLength(255),
                 TextInput::make('city')
@@ -60,6 +67,9 @@ class OrderResource extends Resource
                 TextInput::make('phone_number')
                     ->tel()
                     ->maxLength(255),
+                ])->columns(3)->columnSpanFull(),
+                Section::make('Order Summary')
+                ->schema([
                 TextInput::make('subtotal')
                     ->required()
                     ->numeric(),
@@ -98,6 +108,9 @@ class OrderResource extends Resource
                     ->required(),
                 Textarea::make('notes')
                     ->columnSpanFull(),
+                ])->columns(3)->columnSpanFull(),
+                Section::make('Order Status')
+                ->schema([
                 TextInput::make('coupon_id')
                     ->numeric(),
                 Toggle::make('is_guest')
@@ -109,6 +122,7 @@ class OrderResource extends Resource
                     ->required(),
                 TextInput::make('status')
                     ->required(),
+                ])->columns(3)->columnSpanFull(),
             ]);
     }
 
@@ -128,8 +142,8 @@ class OrderResource extends Resource
                     ->searchable(),
                 TextColumn::make('last_name')
                     ->searchable(),
-                TextColumn::make('country_id')
-                    ->numeric()
+                TextColumn::make('country.name')
+
                     ->sortable(),
                 TextColumn::make('state')
                     ->searchable(),

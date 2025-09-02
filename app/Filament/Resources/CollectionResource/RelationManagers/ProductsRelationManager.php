@@ -4,8 +4,10 @@ namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\BulkActionGroup;
@@ -16,49 +18,33 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ProductResource;
-use Filament\Actions\ForceDeleteBulkAction;
+
 use Filament\Resources\RelationManagers\RelationManager;
 
 class ProductsRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
-    protected static ?string $recordTitleAttribute = 'order_id';
+    protected static ?string $recordTitleAttribute = 'name';
     protected static ?string $relatedResource = ProductResource::class;
 
     public function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('order_id')
-                    ->label('Order ID')
-                    ->sortable()
-                    ->searchable(),
-
-                TextColumn::make('product.name')
-                    ->label('Product Name')
-                    ->sortable()
-                    ->searchable(),
-
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('price')
                     ->money('USD')
-                    ->label('Product Price')
-                    ->sortable()
-                    ->toggleable(),
+                    ->sortable(),
+                TextColumn::make('quantity')
+                    ->sortable(),
+                TextColumn::make('category.name')
+                    ->label('Category'),
             ])
             ->headerActions([
-                AttachAction::make()
-                    ->preloadRecordSelect()
-                    ->recordSelect(fn (Select $select) =>
-                        $select
-                            ->searchable()
-                            ->getOptionLabelFromRecordUsing(
-                                fn ($record) => "{$record->name} - {$record->price} USD"
-                            )
-                    )
-                    ->recordSelectOptionsQuery(fn (Builder $query) =>
-                        $query->whereNull('deleted_at')
-                    )
-                    ->recordSelectSearchColumns(['name', 'sku']),
+                AttachAction::make(),
+                CreateAction::make(),
             ])
             ->recordActions([
                 DetachAction::make(),
@@ -70,9 +56,9 @@ class ProductsRelationManager extends RelationManager
                     DetachBulkAction::make(),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
-            ]);
-    }
+
+            ]),
+        ]);
+}
 
 }

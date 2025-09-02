@@ -36,9 +36,9 @@ class WishlistResource extends Resource
                 TextInput::make('user_id')
                     ->required()
                     ->numeric(),
-                TextInput::make('product_id')
+                TextInput::make('product.name')
                     ->required()
-                    ->numeric(),
+                    ->relationship('product', 'name'),
             ]);
     }
 
@@ -51,6 +51,12 @@ class WishlistResource extends Resource
                     ->sortable(),
                 TextColumn::make('product_id')
                     ->numeric()
+                    ->sortable(),
+                TextColumn::make('product.name')
+
+                    ->sortable(),
+                TextColumn::make('product.variants.sku')
+
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

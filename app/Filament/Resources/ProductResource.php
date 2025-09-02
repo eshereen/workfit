@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Product;
@@ -19,6 +18,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -29,6 +29,7 @@ use App\Filament\Resources\ProductResource\Pages\EditProduct;
 use App\Filament\Resources\ProductResource\Pages\ViewProduct;
 use App\Filament\Resources\ProductResource\Pages\ListProducts;
 use App\Filament\Resources\ProductResource\Pages\CreateProduct;
+use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 
 class ProductResource extends Resource
 {
@@ -41,13 +42,18 @@ class ProductResource extends Resource
     {
         return $schema
             ->components([
+                Section::make('Product Details')
+                ->schema([
+                    TextInput::make('name')
+                    ->required()
+                    ->maxLength(255)->columnSpanFull(),
                 Select::make('category.name')
                     ->relationship('category', 'name'),
                 Select::make('subcategory.name')
                     ->relationship('subcategory', 'name'),
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+
+                    Textarea::make('description')
+                    ->columnSpanFull(),
 
                 SpatieMediaLibraryFileUpload::make('main_image')
                     ->collection('main_image')
@@ -58,18 +64,21 @@ class ProductResource extends Resource
                     ->multiple()
                     ->imageEditor()
                     ->disk('public'),
-                Textarea::make('description')
-                    ->columnSpanFull(),
+
                 TextInput::make('price')
                     ->required()
                     ->numeric()
                     ->prefix('$'),
                 TextInput::make('compare_price')
                     ->numeric(),
+                ])->columns(2)->columnSpanFull(),
+                Section::make('Product Status')
+                ->schema([
                 Toggle::make('featured')
                     ->required(),
                 Toggle::make('active')
                     ->required(),
+            ])->columns(2)->columnSpanFull(),
             ]);
     }
 

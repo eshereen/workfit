@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CollectionResource\RelationManagers\ProductsRelationManager;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Collection;
@@ -18,6 +17,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CollectionResource\Pages;
@@ -28,6 +28,7 @@ use App\Filament\Resources\CollectionResource\Pages\EditCollection;
 use App\Filament\Resources\CollectionResource\Pages\ViewCollection;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionResource\Pages\CreateCollection;
+use App\Filament\Resources\CollectionResource\RelationManagers\ProductsRelationManager;
 
 class CollectionResource extends Resource
 {
@@ -39,18 +40,26 @@ class CollectionResource extends Resource
     {
         return $schema
             ->components([
-                SpatieMediaLibraryFileUpload::make('main_image')
-                ->collection('main_image')
-                ->imageEditor()
-                ->disk('public'),
+                Section::make('Collection Details')
+                ->schema([
+
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
 
-                Textarea::make('description')
-                    ->columnSpanFull(),
+                Textarea::make('description'),
+
+                SpatieMediaLibraryFileUpload::make('main_image')
+                ->collection('main_image')
+                ->imageEditor()
+                ->disk('public')->columnSpanFull()
+                ])->columns(2)->columnSpanFull(),
+                Section::make('Collection Status')
+                ->schema([
                 Toggle::make('active')
                     ->required(),
+            ])->columns(2)
+                ->columnSpanFull()
             ]);
     }
 
@@ -94,7 +103,7 @@ class CollectionResource extends Resource
     {
 
             return [
-                'variants' => ProductsRelationManager::class,
+                ProductsRelationManager::class,
             ];
 
     }
