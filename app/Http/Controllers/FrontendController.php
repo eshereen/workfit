@@ -10,88 +10,88 @@ use Illuminate\Http\Request;
 
 class FrontendController extends Controller
 {
-   public function index()
-   {
-    $title = 'WorkFit|Home';
+    public function index()
+    {
+        $title = 'WorkFit|Home';
 
-      // Optimized queries with caching and limits
-      $categories = cache()->remember('home_categories', 1800, function () {
-          return Category::withCount(['products' => function ($query) {
-              $query->where('active', true);
-          }])->with(['subcategories' => function ($query) {
-            $query->where('active', true);
-        }])
-          ->where('active', true)->take(4)->get();
-      });
-      //recent products
-      $recent = cache()->remember('home_recent_products', 1800, function () {
-        return Product::with(['category:id,name,slug'])
-            ->with(['media' => function ($query) {
-                $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                      ->whereIn('collection_name', ['main_image'])
-                      ->whereNotNull('disk')
-                      ->latest()
-                      ->take(1);
-            }])
-            ->where('active', true)
-            ->whereHas('media', function ($query) {
-                $query->whereIn('collection_name', ['main_image'])
+        // Load main categories with their own products only
+        $categories = cache()->remember('home_categories', 1800, function () {
+            return Category::where('active', true)
+                ->take(4)
+                ->get()
+                ->map(function ($category) {
+                    // Load products belonging directly to this category or its subcategories
+                    $products = Product::with(['media' => function ($q) {
+                            $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                              ->where('collection_name', 'main_image')
+                              ->whereNotNull('disk')
+                              ->limit(1);
+                        }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
+                        ->where('active', true)
+                        ->where(function ($q) use ($category) {
+                            $q->where('category_id', $category->id)
+                              ->orWhereHas('subcategory', function ($sub) use ($category) {
+                                  $sub->where('category_id', $category->id);
+                              });
+                        })
+                        ->latest('created_at')
+                        ->take(8)
+                        ->get();
+
+                    $category->setRelation('products', $products);
+
+                    return $category;
+                });
+        });
+
+        // Recent Products
+        $recent = cache()->remember('home_recent_products', 1800, function () {
+            return Product::with(['category:id,name,slug'])
+                ->with(['media' => function ($query) {
+                    $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                          ->where('collection_name', 'main_image')
+                          ->whereNotNull('disk')
+                          ->limit(1);
+                }])
+                ->where('active', true)
+                ->whereHas('media', function ($q) {
+                    $q->where('collection_name', 'main_image')
                       ->whereNotNull('disk');
-            })
-            ->orderBy('created_at', 'desc')
-            ->take(8)
-            ->get();
-    });
+                })
+                ->orderBy('created_at', 'desc')
+                ->take(8)
+                ->get();
+        });
 
-      $collections = cache()->remember('home_collections', 1800, function () {
-        return Collection::withCount(['products' => function ($query) {
-            $query->where('active', true);
-        }])->where('active', true)->take(4)->get();
-    });
+        // Collections
+        $collections = cache()->remember('home_collections', 1800, function () {
+            return Collection::withCount(['products' => function ($q) {
+                    $q->where('active', true);
+                }])
+                ->where('active', true)
+                ->take(4)
+                ->get();
+        });
 
-      // Single featured products query with optimization
-      $featured = cache()->remember('home_featured_products', 900, function () {
-          return Product::with(['category:id,name,slug', 'media' => function ($query) {
-              $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                    ->whereIn('collection_name', ['main_image'])
-                    ->whereNotNull('disk')
-                    ->limit(1);
-          }])
-          ->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured', 'created_at')
-          ->where('active', true)
-          ->where('featured', true)
-          ->orderBy('created_at', 'desc')
-          ->take(8)
-          ->get();
-      });
+        // Featured Products (ONLY featured + active)
+        $featured = cache()->remember('home_featured_products', 900, function () {
+            return Product::with(['category:id,name,slug', 'media' => function ($q) {
+                    $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                      ->where('collection_name', 'main_image')
+                      ->whereNotNull('disk')
+                      ->limit(1);
+                }])
+                ->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured', 'created_at')
+                ->where('active', true)
+                ->where('featured', true)
+                ->latest('created_at')
+                ->take(8)
+                ->get();
+        });
 
-      // Optimized category queries with product limits
-      $men = cache()->remember('home_men_category', 1800, function () {
-        $category = Category::where('name', 'Men')->first();
+        return view('home', compact('title', 'categories', 'recent', 'collections', 'featured'));
+    }
 
-        if (! $category) {
-            return null;
-        }
-
-        $products = Product::select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured')
-            ->where('active', true)
-            ->where('category_id', $category->id) // ✅ only products directly under "Men"
-            ->with(['media' => function ($q) {
-                $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                  ->whereIn('collection_name', ['main_image','product_images'])
-                  ->whereNotNull('disk')
-                  ->limit(1);
-            }])
-            ->take(8)
-            ->get();
-
-        $category->setRelation('products', $products);
-
-        return $category;
-    });
-
-      return view('home', compact('men',  'featured', 'categories','collections','recent'));
-   }
 
    public function thankyou()
    {
