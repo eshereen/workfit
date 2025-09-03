@@ -14,7 +14,7 @@ class Category extends Model implements HasMedia
 {
     /** @use HasFactory<CategoryFactory> */
     use HasFactory,Sluggable, InteractsWithMedia;
-    protected $fillable = ['name', 'slug', 'description','parent_id', 'active'];
+    protected $fillable = ['name', 'slug', 'description','parent_id', 'active', 'featured'];
 
 
     public function subcategories()

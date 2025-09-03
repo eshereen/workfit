@@ -14,7 +14,7 @@ class Subcategory extends Model implements HasMedia
 {
     /** @use HasFactory<SubcategoryFactory> */
     use HasFactory, Sluggable,InteractsWithMedia;
-    protected $fillable = ['name', 'slug', 'description','category_id', 'active'];
+    protected $fillable = ['name', 'slug', 'description','category_id', 'active', 'featured'];
 
      //register media collections
    // Register media collections
@@ -25,10 +25,7 @@ public function registerMediaCollections(?Media $media = null): void
         ->singleFile()
         ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
         ->registerMediaConversions(function (Media $media) {
-            
-            // Always keep original (JPG/PNG/etc.)
-            // Convert optimized versions:
-            
+
             // WebP versions
             $this->addMediaConversion('thumb_webp')
                 ->format('webp')
