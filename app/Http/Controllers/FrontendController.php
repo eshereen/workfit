@@ -42,7 +42,7 @@ class FrontendController extends Controller
             ->take(8)
             ->get();
     });
-   
+
       $collections = cache()->remember('home_collections', 1800, function () {
         return Collection::withCount(['products' => function ($query) {
             $query->where('active', true);
@@ -67,18 +67,29 @@ class FrontendController extends Controller
 
       // Optimized category queries with product limits
       $men = cache()->remember('home_men_category', 1800, function () {
-          return Category::with(['products' => function ($query) {
-              $query->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured')
-                    ->where('active', true)
-                    ->with(['media' => function ($q) {
-                        $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                          ->whereIn('collection_name', ['main_image','product_images'])
-                          ->whereNotNull('disk')
-                          ->limit(1);
-                    }])
-                    ->take(8);
-          }])->where('name', 'Men')->first();
-      });
+        $category = Category::where('name', 'Men')->first();
+
+        if (! $category) {
+            return null;
+        }
+
+        $products = Product::select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured')
+            ->where('active', true)
+            ->where('category_id', $category->id) // ✅ only products directly under "Men"
+            ->with(['media' => function ($q) {
+                $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                  ->whereIn('collection_name', ['main_image','product_images'])
+                  ->whereNotNull('disk')
+                  ->limit(1);
+            }])
+            ->take(8)
+            ->get();
+
+        $category->setRelation('products', $products);
+
+        return $category;
+    });
+
       return view('home', compact('men',  'featured', 'categories','collections','recent'));
    }
 

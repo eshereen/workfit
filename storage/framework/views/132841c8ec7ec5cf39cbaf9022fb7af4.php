@@ -41,43 +41,49 @@
 
        <!-- Main image with zoom -->
        <div class="mb-4 relative overflow-hidden rounded-lg shadow-md"
-            x-data="{
-               zoom: false,
-               zoomX: 0,
-               zoomY: 0,
-               zoomW: 0,
-               zoomH: 0
-            }"
-            @mousemove="zoom = true;
-                        zoomX = $event.offsetX;
-                        zoomY = $event.offsetY;
-                        zoomW = $event.target.clientWidth;
-                        zoomH = $event.target.clientHeight"
-            @mouseleave="zoom = false">
+       x-data="{
+          zoom: false,
+          zoomX: 0,
+          zoomY: 0,
+          zoomW: 0,
+          zoomH: 0
+       }"
+       @mousemove="zoom = true;
+                   zoomX = $event.offsetX;
+                   zoomY = $event.offsetY;
+                   zoomW = $event.target.clientWidth;
+                   zoomH = $event.target.clientHeight"
+       @mouseleave="zoom = false">
 
-           <picture class="w-full h-auto cursor-zoom-in select-none">
-               <source :srcset="currentImage.replace('webp','avif')" type="image/avif">
-               <source :srcset="currentImage" type="image/webp">
-               <img :src="currentImage"
-                    alt="<?php echo e($product->name); ?>"
-                    class="w-full h-auto"
-                    width="800"
-                    height="800"
-                    decoding="async"
-                    fetchpriority="high">
-           </picture>
+      <!-- Base product image (always visible) -->
+      <picture class="w-full h-auto cursor-zoom-in select-none block">
+        <source srcset="<?php echo e($product->getFirstMediaUrl('main_image', 'large_avif')); ?>" type="image/avif">
+        <source srcset="<?php echo e($product->getFirstMediaUrl('main_image', 'large_webp')); ?>" type="image/webp">
+        <img src="<?php echo e($product->getFirstMediaUrl('main_image', 'large_webp')); ?>"
+             alt="<?php echo e($product->name); ?>"
+             class="w-full h-auto block"
+             width="800"
+             height="800"
+             decoding="async"
+             fetchpriority="high">
+    </picture>
 
-           <!-- Zoom overlay -->
-           <div x-show="zoom"
-                class="absolute inset-0 pointer-events-none"
-                style="background-repeat: no-repeat;"
-                :style="`
-                   background-image: url(${currentImage});
-                   background-size: 200%; /* zoom level */
-                   background-position: ${(zoomX / zoomW) * 100}% ${(zoomY / zoomH) * 100}%;
-                `">
-           </div>
-       </div>
+
+      <!-- Zoom overlay (on top, transparent by default) -->
+      <div x-show="zoom"
+           class="absolute inset-0 pointer-events-none transition-opacity duration-200"
+           style="opacity:0;"
+           x-transition.opacity
+           :style="`
+              opacity:1;
+              background-image: url(${currentImage});
+              background-repeat: no-repeat;
+              background-size: 200%; /* zoom level */
+              background-position: ${(zoomX / zoomW) * 100}% ${(zoomY / zoomH) * 100}%;
+           `">
+      </div>
+  </div>
+
 
        <!-- Thumbnails -->
        <div class="grid grid-cols-4 gap-2">
