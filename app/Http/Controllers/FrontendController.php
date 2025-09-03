@@ -17,6 +17,7 @@ class FrontendController extends Controller
         // Load main categories with their own products only
         $categories = cache()->remember('home_categories', 1800, function () {
             return Category::where('categories.active', true)
+                ->orderBy('name', 'asc') // Order by name for consistency
                 ->take(4)
                 ->with(['products' => function ($query) {
                     $query->with(['media' => function ($q) {
@@ -26,7 +27,7 @@ class FrontendController extends Controller
                               ->limit(1);
                         }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
                         ->where('products.active', true)
-                        ->latest('created_at')
+
                         ->take(8);
                 }])
                 ->get();
@@ -77,7 +78,7 @@ class FrontendController extends Controller
             ])
             ->where('products.active', true)
             ->where('products.featured', true)
-            ->latest('created_at')
+
             ->take(8)
             ->get();
         });
