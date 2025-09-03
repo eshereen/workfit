@@ -20,6 +20,12 @@ class SubcategoriesRelationManager extends RelationManager
 
     protected static ?string $relatedResource = SubcategoryResource::class;
 
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['category_id'] = $this->getOwnerRecord()->id;
+        return $data;
+    }
+
     public function table(Table $table): Table
     {
         return $table
@@ -39,5 +45,5 @@ class SubcategoriesRelationManager extends RelationManager
 
             ]),
         ]);
-}
+    }
 }
