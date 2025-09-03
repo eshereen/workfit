@@ -29,9 +29,11 @@ class FrontendController extends Controller
                         ->where('products.active', true)
                         ->where(function ($q) use ($category) {
                             $q->where('category_id', $category->id)
-                              ->orWhereHas('subcategory', function ($sub) use ($category) {
-                                  $sub->where('category_id', $category->id);
-                              });
+                            ->orWhereHas('subcategory', function ($sub) use ($category) {
+                                $sub->where('subcategories.category_id', $category->id)
+                                    ->where('subcategories.active', true);   // ✅ disambiguate
+                            });
+
                         })
                         ->latest('created_at')
                         ->take(8)
