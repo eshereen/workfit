@@ -11,8 +11,6 @@
                 Your browser does not support the video tag.
             </video>
 
-            <!-- Mobile Video (hidden on desktop) -->
-        
         </div>
 
         <!-- Overlay -->
@@ -39,7 +37,7 @@
     <section class="px-4">
          <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
-        
+
         @livewire('product-index')
     </section>
 
@@ -49,13 +47,13 @@
              loading="lazy"
              alt="Lifestyle Banner"
              class="w-full h-full object-cover">
-
+             @if($collections->isNotEmpty())
         <!-- Overlay with only background dark -->
         <div class="absolute inset-0 bg-black/50 flex items-center justify-center z-0">
             <div class="relative z-40 text-center text-white px-4">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">SUMMER COLLECTION</h2>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 uppercase">{{ $collections->first()->name }} 'S COLLECTIONS</h2>
                 <p class="text-xl mb-6 max-w-2xl mx-auto">
-                    Stay cool and stylish with our latest summer essentials
+                    {{ $collections->first()->description }}
                 </p>
                 <a href="{{ route('collections.index') }}"
                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
@@ -63,26 +61,29 @@
                 </a>
             </div>
         </div>
+        @endif
     </section>
 
 
     <!-- Product Grid - Kids's Collection -->
     <section class="py-16 px-4">
+        @if($categories->isNotEmpty())
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $kids->name }}'S COLLECTION</h2>
+            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $categories->first()->name }}'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $kids->description }}</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $categories->first()->description }}</p>
 
-           @livewire('product-index',['products'=>$kids->products->take(8)])
+           @livewire('product-index',['products'=>$categories->first()->products->take(8)])
 
 
 
             <div class="text-center mt-12 animate-on-scroll">
-                <button class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors">
-                    VIEW ALL KID'S
-                </button>
+                <a href="{{ route('categories.index', $categories->first()->slug) }}" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors">
+                    VIEW ALL {{ $categories->first()->name }}'S
+                </a>
             </div>
         </div>
+        @endif
     </section>
 
     <!-- Three Image Block Section -->
@@ -140,21 +141,26 @@
     <!-- Product Grid - Men's Collection -->
 
      <section class="py-16 px-4">
+        @if($categories->isNotEmpty())
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $men->name }}'S COLLECTION</h2>
+            @if($categories->count() > 1)
+            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $categories->get(1)->name }}'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $men->description }}</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $categories->get(1)->description }}</p>
 
-           @livewire('product-index',['products'=>$men->products->take(8)])
+
+           @livewire('product-index',['products'=>$categories->get(1)->products->take(8)])
 
 
 
             <div class="text-center mt-12 animate-on-scroll">
-                <button class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
-                    VIEW ALL {{ $men->name }}'S
-                </button>
+                <a href="{{ route('categories.index', $categories->get(1)->slug) }}" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
+                    VIEW ALL {{ $categories->get(1)->name }}'S
+                </a>
             </div>
+            @endif
         </div>
+        @endif
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
@@ -169,21 +175,23 @@
             <div class="text-center text-white px-4">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">NEW ARRIVALS</h2>
                 <p class="text-xl mb-6 max-w-2xl mx-auto">Be the first to shop our latest collection</p>
-                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
+                <a href="{{ route('collections.index') }}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
                     SHOP NOW
-                </button>
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Featured Products -->
     <section class="py-16 px-4">
+        @if($featured->isNotEmpty())
         <div class="container mx-auto">
             <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">Featured COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $men->description }}</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Our featured collection</p>
            @livewire('product-index',['products'=>$featured])
         </div>
+        @endif
     </section>
 
 @endsection

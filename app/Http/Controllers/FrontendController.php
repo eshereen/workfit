@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Collection;
 use App\Models\Subcategory;
 use Illuminate\Http\Request;
 
@@ -17,8 +18,16 @@ class FrontendController extends Controller
       $categories = cache()->remember('home_categories', 1800, function () {
           return Category::withCount(['products' => function ($query) {
               $query->where('active', true);
-          }])->where('active', true)->take(4)->get();
+          }])->with(['subcategories' => function ($query) {
+            $query->where('active', true);
+        }])
+          ->where('active', true)->take(4)->get();
       });
+      $collections = cache()->remember('home_collections', 1800, function () {
+        return Collection::withCount(['products' => function ($query) {
+            $query->where('active', true);
+        }])->where('active', true)->take(4)->get();
+    });
 
       // Single featured products query with optimization
       $featured = cache()->remember('home_featured_products', 900, function () {
@@ -50,41 +59,8 @@ class FrontendController extends Controller
                     ->take(8);
           }])->where('name', 'Men')->first();
       });
-
-      $women = cache()->remember('home_women_category', 1800, function () {
-          return Category::with(['products' => function ($query) {
-              $query->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured')
-                    ->where('active', true)
-                    ->with(['media' => function ($q) {
-                        $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                          ->whereIn('collection_name', ['main_image'])
-                          ->whereNotNull('disk')
-                          ->limit(1);
-                    }])
-                    ->take(8);
-          }])->where('name', 'Women')->first();
-      });
-
-      $kids = cache()->remember('home_kids_category', 1800, function () {
-          return Category::with(['products' => function ($query) {
-              $query->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured')
-                    ->where('active', true)
-                    ->with(['media' => function ($q) {
-                        $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                          ->whereIn('collection_name', ['main_image'])
-                          ->whereNotNull('disk')
-                          ->limit(1);
-                    }])
-                    ->take(8);
-          }])->where('name', 'Kids')->first();
-      });
-
-      return view('home', compact('men', 'women', 'kids', 'featured', 'categories'));
-
-
+      return view('home', compact('men',  'featured', 'categories','collections'));
    }
-
-
 
    public function thankyou()
    {

@@ -9,8 +9,6 @@
                 Your browser does not support the video tag.
             </video>
 
-            <!-- Mobile Video (hidden on desktop) -->
-        
         </div>
 
         <!-- Overlay -->
@@ -37,7 +35,7 @@
     <section class="px-4">
          <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
-        
+
         <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
@@ -62,13 +60,14 @@ if (isset($__slots)) unset($__slots);
              loading="lazy"
              alt="Lifestyle Banner"
              class="w-full h-full object-cover">
-
+             <?php if($collections->isNotEmpty()): ?>
         <!-- Overlay with only background dark -->
         <div class="absolute inset-0 bg-black/50 flex items-center justify-center z-0">
             <div class="relative z-40 text-center text-white px-4">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">SUMMER COLLECTION</h2>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 uppercase"><?php echo e($collections->first()->name); ?> 'S COLLECTIONS</h2>
                 <p class="text-xl mb-6 max-w-2xl mx-auto">
-                    Stay cool and stylish with our latest summer essentials
+                    <?php echo e($collections->first()->description); ?>
+
                 </p>
                 <a href="<?php echo e(route('collections.index')); ?>"
                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
@@ -76,21 +75,23 @@ if (isset($__slots)) unset($__slots);
                 </a>
             </div>
         </div>
+        <?php endif; ?>
     </section>
 
 
     <!-- Product Grid - Kids's Collection -->
     <section class="py-16 px-4">
+        <?php if($categories->isNotEmpty()): ?>
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase"><?php echo e($kids->name); ?>'S COLLECTION</h2>
+            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase"><?php echo e($categories->first()->name); ?>'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($kids->description); ?></p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($categories->first()->description); ?></p>
 
            <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
-[$__name, $__params] = $__split('product-index',['products'=>$kids->products->take(8)]);
+[$__name, $__params] = $__split('product-index',['products'=>$categories->first()->products->take(8)]);
 
 $__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-1', $__slots ?? [], get_defined_vars());
 
@@ -106,11 +107,12 @@ if (isset($__slots)) unset($__slots);
 
 
             <div class="text-center mt-12 animate-on-scroll">
-                <button class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors">
-                    VIEW ALL KID'S
-                </button>
+                <a href="<?php echo e(route('categories.index', $categories->first()->slug)); ?>" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors">
+                    VIEW ALL <?php echo e($categories->first()->name); ?>'S
+                </a>
             </div>
         </div>
+        <?php endif; ?>
     </section>
 
     <!-- Three Image Block Section -->
@@ -168,16 +170,19 @@ if (isset($__slots)) unset($__slots);
     <!-- Product Grid - Men's Collection -->
 
      <section class="py-16 px-4">
+        <?php if($categories->isNotEmpty()): ?>
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase"><?php echo e($men->name); ?>'S COLLECTION</h2>
+            <?php if($categories->count() > 1): ?>
+            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase"><?php echo e($categories->get(1)->name); ?>'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($men->description); ?></p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($categories->get(1)->description); ?></p>
+
 
            <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
-[$__name, $__params] = $__split('product-index',['products'=>$men->products->take(8)]);
+[$__name, $__params] = $__split('product-index',['products'=>$categories->get(1)->products->take(8)]);
 
 $__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-2', $__slots ?? [], get_defined_vars());
 
@@ -193,11 +198,13 @@ if (isset($__slots)) unset($__slots);
 
 
             <div class="text-center mt-12 animate-on-scroll">
-                <button class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
-                    VIEW ALL <?php echo e($men->name); ?>'S
-                </button>
+                <a href="<?php echo e(route('categories.index', $categories->get(1)->slug)); ?>" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
+                    VIEW ALL <?php echo e($categories->get(1)->name); ?>'S
+                </a>
             </div>
+            <?php endif; ?>
         </div>
+        <?php endif; ?>
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
@@ -212,19 +219,20 @@ if (isset($__slots)) unset($__slots);
             <div class="text-center text-white px-4">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">NEW ARRIVALS</h2>
                 <p class="text-xl mb-6 max-w-2xl mx-auto">Be the first to shop our latest collection</p>
-                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
+                <a href="<?php echo e(route('collections.index')); ?>" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
                     SHOP NOW
-                </button>
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Featured Products -->
     <section class="py-16 px-4">
+        <?php if($featured->isNotEmpty()): ?>
         <div class="container mx-auto">
             <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">Featured COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($men->description); ?></p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Our featured collection</p>
            <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
@@ -242,6 +250,7 @@ unset($__split);
 if (isset($__slots)) unset($__slots);
 ?>
         </div>
+        <?php endif; ?>
     </section>
 
 <?php $__env->stopSection(); ?>
