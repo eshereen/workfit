@@ -220,7 +220,7 @@ class ProductIndex extends Component
     {
         // Cache product with variants for better performance
         $this->selectedProduct = cache()->remember(
-            'product_with_variants_' . $productId,
+            'product_with_variants_' . $productId . '_' . $this->currencyCode,
             300, // 5 minutes cache
             function () use ($productId) {
                 return Product::with(['variantsOptimized'])
