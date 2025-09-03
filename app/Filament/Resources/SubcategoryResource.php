@@ -18,6 +18,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SubcategoryResource\Pages;
@@ -39,26 +40,29 @@ class SubcategoryResource extends Resource
     {
         return $schema
             ->components([
-                SpatieMediaLibraryFileUpload::make('main_image')
-                ->collection('main_image')
-                ->imageEditor()
-                ->disk('public'),
+                Section::make('Subcategory Details')
+                ->schema([
+
                 Select::make('category.name')
                     ->required()
                    ->relationship('category', 'name'),
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255),
+                    SpatieMediaLibraryFileUpload::make('main_image')
+                    ->collection('main_image')
+                    ->imageEditor()
+                    ->disk('public'),
 
-                Textarea::make('description')
-                    ->columnSpanFull(),
+                Textarea::make('description'),
+                ])->columns(2)->columnSpanFull(),
+                Section::make('Subcategory Status')
+                ->schema([
                 Toggle::make('featured')
                     ->required(),
                 Toggle::make('active')
                     ->required(),
+            ])->columns(2)->columnSpanFull(),
             ]);
     }
 
@@ -73,8 +77,7 @@ class SubcategoryResource extends Resource
                     ->sortable(),
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('slug')
-                    ->searchable(),
+
                 IconColumn::make('featured')
                     ->boolean(),
                 IconColumn::make('active')
