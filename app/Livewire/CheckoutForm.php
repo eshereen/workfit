@@ -49,19 +49,10 @@ class CheckoutForm extends Component
 
     public function mount()
     {
-        // Basic debug to see if component is even loading
-        error_log('CheckoutForm: Component mount() called');
-
-        Log::info('CheckoutForm: Component mounting');
         $this->loadInitialData();
 
-        Log::info('CheckoutForm: Mount completed', [
-            'selected_payment_method' => $this->selectedPaymentMethod,
-            'paypal_payment_type' => $this->paypalPaymentType,
-            'current_currency' => $this->currentCurrency
-        ]);
-
-        Log::info('CheckoutForm: Component mounted successfully');
+        // Check stock availability and show warnings
+        $this->checkStockAvailability();
     }
 
     protected function loadInitialData()
@@ -88,18 +79,7 @@ class CheckoutForm extends Component
             $currencyInfo = $currencyService->getCurrentCurrencyInfo();
             $this->currentCurrency = $currencyInfo['currency_code'];
             $this->currentSymbol = $currencyInfo['currency_symbol'];
-
-            Log::info('CheckoutForm: Using existing manual currency', [
-                'currency' => $this->currentCurrency,
-                'symbol' => $this->currentSymbol
-            ]);
         }
-
-        Log::info('CheckoutForm: Initial data loaded', [
-            'country_code' => $countryCode,
-            'payment_methods' => $this->paymentMethods,
-            'currency' => $this->currentCurrency
-        ]);
     }
 
     public function updatedBillingCountry($countryId)
@@ -134,13 +114,6 @@ class CheckoutForm extends Component
 
         $country = Country::find($countryId);
         if (!$country) return;
-
-        Log::info('CheckoutForm: Country changed', [
-            'source' => $source,
-            'country_id' => $countryId,
-            'country_code' => $country->code,
-            'country_name' => $country->name
-        ]);
 
         // Update session
         session(['checkout_country' => $country->code]);
@@ -300,18 +273,7 @@ class CheckoutForm extends Component
                 $this->paypalPaymentType = 'credit_card';
             }
 
-            Log::info('CheckoutForm: Payment methods updated', [
-                'country_code' => $countryCode,
-                'methods' => $this->paymentMethods,
-                'credit_card_available' => $this->creditCardAvailable,
-                'selected_method' => $this->selectedPaymentMethod
-            ]);
-
         } catch (Exception $e) {
-            Log::error('CheckoutForm: Error updating payment methods', [
-                'country_code' => $countryCode,
-                'error' => $e->getMessage()
-            ]);
 
             // Fallback to default methods
             $this->paymentMethods = ['paypal'];
@@ -329,11 +291,6 @@ class CheckoutForm extends Component
             // This allows country changes to override manual selections
             $country = Country::where('code', $countryCode)->first();
             if ($country) {
-                Log::info('CheckoutForm: Updating currency based on country change', [
-                    'country_code' => $countryCode,
-                    'country_name' => $country->name
-                ]);
-
                 $currencyService->setPreferredCountry($country->id);
             }
 
@@ -342,17 +299,7 @@ class CheckoutForm extends Component
             $this->currentCurrency = $currencyInfo['currency_code'];
             $this->currentSymbol = $currencyInfo['currency_symbol'];
 
-            Log::info('CheckoutForm: Currency updated', [
-                'country_code' => $countryCode,
-                'currency_code' => $this->currentCurrency,
-                'currency_symbol' => $this->currentSymbol
-            ]);
-
         } catch (Exception $e) {
-            Log::error('CheckoutForm: Error updating currency', [
-                'country_code' => $countryCode,
-                'error' => $e->getMessage()
-            ]);
 
             // Keep current currency on error
         }
@@ -418,20 +365,7 @@ class CheckoutForm extends Component
     #[On('payment-method-selected')]
     public function handlePaymentMethodSelected($method)
     {
-        Log::info('CheckoutForm: Received payment-method-selected event', [
-            'method' => $method,
-            'previous_selection' => $this->selectedPaymentMethod,
-            'component_id' => $this->getId()
-        ]);
-
         $this->selectedPaymentMethod = $method;
-
-        Log::info('CheckoutForm: Payment method updated', [
-            'new_method' => $this->selectedPaymentMethod,
-            'is_cod' => $this->selectedPaymentMethod === 'cash_on_delivery',
-            'is_paymob' => $this->selectedPaymentMethod === 'paymob',
-            'is_paypal' => $this->selectedPaymentMethod === 'paypal'
-        ]);
     }
 
     // Listen for PayPal payment type change
@@ -440,14 +374,12 @@ class CheckoutForm extends Component
     {
         // Always set to credit card for simplified flow
         $this->paypalPaymentType = 'credit_card';
-        Log::info('CheckoutForm: PayPal payment type set to credit card (simplified flow)', ['requested_type' => $type, 'actual_type' => $this->paypalPaymentType]);
     }
 
     // Listen for loyalty points events
     #[On('country-changed')]
     public function handleCountryChanged($countryCode)
     {
-        Log::info('CheckoutForm: Received country-changed event', ['country_code' => $countryCode]);
         $this->updatePaymentMethods($countryCode);
         $this->updateCurrencyInfo($countryCode);
     }
@@ -455,8 +387,6 @@ class CheckoutForm extends Component
         #[On('loyaltyPointsApplied')]
     public function handleLoyaltyPointsApplied($data)
     {
-        Log::info('CheckoutForm: Received loyaltyPointsApplied event', $data);
-
         $this->loyaltyPointsApplied = $data['points'];
         // Convert loyalty discount from USD to local currency using service container
         $loyaltyDiscountUSD = $data['value'];
@@ -467,8 +397,6 @@ class CheckoutForm extends Component
     #[On('loyaltyPointsRemoved')]
     public function handleLoyaltyPointsRemoved()
     {
-        Log::info('CheckoutForm: Received loyaltyPointsRemoved event');
-
         $this->loyaltyPointsApplied = 0;
         $this->loyaltyDiscount = 0;
     }
@@ -476,8 +404,6 @@ class CheckoutForm extends Component
     #[On('loyaltyPointsUpdated')]
     public function handleLoyaltyPointsUpdated($data)
     {
-        Log::info('CheckoutForm: Received loyaltyPointsUpdated event', $data);
-
         // This is just a preview update, don't change the actual applied points
         // The discount will be shown in the order summary but not stored until applied
     }
@@ -491,30 +417,12 @@ class CheckoutForm extends Component
     // Method to handle form submission
     public function submitForm()
     {
-        Log::info('CheckoutForm: submitForm method called');
-
         try {
             // Validate the form
-            Log::info('CheckoutForm: Starting form validation');
             $this->validate();
-            Log::info('CheckoutForm: Form validation passed');
 
             // Validate stock availability before proceeding
             $this->validateStockAvailability();
-
-            // Debug: Log current form values before session storage
-            Log::info('CheckoutForm: Current form values before session storage', [
-                'firstName' => $this->firstName,
-                'lastName' => $this->lastName,
-                'email' => $this->email,
-                'phoneNumber' => $this->phoneNumber,
-                'billingCountry' => $this->billingCountry,
-                'billingState' => $this->billingState,
-                'billingCity' => $this->billingCity,
-                'billingAddress' => $this->billingAddress,
-                'selectedPaymentMethod' => $this->selectedPaymentMethod,
-                'useBillingForShipping' => $this->useBillingForShipping,
-            ]);
 
             // Store form data in session
             $sessionData = [
@@ -540,58 +448,6 @@ class CheckoutForm extends Component
                 'loyalty_points_applied' => $this->loyaltyPointsApplied,
             ];
 
-            Log::info('CheckoutForm: Form data being stored in session', [
-                'payment_method' => $this->selectedPaymentMethod,
-                'is_cod' => $this->selectedPaymentMethod === 'cash_on_delivery',
-                'is_paymob' => $this->selectedPaymentMethod === 'paymob',
-                'is_paypal' => $this->selectedPaymentMethod === 'paypal',
-                'session_data' => $sessionData
-            ]);
-
-            Log::info('CheckoutForm: Storing session data', ['session_data' => $sessionData]);
-            session(['checkout_data' => $sessionData]);
-            Log::info('CheckoutForm: Session data stored successfully');
-
-            // Debug: Log the form data being stored
-            Log::info('CheckoutForm: Storing form data in session', [
-                'first_name' => $this->firstName,
-                'last_name' => $this->lastName,
-                'email' => $this->email,
-                'payment_method' => $this->selectedPaymentMethod,
-                'billing_country_id' => $this->billingCountry,
-                'use_billing_for_shipping' => $this->useBillingForShipping,
-                'all_form_data' => [ // Added for debugging
-                    'firstName' => $this->firstName,
-                    'lastName' => $this->lastName,
-                    'email' => $this->email,
-                    'phoneNumber' => $this->phoneNumber,
-                    'billingCountry' => $this->billingCountry,
-                    'billingState' => $this->billingState,
-                    'billingCity' => $this->billingCity,
-                    'billingAddress' => $this->billingAddress,
-                    'billingBuildingNumber' => $this->billingBuildingNumber,
-                    'shippingCountry' => $this->shippingCountry,
-                    'shippingState' => $this->shippingState,
-                    'shippingCity' => $this->shippingCity,
-                    'shippingAddress' => $this->shippingAddress,
-                    'shippingBuildingNumber' => $this->shippingBuildingNumber,
-                    'useBillingForShipping' => $this->useBillingForShipping,
-                    'selectedPaymentMethod' => $this->selectedPaymentMethod,
-                    'paypalPaymentType' => $this->paypalPaymentType,
-                    'currentCurrency' => $this->currentCurrency,
-                ]
-            ]);
-
-            // Debug: Log the form data being stored
-            Log::info('CheckoutForm: Storing form data in session', [
-                'first_name' => $this->firstName,
-                'last_name' => $this->lastName,
-                'email' => $this->email,
-                'payment_method' => $this->selectedPaymentMethod,
-                'billing_country_id' => $this->billingCountry,
-                'use_billing_for_shipping' => $this->useBillingForShipping
-            ]);
-
             // Clear any previous session data and set new data
             session(['checkout_data' => $sessionData]);
 
@@ -611,12 +467,93 @@ class CheckoutForm extends Component
                 form.submit();
             ');
 
-            Log::info('CheckoutForm: Triggering form submission via JavaScript');
-
         } catch (Exception $e) {
-            // Log the error
-            Log::error('CheckoutForm submission error: ' . $e->getMessage());
-            session()->flash('error', 'An error occurred while submitting the form. Please try again.');
+
+            // Check if it's a stock-related error
+            $errorMessage = $e->getMessage();
+            if (strpos($errorMessage, 'out of stock') !== false || strpos($errorMessage, 'Only') !== false) {
+                // Show specific stock error with action buttons
+                $this->dispatch('showStockError', [
+                    'message' => $errorMessage,
+                    'type' => 'error',
+                    'showCartButton' => true
+                ]);
+            } else {
+                // Show generic error
+                $this->dispatch('showNotification', [
+                    'message' => 'An error occurred while submitting the form. Please try again.',
+                    'type' => 'error'
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Check stock availability and show warnings to users
+     */
+    protected function checkStockAvailability()
+    {
+        $cart = app(\App\Services\CartService::class)->getCart();
+        $stockIssues = [];
+
+        foreach ($cart as $item) {
+            $productId = null;
+            if (strpos($item['id'], '-') !== false) {
+                $parts = explode('-', $item['id']);
+                $productId = (int) $parts[0];
+            } else {
+                $productId = (int) $item['id'];
+            }
+
+            $variantId = $item['attributes']['variant_id'] ?? null;
+            $requestedQuantity = $item['quantity'];
+
+            if ($variantId) {
+                // Check variant stock
+                $variant = \App\Models\ProductVariant::find($variantId);
+                if (!$variant) {
+                    $stockIssues[] = "Product variant not found: {$variantId}";
+                    continue;
+                }
+
+                if ($variant->stock < $requestedQuantity) {
+                    $product = \App\Models\Product::find($productId);
+                    $availableStock = $variant->stock;
+
+                    if ($availableStock <= 0) {
+                        $stockIssues[] = "❌ Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is out of stock.";
+                    } else {
+                        $stockIssues[] = "⚠️ Only {$availableStock} items available for '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}).";
+                    }
+                }
+            } else {
+                // Check product stock for simple products
+                $product = \App\Models\Product::find($productId);
+                if (!$product) {
+                    $stockIssues[] = "Product not found: {$productId}";
+                    continue;
+                }
+
+                if ($product->quantity < $requestedQuantity) {
+                    $availableStock = $product->quantity;
+
+                    if ($availableStock <= 0) {
+                        $stockIssues[] = "❌ Product '{$product->name}' is out of stock.";
+                    } else {
+                        $stockIssues[] = "⚠️ Only {$availableStock} items available for '{$product->name}'.";
+                    }
+                }
+            }
+        }
+
+        // Show stock warnings if any issues found
+        if (!empty($stockIssues)) {
+            $message = "Stock Issues Found:\n" . implode("\n", $stockIssues);
+            $this->dispatch('showStockError', [
+                'message' => $message,
+                'type' => 'warning',
+                'showCartButton' => true
+            ]);
         }
     }
 
@@ -626,7 +563,7 @@ class CheckoutForm extends Component
     protected function validateStockAvailability()
     {
         $cart = app(\App\Services\CartService::class)->getCart();
-        
+
         foreach ($cart as $item) {
             $productId = null;
             if (strpos($item['id'], '-') !== false) {
@@ -646,14 +583,14 @@ class CheckoutForm extends Component
                     throw new \Exception("Product variant not found: {$variantId}");
                 }
 
-                if ($variant->stock < $requestedQuantity) {
+                                if ($variant->stock < $requestedQuantity) {
                     $product = \App\Models\Product::find($productId);
                     $availableStock = $variant->stock;
-                    
-                    if ($availableStock == 0) {
-                        throw new \Exception("Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is out of stock.");
+
+                    if ($availableStock <= 0) {
+                        throw new \Exception("❌ Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is currently out of stock. Please remove it from your cart or try a different variant.");
                     } else {
-                        throw new \Exception("Only {$availableStock} items available for '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}). Please select fewer quantity.");
+                        throw new \Exception("⚠️ Only {$availableStock} items available for '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}). Please reduce the quantity in your cart.");
                     }
                 }
             } else {
@@ -663,13 +600,13 @@ class CheckoutForm extends Component
                     throw new \Exception("Product not found: {$productId}");
                 }
 
-                if ($product->quantity < $requestedQuantity) {
+                                if ($product->quantity < $requestedQuantity) {
                     $availableStock = $product->quantity;
-                    
-                    if ($availableStock == 0) {
-                        throw new \Exception("Product '{$product->name}' is out of stock.");
+
+                    if ($availableStock <= 0) {
+                        throw new \Exception("❌ Product '{$product->name}' is currently out of stock. Please remove it from your cart.");
                     } else {
-                        throw new \Exception("Only {$availableStock} items available for '{$product->name}'. Please select fewer quantity.");
+                        throw new \Exception("⚠️ Only {$availableStock} items available for '{$product->name}'. Please reduce the quantity in your cart.");
                     }
                 }
             }

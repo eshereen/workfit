@@ -139,7 +139,7 @@
             // Product image hover effect (JavaScript backup)
             function initializeHoverEffect() {
                 const containers = document.querySelectorAll('.product-image-container');
-                
+
                 containers.forEach((container) => {
                     const mainImage = container.querySelector('.main-image');
                     const galleryImage = container.querySelector('.gallery-image');
@@ -257,6 +257,96 @@
                 }
 
                 showNotification(message, type);
+            });
+
+            // Handle stock error notifications with action buttons
+            Livewire.on('showStockError', (data) => {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                const notification = document.createElement('div');
+                notification.className = 'notification mb-4 p-4 rounded-lg shadow-lg transform translate-x-full transition-all duration-300 bg-red-500';
+
+                notification.style.zIndex = '9999';
+                notification.style.minWidth = '400px';
+                notification.style.border = '3px solid #DC2626';
+                notification.style.backgroundColor = '#EF4444';
+                notification.style.padding = '20px';
+                notification.style.marginBottom = '16px';
+
+                // Create message container
+                const messageDiv = document.createElement('div');
+                messageDiv.style.color = 'white';
+                messageDiv.style.fontSize = '16px';
+                messageDiv.style.fontWeight = 'bold';
+                messageDiv.style.marginBottom = '15px';
+                messageDiv.style.textAlign = 'center';
+                messageDiv.textContent = data.message || 'Stock error occurred';
+
+                // Create action buttons container
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.style.display = 'flex';
+                buttonsDiv.style.justifyContent = 'center';
+                buttonsDiv.style.gap = '10px';
+
+                // View Cart button
+                const cartButton = document.createElement('button');
+                cartButton.textContent = 'View Cart';
+                cartButton.className = 'px-4 py-2 bg-white text-red-600 font-bold rounded hover:bg-gray-100 transition-colors';
+                cartButton.onclick = () => {
+                    window.location.href = '/cart';
+                };
+
+                // Continue Shopping button
+                const shopButton = document.createElement('button');
+                shopButton.textContent = 'Continue Shopping';
+                shopButton.className = 'px-4 py-2 bg-white text-red-600 font-bold rounded hover:bg-gray-100 transition-colors';
+                shopButton.onclick = () => {
+                    window.location.href = '/';
+                };
+
+                // Close button
+                const closeButton = document.createElement('button');
+                closeButton.textContent = '✕';
+                closeButton.className = 'px-3 py-2 bg-white text-red-600 font-bold rounded hover:bg-gray-100 transition-colors';
+                closeButton.style.position = 'absolute';
+                closeButton.style.top = '10px';
+                closeButton.style.right = '10px';
+                closeButton.onclick = () => {
+                    notification.style.transform = 'translateX(100%)';
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        if (container.contains(notification)) {
+                            container.removeChild(notification);
+                        }
+                    }, 300);
+                };
+
+                notification.style.position = 'relative';
+                buttonsDiv.appendChild(cartButton);
+                buttonsDiv.appendChild(shopButton);
+                notification.appendChild(messageDiv);
+                notification.appendChild(buttonsDiv);
+                notification.appendChild(closeButton);
+
+                container.appendChild(notification);
+
+                // Show notification
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+
+                // Auto-hide after 10 seconds (longer for stock errors)
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        if (container.contains(notification)) {
+                            container.removeChild(notification);
+                        }
+                    }, 300);
+                }, 10000);
             });
         });
     </script>
