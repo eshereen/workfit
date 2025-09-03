@@ -24,9 +24,9 @@ use App\Filament\Resources\SubcategoryResource\Pages;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use App\Filament\Resources\SubcategoryResource\RelationManagers;
-use App\Filament\Resources\SubcategoryResource\Pages\EditSubcategories;
-use App\Filament\Resources\SubcategoryResource\Pages\ViewSubcategories;
-use App\Filament\Resources\SubcategoryResource\Pages\CreateSubcategories;
+use App\Filament\Resources\SubcategoryResource\Pages\EditSubcategory;
+use App\Filament\Resources\SubcategoryResource\Pages\ViewSubcategory;
+use App\Filament\Resources\SubcategoryResource\Pages\CreateSubcategory;
 use App\Filament\Resources\SubcategoryResource\Pages\ListSubcategories;
 
 class SubcategoryResource extends Resource
@@ -117,9 +117,9 @@ class SubcategoryResource extends Resource
     {
         return [
             'index' => ListSubcategories::route('/'),
-            'create' => CreateSubcategories::route('/create'),
-            'view' => ViewSubcategories::route('/{record}'),
-            'edit' => EditSubcategories::route('/{record}/edit'),
+            'create' => CreateSubcategory::route('/create'),
+            'view' => ViewSubcategory::route('/{record}'),
+            'edit' => EditSubcategory::route('/{record}/edit'),
         ];
     }
 }
