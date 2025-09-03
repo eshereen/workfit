@@ -42,10 +42,9 @@ class SubcategoryResource extends Resource
             ->components([
                 Section::make('Subcategory Details')
                 ->schema([
-
-                Select::make('category.name')
-                    ->required()
-                   ->relationship('category', 'name'),
+                    Select::make('category_id')
+                    ->relationship('category', 'name')
+                    ->required(),
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -53,7 +52,6 @@ class SubcategoryResource extends Resource
                     ->collection('main_image')
                     ->imageEditor()
                     ->disk('public'),
-
                 Textarea::make('description'),
                 ])->columns(2)->columnSpanFull(),
                 Section::make('Subcategory Status')
