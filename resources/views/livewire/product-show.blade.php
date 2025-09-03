@@ -55,16 +55,17 @@
 
       <!-- Base product image (always visible) -->
       <picture class="w-full h-auto cursor-zoom-in select-none block">
-          <source :srcset="currentImage.replace('webp','avif')" type="image/avif">
-          <source :srcset="currentImage" type="image/webp">
-          <img :src="currentImage"
-               alt="{{ $product->name }}"
-               class="w-full h-auto block"
-               width="800"
-               height="800"
-               decoding="async"
-               fetchpriority="high">
-      </picture>
+        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
+        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
+        <img src="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}"
+             alt="{{ $product->name }}"
+             class="w-full h-auto block"
+             width="800"
+             height="800"
+             decoding="async"
+             fetchpriority="high">
+    </picture>
+
 
       <!-- Zoom overlay (on top, transparent by default) -->
       <div x-show="zoom"
