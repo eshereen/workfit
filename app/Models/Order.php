@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use App\Services\CountryCurrencyService;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -53,6 +54,7 @@ class Order extends Model
         'billing_building_number' => 'string',
         'shipping_building_number' => 'string',
         'use_billing_for_shipping' => 'boolean',
+        'payment_status' => PaymentStatus::class,
     ];
 
 
@@ -139,5 +141,56 @@ class Order extends Model
     public function coupon()
     {
         return $this->belongsTo(Coupon::class);
+    }
+
+    // Payment Status Helper Methods
+    public function isPaymentSuccessful(): bool
+    {
+        return $this->payment_status?->isSuccessful() ?? false;
+    }
+
+    public function isPaymentPending(): bool
+    {
+        return $this->payment_status?->isPending() ?? false;
+    }
+
+    public function isPaymentFailed(): bool
+    {
+        return $this->payment_status?->isFailed() ?? false;
+    }
+
+    public function getPaymentStatusLabel(): string
+    {
+        return $this->payment_status?->label() ?? 'Unknown';
+    }
+
+    public function getPaymentStatusColor(): string
+    {
+        return $this->payment_status?->color() ?? 'gray';
+    }
+
+    public function markAsProcessed(): void
+    {
+        $this->update(['payment_status' => PaymentStatus::PROCESSED]);
+    }
+
+    public function markAsConfirmed(): void
+    {
+        $this->update(['payment_status' => PaymentStatus::CONFIRMED]);
+    }
+
+    public function markAsCompleted(): void
+    {
+        $this->update(['payment_status' => PaymentStatus::COMPLETED]);
+    }
+
+    public function markAsFailed(): void
+    {
+        $this->update(['payment_status' => PaymentStatus::FAILED]);
+    }
+
+    public function markAsCancelled(): void
+    {
+        $this->update(['payment_status' => PaymentStatus::CANCELLED]);
     }
 }

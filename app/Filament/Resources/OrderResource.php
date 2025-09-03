@@ -28,6 +28,7 @@ use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
+use App\Enums\PaymentStatus;
 
 class OrderResource extends Resource
 {
@@ -118,7 +119,8 @@ class OrderResource extends Resource
                 TextInput::make('payment_method')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('payment_status')
+                Select::make('payment_status')
+                    ->options(PaymentStatus::class)
                     ->required(),
                 TextInput::make('status')
                     ->required(),
@@ -187,7 +189,23 @@ class OrderResource extends Resource
                     ->boolean(),
                 TextColumn::make('payment_method')
                     ->searchable(),
-                TextColumn::make('payment_status'),
+                TextColumn::make('payment_status')
+                    ->badge()
+                    ->color(fn (PaymentStatus $state): string => match ($state) {
+                        PaymentStatus::PENDING => 'warning',
+                        PaymentStatus::PROCESSING => 'info',
+                        PaymentStatus::PROCESSED => 'success',
+                        PaymentStatus::CONFIRMED => 'success',
+                        PaymentStatus::COMPLETED => 'success',
+                        PaymentStatus::FAILED => 'danger',
+                        PaymentStatus::CANCELLED => 'danger',
+                        PaymentStatus::REFUNDED => 'info',
+                        PaymentStatus::PARTIALLY_REFUNDED => 'warning',
+                        PaymentStatus::DECLINED => 'danger',
+                        PaymentStatus::EXPIRED => 'danger',
+                        PaymentStatus::VOIDED => 'danger',
+                    })
+                    ->formatStateUsing(fn (PaymentStatus $state): string => $state->label()),
                 TextColumn::make('status'),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -203,7 +221,9 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('payment_status')
+                    ->options(PaymentStatus::class)
+                    ->label('Payment Status'),
             ])
             ->recordActions([
                 ViewAction::make(),
