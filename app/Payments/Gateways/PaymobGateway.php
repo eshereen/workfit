@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Payments\Contracts\PaymentGateway;
-use App\Enums\PaymentStatus;
-use App\Enums\OrderStatus;
 
 class PaymobGateway implements PaymentGateway
 {
@@ -214,8 +212,8 @@ class PaymobGateway implements PaymentGateway
             $payment->update(['status' => $success ? 'succeeded' : 'failed']);
 
             $payment->order->update([
-                'payment_status' => $success ? PaymentStatus::PAID : PaymentStatus::FAILED,
-                'status' => $success ? OrderStatus::PROCESSING : OrderStatus::PENDING,
+                'payment_status' => $success ? 'paid' : 'failed',
+                'status' => $success ? 'processing' : 'pending',
             ]);
         });
     }

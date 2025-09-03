@@ -28,8 +28,6 @@ use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
-use App\Enums\PaymentStatus;
-use App\Enums\OrderStatus;
 
 class OrderResource extends Resource
 {
@@ -98,15 +96,16 @@ class OrderResource extends Resource
                     ->required()
                     ->maxLength(255),
                 TextInput::make('billing_building_number')
-
+                    ->required()
                     ->maxLength(255),
                 TextInput::make('shipping_address')
                     ->required()
                     ->maxLength(255),
                 TextInput::make('shipping_building_number')
-
+                    ->required()
                     ->maxLength(255),
-                Toggle::make('use_billing_for_shipping'),
+                Toggle::make('use_billing_for_shipping')
+                    ->required(),
                 Textarea::make('notes')
                     ->columnSpanFull(),
                 ])->columns(3)->columnSpanFull(),
@@ -119,11 +118,9 @@ class OrderResource extends Resource
                 TextInput::make('payment_method')
                     ->required()
                     ->maxLength(255),
-                Select::make('payment_status')
-                    ->options(PaymentStatus::class)
+                TextInput::make('payment_status')
                     ->required(),
-                Select::make('status')
-                    ->options(OrderStatus::class)
+                TextInput::make('status')
                     ->required(),
                 ])->columns(3)->columnSpanFull(),
             ]);
@@ -190,40 +187,8 @@ class OrderResource extends Resource
                     ->boolean(),
                 TextColumn::make('payment_method')
                     ->searchable(),
-                TextColumn::make('payment_status')
-                    ->badge()
-                    ->color(fn (PaymentStatus $state): string => match ($state) {
-                        PaymentStatus::PENDING => 'warning',
-                        PaymentStatus::PROCESSING => 'info',
-                        PaymentStatus::PAID => 'success',
-                        PaymentStatus::CONFIRMED => 'success',
-                        PaymentStatus::COMPLETED => 'success',
-                        PaymentStatus::FAILED => 'danger',
-                        PaymentStatus::CANCELLED => 'danger',
-                        PaymentStatus::REFUNDED => 'info',
-                        PaymentStatus::PARTIALLY_REFUNDED => 'warning',
-                        PaymentStatus::DECLINED => 'danger',
-                        PaymentStatus::EXPIRED => 'danger',
-                        PaymentStatus::VOIDED => 'danger',
-                    })
-                    ->formatStateUsing(fn (PaymentStatus $state): string => $state->label()),
-                TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (OrderStatus $state): string => match ($state) {
-                        OrderStatus::PENDING => 'warning',
-                        OrderStatus::CONFIRMED => 'info',
-                        OrderStatus::PROCESSING => 'info',
-                        OrderStatus::SHIPPED => 'primary',
-                        OrderStatus::DELIVERED => 'success',
-                        OrderStatus::CANCELLED => 'danger',
-                        OrderStatus::REFUNDED => 'info',
-                        OrderStatus::RETURNED => 'warning',
-                        OrderStatus::ON_HOLD => 'warning',
-                        OrderStatus::BACKORDERED => 'warning',
-                        OrderStatus::PARTIALLY_SHIPPED => 'primary',
-                        OrderStatus::COMPLETED => 'success',
-                    })
-                    ->formatStateUsing(fn (OrderStatus $state): string => $state->label()),
+                TextColumn::make('payment_status'),
+                TextColumn::make('status'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -238,9 +203,7 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('payment_status')
-                    ->options(PaymentStatus::class)
-                    ->label('Payment Status'),
+                //
             ])
             ->recordActions([
                 ViewAction::make(),

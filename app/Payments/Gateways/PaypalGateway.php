@@ -10,8 +10,6 @@ use App\Models\Payment;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
-use App\Enums\PaymentStatus;
-use App\Enums\OrderStatus;
 
 class PaypalGateway
 {
@@ -312,14 +310,14 @@ class PaypalGateway
                 // Update the associated order status
                 if ($payment->order) {
                     $payment->order->update([
-                        'status' => OrderStatus::PROCESSING,
-                        'payment_status' => PaymentStatus::PAID
+                        'status' => 'processing',
+                        'payment_status' => 'paid'
                     ]);
 
                     Log::info('PayPal gateway: Order status updated after successful capture', [
                         'order_id' => $payment->order->id,
-                        'new_status' => OrderStatus::PROCESSING->value,
-                        'payment_status' => PaymentStatus::PAID->value
+                        'new_status' => 'processing',
+                        'payment_status' => 'paid'
                     ]);
                 }
 

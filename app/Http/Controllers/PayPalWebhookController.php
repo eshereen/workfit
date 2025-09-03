@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Payment;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
-use App\Enums\PaymentStatus;
-use App\Enums\OrderStatus;
 
 class PayPalWebhookController extends Controller
 {
@@ -94,8 +92,8 @@ class PayPalWebhookController extends Controller
             // Update order status
             $order = $payment->order;
             $order->update([
-                'payment_status' => PaymentStatus::PAID,
-                'status' => OrderStatus::PROCESSING
+                'payment_status' => 'paid',
+                'status' => 'processing'
             ]);
 
             Log::info('PayPal payment completed', [
@@ -119,8 +117,8 @@ class PayPalWebhookController extends Controller
 
             $order = $payment->order;
             $order->update([
-                'payment_status' => PaymentStatus::FAILED,
-                'status' => OrderStatus::PENDING
+                'payment_status' => 'failed',
+                'status' => 'pending'
             ]);
 
             Log::info('PayPal payment denied', [
@@ -160,8 +158,8 @@ class PayPalWebhookController extends Controller
 
             $order = $payment->order;
             $order->update([
-                'payment_status' => PaymentStatus::REFUNDED,
-                'status' => OrderStatus::CANCELLED
+                'payment_status' => 'refunded',
+                'status' => 'cancelled'
             ]);
 
             Log::info('PayPal payment refunded', [

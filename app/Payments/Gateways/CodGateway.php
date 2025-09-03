@@ -7,8 +7,6 @@ use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Log;
 use App\Payments\Contracts\PaymentGateway;
-use App\Enums\PaymentStatus;
-use App\Enums\OrderStatus;
 
 class CodGateway implements PaymentGateway
 {
@@ -44,17 +42,17 @@ class CodGateway implements PaymentGateway
         ]);
 
         $payment->update(['status' => 'succeeded', 'provider_reference' => 'COD-'.now()->timestamp]);
-        $order->update(['payment_status' => PaymentStatus::PENDING, 'status' => OrderStatus::PENDING]); // collect on delivery
-
+        $order->update(['payment_status' => 'pending', 'status' => 'pending']); // collect on delivery
+        
         $result = ['payment' => $payment, 'redirect_url' => null];
-
+        
         // Debug: Log what we're returning
-        Log::info('CodGateway: Returning result', [
+        \Log::info('CodGateway: Returning result', [
             'result' => $result,
             'has_redirect_url' => !empty($result['redirect_url']),
             'redirect_url' => $result['redirect_url']
         ]);
-
+        
         return $result;
     }
     public function handleReturn(array $request): Payment {

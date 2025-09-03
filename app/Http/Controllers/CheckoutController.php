@@ -13,8 +13,6 @@ use App\Models\Customer;
 use App\Events\OrderPlaced;
 use Illuminate\Support\Str;
 use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
-use App\Enums\OrderStatus;
 use Illuminate\Http\Request;
 use App\Services\CartService;
 use App\Services\PaymentService;
@@ -616,8 +614,8 @@ DB::commit();
             'total_amount' => $finalTotal,
             'currency' => $currencyCode,
             'payment_method' => $data['payment_method'],
-            'payment_status' => PaymentStatus::PENDING,
-            'status' => OrderStatus::PENDING,
+            'payment_status' => 'pending',
+            'status' => 'pending',
             'is_guest' => $isGuest,
             'use_billing_for_shipping' => $data['use_billing_for_shipping'],
             'billing_address' => $data['billing_address'],
@@ -719,7 +717,7 @@ DB::commit();
                 if ($variant->stock < $requestedQuantity) {
                     $product = \App\Models\Product::find($productId);
                     $availableStock = $variant->stock;
-
+                    
                     if ($availableStock == 0) {
                         throw new \Exception("Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is out of stock.");
                     } else {
@@ -735,7 +733,7 @@ DB::commit();
 
                 if ($product->quantity < $requestedQuantity) {
                     $availableStock = $product->quantity;
-
+                    
                     if ($availableStock == 0) {
                         throw new \Exception("Product '{$product->name}' is out of stock.");
                     } else {
