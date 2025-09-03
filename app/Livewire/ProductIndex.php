@@ -73,7 +73,7 @@ class ProductIndex extends Component
     {
         Log::info('Manual currency change triggered', ['currency' => $currencyCode]);
         $this->loadCurrencyInfo();
-        
+
         // If modal is open, re-convert variant prices
         if ($this->showVariantModal && $this->selectedProduct) {
             $this->convertVariantPrices();
@@ -99,14 +99,24 @@ class ProductIndex extends Component
             $currencyService = app(CountryCurrencyService::class);
             $currencyInfo = $currencyService->getCurrentCurrencyInfo();
 
+            Log::info('ProductIndex: Loading currency info', [
+                'currency_info' => $currencyInfo
+            ]);
+
             $this->currencyCode = $currencyInfo['currency_code'];
             $this->currencySymbol = $currencyInfo['currency_symbol'];
             $this->isAutoDetected = $currencyInfo['is_auto_detected'];
 
+            Log::info('ProductIndex: Currency info loaded', [
+                'currency_code' => $this->currencyCode,
+                'currency_symbol' => $this->currencySymbol,
+                'is_auto_detected' => $this->isAutoDetected
+            ]);
+
             // Convert product prices to current currency
             $this->convertProductPrices();
         } catch (Exception $e) {
-            // Use defaults if currency service fails
+            Log::error('ProductIndex: Error loading currency info', ['error' => $e->getMessage()]);
         }
     }
 
@@ -139,28 +149,48 @@ class ProductIndex extends Component
     protected function convertVariantPrices()
     {
         if ($this->currencyCode === 'USD' || !$this->selectedProduct) {
+            Log::info('ProductIndex: Skipping conversion', [
+                'currency_code' => $this->currencyCode,
+                'has_product' => !$this->selectedProduct
+            ]);
             return; // No conversion needed
         }
 
         try {
             $currencyService = app(CountryCurrencyService::class);
 
+            Log::info('ProductIndex: Starting variant price conversion', [
+                'currency_code' => $this->currencyCode,
+                'currency_symbol' => $this->currencySymbol,
+                'product_price' => $this->selectedProduct->price
+            ]);
+
             // Convert product price
             if ($this->selectedProduct->price) {
                 $this->selectedProduct->converted_price = $currencyService->convertFromUSD($this->selectedProduct->price, $this->currencyCode);
+                Log::info('ProductIndex: Product price converted', [
+                    'original' => $this->selectedProduct->price,
+                    'converted' => $this->selectedProduct->converted_price
+                ]);
             }
 
             // Convert variant prices with bulk processing
             if ($this->selectedProduct->variants) {
                 $this->selectedProduct->variants->transform(function ($variant) use ($currencyService) {
                     if ($variant->price) {
-                        $variant->converted_price = $currencyService->convertFromUSD($variant->price, $this->currencyCode);
+                        $originalPrice = $variant->price;
+                        $variant->converted_price = $currencyService->convertFromUSD($originalPrice, $this->currencyCode);
+                        Log::info('ProductIndex: Variant price converted', [
+                            'variant_id' => $variant->id,
+                            'original' => $originalPrice,
+                            'converted' => $variant->converted_price
+                        ]);
                     }
                     return $variant;
                 });
             }
         } catch (Exception $e) {
-            // Handle conversion error silently
+            Log::error('ProductIndex: Conversion error', ['error' => $e->getMessage()]);
         }
     }
 
@@ -225,7 +255,7 @@ class ProductIndex extends Component
     {
         // Ensure we have the latest currency info
         $this->loadCurrencyInfo();
-        
+
         // Get product with variants - no caching to ensure fresh currency conversion
         $this->selectedProduct = Product::with(['variantsOptimized'])
             ->select('id', 'name', 'slug', 'price', 'compare_price')
@@ -242,12 +272,76 @@ class ProductIndex extends Component
 
     public function selectVariant($variantId)
     {
+        Log::info('ProductIndex: selectVariant called', [
+            'variant_id' => $variantId,
+            'currency_code' => $this->currencyCode,
+            'currency_symbol' => $this->currencySymbol
+        ]);
+
         $this->selectedVariantId = $variantId;
         $this->selectedVariant = $this->selectedProduct->variants->find($variantId);
 
-        // Reset quantity if it exceeds stock
-        if ($this->selectedVariant && $this->quantity > $this->selectedVariant->stock) {
-            $this->quantity = $this->selectedVariant->stock;
+        Log::info('ProductIndex: Variant found', [
+            'variant_id' => $variantId,
+            'variant_price' => $this->selectedVariant ? $this->selectedVariant->price : 'NULL',
+            'variant_converted_price' => $this->selectedVariant ? ($this->selectedVariant->converted_price ?? 'NULL') : 'NULL',
+            'variant_stock' => $this->selectedVariant ? $this->selectedVariant->stock : 'NULL',
+            'quantity' => $this->quantity
+        ]);
+
+                // Ensure the selected variant has converted prices
+        if ($this->selectedVariant && $this->currencyCode !== 'USD') {
+            $currencyService = app(CountryCurrencyService::class);
+
+            // If variant has its own price, convert it
+            if ($this->selectedVariant->price) {
+                $originalPrice = $this->selectedVariant->price;
+                $this->selectedVariant->converted_price = $currencyService->convertFromUSD($originalPrice, $this->currencyCode);
+
+                Log::info('ProductIndex: Variant price converted in selectVariant', [
+                    'variant_id' => $variantId,
+                    'original_price' => $originalPrice,
+                    'converted_price' => $this->selectedVariant->converted_price,
+                    'currency_code' => $this->currencyCode
+                ]);
+            } else {
+                // If variant has no price, use product price
+                if ($this->selectedProduct->price) {
+                    $originalPrice = $this->selectedProduct->price;
+                    $this->selectedVariant->converted_price = $currencyService->convertFromUSD($originalPrice, $this->currencyCode);
+
+                    Log::info('ProductIndex: Using product price for variant', [
+                        'variant_id' => $variantId,
+                        'product_price' => $originalPrice,
+                        'converted_price' => $this->selectedVariant->converted_price,
+                        'currency_code' => $this->currencyCode
+                    ]);
+                }
+            }
+        }
+
+        // Reset quantity if it exceeds stock or if stock is invalid
+        if ($this->selectedVariant) {
+            $stock = $this->selectedVariant->stock;
+
+            // If stock is negative or zero, set quantity to 0 (out of stock)
+            if ($stock <= 0) {
+                $this->quantity = 0;
+                Log::info('ProductIndex: Variant out of stock', [
+                    'variant_id' => $variantId,
+                    'stock' => $stock,
+                    'quantity_set_to' => 0
+                ]);
+            }
+            // If quantity exceeds stock, reset to stock level
+            elseif ($this->quantity > $stock) {
+                $this->quantity = $stock;
+                Log::info('ProductIndex: Quantity adjusted to stock level', [
+                    'variant_id' => $variantId,
+                    'stock' => $stock,
+                    'quantity_set_to' => $stock
+                ]);
+            }
         }
     }
 
