@@ -49,15 +49,15 @@ class AppServiceProvider extends ServiceProvider
         // Share categories with all views - Optimized with caching and eager loading
         View::composer('*', function ($view) {
             $categories = cache()->remember('header_categories', 1800, function () {
-                return Category::where('active', true)
+                return Category::where('categories.active', true)
+                    ->with(['media'])
                     ->withCount(['products' => function ($query) {
-                        $query->where('active', true);
+                        $query->where('products.active', true);
                     }])
                     ->orderBy('name')
                     ->take(4)
                     ->get()
                     ->map(function ($category) {
-                        // Add media URL to avoid N+1 queries
                         $category->media_url = $category->getFirstMediaUrl('main_image', 'small_webp');
                         return $category;
                     });
@@ -69,17 +69,17 @@ class AppServiceProvider extends ServiceProvider
         // Share all categories for category pages - Cached separately
         View::composer(['livewire.categories-grid', 'livewire.category-products'], function ($view) {
             $allCategories = cache()->remember('all_categories', 900, function () {
-                return Category::where('active', true)
+                return Category::where('categories.active', true)
+                    ->with(['media'])
                     ->withCount(['products' => function ($query) {
-                        $query->where('active', true);
+                        $query->where('products.active', true);
                     }])
                     ->with(['subcategories' => function ($query) {
-                        $query->where('active', true);
+                        $query->where('subcategories.active', true);
                     }])
                     ->orderBy('name')
                     ->get()
                     ->map(function ($category) {
-                        // Add media URL to avoid N+1 queries
                         $category->media_url = $category->getFirstMediaUrl('main_image', 'small_webp');
                         return $category;
                     });
