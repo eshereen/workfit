@@ -72,7 +72,12 @@ class ProductIndex extends Component
     public function handleCurrencyChange($currencyCode = null)
     {
         Log::info('Manual currency change triggered', ['currency' => $currencyCode]);
-        $this->refreshCurrency();
+        $this->loadCurrencyInfo();
+        
+        // If modal is open, re-convert variant prices
+        if ($this->showVariantModal && $this->selectedProduct) {
+            $this->convertVariantPrices();
+        }
     }
 
     public function mount()
@@ -218,6 +223,9 @@ class ProductIndex extends Component
 
     public function openVariantModal($productId)
     {
+        // Ensure we have the latest currency info
+        $this->loadCurrencyInfo();
+        
         // Get product with variants - no caching to ensure fresh currency conversion
         $this->selectedProduct = Product::with(['variantsOptimized'])
             ->select('id', 'name', 'slug', 'price', 'compare_price')
