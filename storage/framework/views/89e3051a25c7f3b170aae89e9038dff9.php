@@ -30,7 +30,7 @@
                 <h4 class="font-bold mb-4">SHOP</h4>
                 <ul class="space-y-2">
                     <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <li><a href="<?php echo e(route('categories.index', $category->slug)); ?>" class="text-gray-200hover:text-red-600 transition-colors"><?php echo e($category->name); ?></a></li>
+                    <li><a href="<?php echo e(route('categories.index', $category->slug)); ?>" class="text-gray-200hover:text-red-600 transition-colors capitalize"><?php echo e($category->name); ?></a></li>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                 </ul>

@@ -81,18 +81,10 @@
     </div>
 
     <!-- Shipping Address -->
-    <div x-data="{ showShipping: @entangle('useBillingForShipping').as('!$value') }"
-         x-show="showShipping"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 transform -translate-y-4"
-         x-transition:enter-end="opacity-100 transform translate-y-0"
-         x-transition:leave="transition ease-in duration-300"
-         x-transition:leave-start="opacity-100 transform translate-y-0"
-         x-transition:leave-end="opacity-0 transform -translate-y-4"
-         class="bg-white rounded-lg shadow-md p-6 mb-6"
-         wire:ignore.self>
+    @if(!$useBillingForShipping)
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">Shipping Address</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:col-span-2">
                     <label for="shipping_country" class="block text-sm font-medium text-gray-700 mb-1">Country *</label>
                     <select wire:model.live="shippingCountry" id="shipping_country" name="shipping_address[country]" required
@@ -130,7 +122,7 @@
                 </div>
             </div>
         </div>
-    
+    @endif
 
     <!-- Payment Methods Selector -->
     @livewire('payment-methods-selector')
