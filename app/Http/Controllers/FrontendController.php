@@ -69,12 +69,13 @@ class FrontendController extends Controller
         // Collections
         $collections = cache()->remember('home_collections', 1800, function () {
             return Collection::withCount(['products' => function ($q) {
-                    $q->where('collections.active', true);
+                    $q->where('products.active', true); // ✅ correct
                 }])
-                ->where('collections.active', true)
+                ->where('collections.active', true) // ✅ this one is fine, filters collections
                 ->take(4)
                 ->get();
         });
+
 
         // Featured Products (ONLY featured + active)
         $featured = cache()->remember('home_featured_products', 900, function () {
