@@ -346,4 +346,15 @@
     @endif
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Listen for currency change events
+    window.addEventListener('currency-changed', function(e) {
+        console.log('ProductShow: Currency change event received:', e.detail);
+        // Trigger the Livewire method to refresh currency
+        @this.call('handleCurrencyChange', e.detail);
+    });
+});
+</script>
+
 

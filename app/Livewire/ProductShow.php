@@ -99,6 +99,13 @@ class ProductShow extends Component
         }
     }
 
+    // Handle currency changes
+    public function handleCurrencyChange($currencyCode = null)
+    {
+        Log::info('ProductShow: Currency change triggered', ['currency' => $currencyCode]);
+        $this->loadCurrencyInfo();
+    }
+
     /**
      * Get the hex color code for a color name from config
      */

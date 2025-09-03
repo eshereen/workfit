@@ -218,16 +218,10 @@ class ProductIndex extends Component
 
     public function openVariantModal($productId)
     {
-        // Cache product with variants for better performance
-        $this->selectedProduct = cache()->remember(
-            'product_with_variants_' . $productId . '_' . $this->currencyCode,
-            300, // 5 minutes cache
-            function () use ($productId) {
-                return Product::with(['variantsOptimized'])
-                    ->select('id', 'name', 'slug', 'price', 'compare_price')
-                    ->find($productId);
-            }
-        );
+        // Get product with variants - no caching to ensure fresh currency conversion
+        $this->selectedProduct = Product::with(['variantsOptimized'])
+            ->select('id', 'name', 'slug', 'price', 'compare_price')
+            ->find($productId);
 
         $this->selectedVariantId = null;
         $this->selectedVariant = null;
