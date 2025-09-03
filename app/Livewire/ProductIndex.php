@@ -465,8 +465,15 @@ class ProductIndex extends Component
         try {
             $currencyService = app(CountryCurrencyService::class);
 
-            // Bulk convert all prices at once
-            $products->getCollection()->transform(function ($product) use ($currencyService) {
+            // Get the collection to transform
+            if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator || $products instanceof \Illuminate\Pagination\Paginator) {
+                $collection = $products->getCollection();
+            } else {
+                $collection = $products;
+            }
+
+            // Transform the collection
+            $collection->transform(function ($product) use ($currencyService) {
                 if ($product->price) {
                     $product->converted_price = $currencyService->convertFromUSD($product->price, $this->currencyCode);
                 }
@@ -475,6 +482,11 @@ class ProductIndex extends Component
                 }
                 return $product;
             });
+
+            // If it was a paginator, set the transformed collection back
+            if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator || $products instanceof \Illuminate\Pagination\Paginator) {
+                $products->setCollection($collection);
+            }
         } catch (Exception $e) {
             // Handle conversion error silently
         }
@@ -485,7 +497,15 @@ class ProductIndex extends Component
      */
     protected function precomputeVariantsData($products)
     {
-        $products->getCollection()->transform(function ($product) {
+        // Get the collection to transform
+        if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator || $products instanceof \Illuminate\Pagination\Paginator) {
+            $collection = $products->getCollection();
+        } else {
+            $collection = $products;
+        }
+
+        // Transform the collection
+        $collection->transform(function ($product) {
             // Add computed properties to avoid individual queries
             $product->has_variants = $product->variants && $product->variants->isNotEmpty();
             $product->variants_count = $product->variants ? $product->variants->count() : 0;
@@ -498,6 +518,11 @@ class ProductIndex extends Component
 
             return $product;
         });
+
+        // If it was a paginator, set the transformed collection back
+        if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator || $products instanceof \Illuminate\Pagination\Paginator) {
+            $products->setCollection($collection);
+        }
     }
 
     protected function checkCurrencyChange()
