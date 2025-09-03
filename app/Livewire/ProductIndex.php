@@ -289,7 +289,8 @@ class ProductIndex extends Component
             'quantity' => $this->quantity
         ]);
 
-                // Ensure the selected variant has converted prices
+
+        // Ensure the selected variant has converted prices
         if ($this->selectedVariant && $this->currencyCode !== 'USD') {
             $currencyService = app(CountryCurrencyService::class);
 

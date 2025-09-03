@@ -98,10 +98,7 @@
 
     @include('layouts.footer')
 
-    <!-- Alpine.js for interactive components -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <!-- Livewire Scripts -->
+    <!-- Livewire Scripts (includes Alpine.js) -->
     @livewireScripts
 
 
