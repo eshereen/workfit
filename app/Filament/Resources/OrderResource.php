@@ -98,16 +98,15 @@ class OrderResource extends Resource
                     ->required()
                     ->maxLength(255),
                 TextInput::make('billing_building_number')
-                    ->required()
+
                     ->maxLength(255),
                 TextInput::make('shipping_address')
                     ->required()
                     ->maxLength(255),
                 TextInput::make('shipping_building_number')
-                    ->required()
+
                     ->maxLength(255),
-                Toggle::make('use_billing_for_shipping')
-                    ->required(),
+                Toggle::make('use_billing_for_shipping'),
                 Textarea::make('notes')
                     ->columnSpanFull(),
                 ])->columns(3)->columnSpanFull(),
