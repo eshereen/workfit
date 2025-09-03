@@ -64,15 +64,13 @@
         </div>
         @endif
     </section>
-
-
     <!-- Product Grid - First Category Collection -->
     <section class="py-16 px-4">
         @if($categories->isNotEmpty())
         <div class="container mx-auto">
             <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $categories[0]->name }}'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $categories[1]->description }}</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $categories[0]->description }}</p>
 
            @livewire('product-index',['products'=>$categories->first()->products->take(8)])
 

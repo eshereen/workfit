@@ -33,6 +33,8 @@ class ProductIndex extends Component
     public $selectedVariant = null;
     public $quantity = 1;
 
+    public $products = null;
+
     #[On('wishlistUpdated')]
     public function loadWishlist()
     {
@@ -350,74 +352,77 @@ class ProductIndex extends Component
 
     public function render()
     {
-        // Build cache key for this specific query
-        $cacheKey = $this->buildCacheKey();
+        if ($this->products) {
+            // Use passed products if provided (no pagination needed for home page sections)
+            $productsToDisplay = collect($this->products);
+        } else {
+            // Existing query logic for when no products are passed
+            $cacheKey = $this->buildCacheKey();
+            $cacheTime = request()->routeIs('home') ? 60 : 180;
+            $productsToDisplay = cache()->remember($cacheKey, $cacheTime, function () {
+                // Optimized eager loading with specific selects
+                $with = [
+                    'category:id,name,slug',
+                    'media' => function ($query) {
+                        $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                              ->whereIn('collection_name', ['main_image', 'product_images'])
+                              ->whereNotNull('disk')
+                              ->orderBy('collection_name', 'asc')
+                              ->orderBy('id', 'asc');
+                    }
+                ];
 
-        // Try to get from cache first with shorter cache time for better performance
-        $cacheTime = request()->routeIs('home') ? 60 : 180; // Shorter cache for home page
-        $products = cache()->remember($cacheKey, $cacheTime, function () {
-            // Optimized eager loading with specific selects
-            $with = [
-                'category:id,name,slug',
-                'media' => function ($query) {
-                    $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                          ->whereIn('collection_name', ['main_image', 'product_images'])
-                          ->whereNotNull('disk')
-                          ->orderBy('collection_name', 'asc')
-                          ->orderBy('id', 'asc');
+                // Always load variants for product index pages to avoid N+1 queries
+                if (!request()->routeIs('home')) {
+                    $with[] = 'subcategory:id,name,slug';
                 }
-            ];
 
-            // Always load variants for product index pages to avoid N+1 queries
-            if (!request()->routeIs('home')) {
-                $with[] = 'subcategory:id,name,slug';
-            }
+                // Always load variants to prevent N+1 queries
+                $with[] = 'variants:id,product_id,color,size,price,stock';
 
-            // Always load variants to prevent N+1 queries
-            $with[] = 'variants:id,product_id,color,size,price,stock';
+                $query = Product::with($with)
+                    ->select('id', 'name', 'slug', 'description', 'price', 'compare_price', 'category_id', 'subcategory_id', 'active', 'featured', 'created_at')
+                    ->where('products.active', true);
 
-            $query = Product::with($with)
-                ->select('id', 'name', 'slug', 'description', 'price', 'compare_price', 'category_id', 'subcategory_id', 'active', 'featured', 'created_at')
-                ->where('products.active', true);
+                // Optimized search with full-text search if available
+                if ($this->search) {
+                    $query->where(function ($q) {
+                        $q->where('name', 'like', '%' . $this->search . '%')
+                          ->orWhere('description', 'like', '%' . $this->search . '%');
+                    });
+                }
 
-            // Optimized search with full-text search if available
-            if ($this->search) {
-                $query->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('description', 'like', '%' . $this->search . '%');
-                });
-            }
+                if ($this->category) {
+                    $query->where('category_id', $this->category);
+                }
 
-            if ($this->category) {
-                $query->where('category_id', $this->category);
-            }
+                // Optimized sorting
+                switch ($this->sortBy) {
+                    case 'price_low':
+                        $query->orderBy('price', 'asc')->orderBy('created_at', 'desc');
+                        break;
+                    case 'price_high':
+                        $query->orderBy('price', 'desc')->orderBy('created_at', 'desc');
+                        break;
+                    case 'newest':
+                    default:
+                        $query->orderBy('created_at', 'desc');
+                        break;
+                }
 
-            // Optimized sorting
-            switch ($this->sortBy) {
-                case 'price_low':
-                    $query->orderBy('price', 'asc')->orderBy('created_at', 'desc');
-                    break;
-                case 'price_high':
-                    $query->orderBy('price', 'desc')->orderBy('created_at', 'desc');
-                    break;
-                case 'newest':
-                default:
-                    $query->orderBy('created_at', 'desc');
-                    break;
-            }
-
-            $perPage = request()->routeIs('home') ? 8 : 12;
-            return $query->paginate($perPage);
-        });
+                $perPage = request()->routeIs('home') ? 8 : 12;
+                return $query->paginate($perPage);
+            });
+        }
 
         // Convert product prices to current currency (optimized)
-        $this->convertProductPricesOptimized($products);
+        $this->convertProductPricesOptimized($productsToDisplay);
 
         // Pre-compute variants data to avoid N+1 queries
-        $this->precomputeVariantsData($products);
+        $this->precomputeVariantsData($productsToDisplay);
 
         return view('livewire.product-index', [
-            'products' => $products
+            'products' => $productsToDisplay
         ]);
     }
 

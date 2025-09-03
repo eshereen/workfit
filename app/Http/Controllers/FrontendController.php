@@ -27,7 +27,6 @@ class FrontendController extends Controller
                               ->limit(1);
                         }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
                         ->where('products.active', true)
-
                         ->take(8);
                 }])
                 ->get();
@@ -78,7 +77,6 @@ class FrontendController extends Controller
             ])
             ->where('products.active', true)
             ->where('products.featured', true)
-
             ->take(8)
             ->get();
         });
