@@ -55,12 +55,12 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach($products as $product)
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
-            <div class="relative overflow-hidden aspect-[4/5] product-image-container" 
-                 style="cursor: pointer;"                             
+            <div class="relative overflow-hidden aspect-[4/5] product-image-container"
+                 style="cursor: pointer;"
                  onmouseenter="this.querySelector('.main-image').style.opacity='0'; this.querySelector('.gallery-image').style.opacity='1';"
                  onmouseleave="this.querySelector('.main-image').style.opacity='1'; this.querySelector('.gallery-image').style.opacity='0';"
                  onclick="window.location.href='{{ route('product.show', $product->slug) }}'">
-                
+
                 <div class="block relative w-full h-full">
                     {{-- Main image --}}
                     @php
@@ -127,7 +127,9 @@
                            class="font-semibold text-lg hover:text-red-600">
                             {{ $product->name }}
                         </a>
-                        <p class="text-gray-600 text-sm">{{ $product->category->name }}</p>
+                        @if($product->category)
+                            <p class="text-gray-600 text-sm">{{ $product->category->name }}</p>
+                        @endif
                     </div>
                     @if($product->compare_price > 0)
                     <span class="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">
