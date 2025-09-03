@@ -16,7 +16,7 @@ class FrontendController extends Controller
 
         // Load main categories with their own products only
         $categories = cache()->remember('home_categories', 1800, function () {
-            return Category::where('active', true)
+            return Category::where('categories.active', true)
                 ->take(4)
                 ->get()
                 ->map(function ($category) {
@@ -27,7 +27,7 @@ class FrontendController extends Controller
                               ->whereNotNull('disk')
                               ->limit(1);
                         }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
-                        ->where('active', true)
+                        ->where('products.active', true)
                         ->where(function ($q) use ($category) {
                             $q->where('category_id', $category->id)
                               ->orWhereHas('subcategory', function ($sub) use ($category) {
@@ -71,7 +71,7 @@ class FrontendController extends Controller
             return Collection::withCount(['products' => function ($q) {
                     $q->where('active', true);
                 }])
-                ->where('active', true)
+                ->where('collections.active', true)
                 ->take(4)
                 ->get();
         });
