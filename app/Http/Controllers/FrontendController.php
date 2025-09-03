@@ -76,6 +76,9 @@ class FrontendController extends Controller
             ])
             ->where('products.active', true)
             ->where('products.featured', true)
+            ->whereHas('media', function ($query) {
+                $query->where('collection_name', 'product_images');
+            })
             ->take(8)
             ->get();
         });
