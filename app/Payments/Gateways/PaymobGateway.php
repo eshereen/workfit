@@ -182,7 +182,7 @@ class PaymobGateway implements PaymentGateway
             throw new RuntimeException($errorMessage);
         }
 
-        $iframeUrl = sprintf('https://accept.paymob.com/api/acceptance/iframes/441229?payment_token=%s', $key['token']);
+        $iframeUrl = sprintf('https://accept.paymob.com/api/acceptance/iframes/%s?payment_token=%s', config('paymob.iframe_id'), $key['token']);
 
         $payment->update([
             'provider_reference' => (string)$reg['id'],
