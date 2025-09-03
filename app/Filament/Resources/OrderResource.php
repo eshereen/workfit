@@ -196,7 +196,7 @@ class OrderResource extends Resource
                     ->color(fn (PaymentStatus $state): string => match ($state) {
                         PaymentStatus::PENDING => 'warning',
                         PaymentStatus::PROCESSING => 'info',
-                        PaymentStatus::PROCESSED => 'success',
+                        PaymentStatus::PAID => 'success',
                         PaymentStatus::CONFIRMED => 'success',
                         PaymentStatus::COMPLETED => 'success',
                         PaymentStatus::FAILED => 'danger',
