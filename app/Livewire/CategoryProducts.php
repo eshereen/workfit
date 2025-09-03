@@ -75,7 +75,7 @@ class CategoryProducts extends Component
     {
         if ($this->categorySlug) {
             $this->category = Category::where('slug', $this->categorySlug)
-                ->where('active', true)
+                ->where('category.active', true)
                 ->first();
         }
     }
@@ -251,7 +251,7 @@ class CategoryProducts extends Component
     public function render()
     {
         $query = Product::with(['category', 'subcategory', 'media', 'variants'])
-            ->where('active', true);
+            ->where('products.active', true);
 
         // If a specific category is selected, filter by it
         if ($this->category) {

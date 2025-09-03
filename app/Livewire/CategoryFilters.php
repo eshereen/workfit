@@ -24,7 +24,7 @@ class CategoryFilters extends Component
     {
         if ($this->categorySlug) {
             $this->category = Category::where('slug', $this->categorySlug)
-                ->where('active', true)
+                ->where('category.active', true)
                 ->first();
         }
     }
@@ -94,7 +94,7 @@ class CategoryFilters extends Component
         }
 
         // Otherwise show all active categories
-        return Category::where('active', true)
+        return Category::where('category.active', true)
             ->withCount('products')
             ->orderBy('name')
             ->get();
@@ -103,7 +103,7 @@ class CategoryFilters extends Component
     public function getSubcategories($categoryId)
     {
         return Subcategory::where('category_id', $categoryId)
-            ->where('active', true)
+            ->where('subcategories.active', true)
             ->withCount('products')
             ->orderBy('name')
             ->get();
@@ -127,13 +127,13 @@ class CategoryFilters extends Component
     public function getProductCountForCategory($categoryId)
     {
         $category = Category::find($categoryId);
-        return $category ? $category->products()->where('active', true)->count() : 0;
+        return $category ? $category->products()->where('products.active', true)->count() : 0;
     }
 
     public function getProductCountForSubcategory($subcategoryId)
     {
         $subcategory = Subcategory::find($subcategoryId);
-        return $subcategory ? $subcategory->products()->where('active', true)->count() : 0;
+        return $subcategory ? $subcategory->products()->where('products.active', true)->count() : 0;
     }
 
     public function render()

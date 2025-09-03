@@ -378,7 +378,7 @@ class ProductIndex extends Component
 
             $query = Product::with($with)
                 ->select('id', 'name', 'slug', 'description', 'price', 'compare_price', 'category_id', 'subcategory_id', 'active', 'featured', 'created_at')
-                ->where('active', true);
+                ->where('products.active', true);
 
             // Optimized search with full-text search if available
             if ($this->search) {
