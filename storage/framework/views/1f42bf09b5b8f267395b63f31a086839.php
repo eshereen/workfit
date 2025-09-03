@@ -35,12 +35,15 @@
     <section class="px-4">
          <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
+         <?php if($recent->isNotEmpty()): ?>
+
+
 
         <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
-[$__name, $__params] = $__split('product-index');
+[$__name, $__params] = $__split('product-index',['products'=>$recent]);
 
 $__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-0', $__slots ?? [], get_defined_vars());
 
@@ -52,6 +55,8 @@ unset($__params);
 unset($__split);
 if (isset($__slots)) unset($__slots);
 ?>
+    
+        <?php endif; ?>
     </section>
 
     <!-- Full-width Lifestyle Banner -->

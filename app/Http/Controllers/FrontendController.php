@@ -23,6 +23,26 @@ class FrontendController extends Controller
         }])
           ->where('active', true)->take(4)->get();
       });
+      //recent products
+      $recent = cache()->remember('home_recent_products', 1800, function () {
+        return Product::with(['category:id,name,slug'])
+            ->with(['media' => function ($query) {
+                $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                      ->whereIn('collection_name', ['main_image'])
+                      ->whereNotNull('disk')
+                      ->latest()
+                      ->take(1);
+            }])
+            ->where('active', true)
+            ->whereHas('media', function ($query) {
+                $query->whereIn('collection_name', ['main_image'])
+                      ->whereNotNull('disk');
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(8)
+            ->get();
+    });
+   
       $collections = cache()->remember('home_collections', 1800, function () {
         return Collection::withCount(['products' => function ($query) {
             $query->where('active', true);
@@ -52,14 +72,14 @@ class FrontendController extends Controller
                     ->where('active', true)
                     ->with(['media' => function ($q) {
                         $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                          ->whereIn('collection_name', ['main_image'])
+                          ->whereIn('collection_name', ['main_image','product_images'])
                           ->whereNotNull('disk')
                           ->limit(1);
                     }])
                     ->take(8);
           }])->where('name', 'Men')->first();
       });
-      return view('home', compact('men',  'featured', 'categories','collections'));
+      return view('home', compact('men',  'featured', 'categories','collections','recent'));
    }
 
    public function thankyou()
