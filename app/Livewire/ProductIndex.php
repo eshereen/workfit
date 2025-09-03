@@ -355,6 +355,7 @@ class ProductIndex extends Component
         if ($this->products) {
             // Use passed products if provided (no pagination needed for home page sections)
             $productsToDisplay = collect($this->products);
+            $productsToDisplay->loadMissing(['category', 'subcategory']); // Ensure relationships are loaded
         } else {
             // Existing query logic for when no products are passed
             $cacheKey = $this->buildCacheKey();
