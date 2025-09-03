@@ -39,7 +39,7 @@ class FrontendController extends Controller
                     'category:id,name,slug',
                     'media' => function ($query) {
                         $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                              ->where('collection_name', 'main_image')
+                              ->whereIn('collection_name', ['main_image', 'product_images'])
                               ->whereNotNull('disk');
                     }
                 ])
