@@ -354,13 +354,8 @@ class ProductIndex extends Component
     {
         if ($this->products) {
             // Use passed products if provided (no pagination needed for home page sections)
-            $productsToDisplay = collect($this->products);
-            // Iterate over the collection and load missing relationships on each product model
-            $productsToDisplay->each(function ($product) {
-                if ($product instanceof \Illuminate\Database\Eloquent\Model) {
-                    $product->loadMissing(['category', 'subcategory']);
-                }
-            });
+            $productsToDisplay = \Illuminate\Database\Eloquent\Collection::make($this->products);
+            $productsToDisplay->loadMissing(['category', 'subcategory']); // Load missing relationships efficiently
         } else {
             // Existing query logic for when no products are passed
             $cacheKey = $this->buildCacheKey();
