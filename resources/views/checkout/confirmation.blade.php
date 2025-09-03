@@ -190,7 +190,7 @@
 
                         <!-- Action Buttons -->
                         <div class="mt-6 space-y-3">
-                            <a href="{{ route('products.index') }}"
+                            <a href="{{ route('home') }}"
                                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors">
                                 Continue Shopping
                             </a>

@@ -203,7 +203,7 @@
                     <a href="{{ route('checkout') }}" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-md font-medium transition text-center block">
                         Proceed to Checkout
                     </a>
-                    <a href="{{ route('products.index') }}" class="w-full border border-gray-300 hover:bg-gray-50 py-3 rounded-md font-medium transition text-center block">
+                    <a href="{{ route('home') }}" class="w-full border border-gray-300 hover:bg-gray-50 py-3 rounded-md font-medium transition text-center block">
                         Continue Shopping
                     </a>
                     @if($cartCount > 0)
