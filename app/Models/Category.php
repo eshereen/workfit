@@ -23,8 +23,16 @@ class Category extends Model implements HasMedia
     }
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasManyThrough(
+            Product::class,
+            Subcategory::class,
+            'category_id',   // Foreign key on subcategories table
+            'subcategory_id', // Foreign key on products table
+            'id',             // Local key on categories table
+            'id'              // Local key on subcategories table
+        );
     }
+
 
     /**
      * Get the optimized media URL for the category

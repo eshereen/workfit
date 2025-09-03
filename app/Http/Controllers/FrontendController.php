@@ -46,22 +46,25 @@ class FrontendController extends Controller
 
         // Recent Products
         $recent = cache()->remember('home_recent_products', 1800, function () {
-            return Product::with(['category:id,name,slug'])
-                ->with(['media' => function ($query) {
-                    $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                          ->where('collection_name', 'main_image')
-                          ->whereNotNull('disk')
-                          ->limit(1);
-                }])
+            return Product::select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'created_at')
+                ->with([
+                    'category:id,name,slug',
+                    'media' => function ($query) {
+                        $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                              ->where('collection_name', 'main_image')
+                              ->whereNotNull('disk');
+                    }
+                ])
                 ->where('active', true)
-                ->whereHas('media', function ($q) {
-                    $q->where('collection_name', 'main_image')
-                      ->whereNotNull('disk');
+                ->whereHas('media', function ($query) {
+                    $query->where('collection_name', 'main_image')
+                          ->whereNotNull('disk');
                 })
-                ->orderBy('created_at', 'desc')
+                ->latest('created_at')
                 ->take(8)
                 ->get();
         });
+
 
         // Collections
         $collections = cache()->remember('home_collections', 1800, function () {
@@ -75,20 +78,23 @@ class FrontendController extends Controller
 
         // Featured Products (ONLY featured + active)
         $featured = cache()->remember('home_featured_products', 900, function () {
-            return Product::with(['category:id,name,slug', 'media' => function ($q) {
+            return Product::select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured', 'created_at')
+            ->with([
+                'category:id,name,slug',
+                'media' => function ($q) {
                     $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
                       ->where('collection_name', 'main_image')
                       ->whereNotNull('disk')
                       ->limit(1);
-                }])
-                ->select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured', 'created_at')
-                ->where('active', true)
-                ->where('featured', true)
-                ->latest('created_at')
-                ->take(8)
-                ->get();
-        });
+                }
+            ])
+            ->where('active', true)
+            ->where('featured', true)
+            ->latest('created_at')
+            ->take(8)
+            ->get();
 
+        });
         return view('home', compact('title', 'categories', 'recent', 'collections', 'featured'));
     }
 
