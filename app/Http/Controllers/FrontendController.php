@@ -18,31 +18,18 @@ class FrontendController extends Controller
         $categories = cache()->remember('home_categories', 1800, function () {
             return Category::where('categories.active', true)
                 ->take(4)
-                ->get()
-                ->map(function ($category) {
-                    $products = Product::with(['media' => function ($q) {
+                ->with(['products' => function ($query) {
+                    $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
                               ->where('collection_name', 'main_image')
                               ->whereNotNull('disk')
                               ->limit(1);
                         }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
                         ->where('products.active', true)
-                        ->where(function ($q) use ($category) {
-                            $q->where('category_id', $category->id)
-                            ->orWhereHas('subcategory', function ($sub) use ($category) {
-                                $sub->where('subcategories.category_id', $category->id)
-                                    ->where('subcategories.active', true);   // ✅ disambiguate
-                            });
-
-                        })
                         ->latest('created_at')
-                        ->take(8)
-                        ->get();
-
-                    $category->setRelation('products', $products);
-
-                    return $category;
-                });
+                        ->take(8);
+                }])
+                ->get();
         });
 
         // Recent Products
@@ -78,7 +65,7 @@ class FrontendController extends Controller
 
         // Featured Products
         $featured = cache()->remember('home_featured_products', 900, function () {
-            return Product::select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured', 'created_at')
+            return Product::select('id', 'name', 'slug', 'price', 'compare_price', 'active', 'featured', 'created_at')
             ->with([
                 'category:id,name,slug',
                 'media' => function ($q) {
