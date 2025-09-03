@@ -26,7 +26,7 @@ class CollectionFilters extends Component
     {
         if ($this->collectionSlug) {
             $this->collection = CollectionModel::where('slug', $this->collectionSlug)
-                ->where('collection.active', true)
+                ->where('collections.active', true)
                 ->with(['products.category', 'products.subcategory'])
                 ->first();
         }
@@ -111,7 +111,7 @@ class CollectionFilters extends Component
         if (!$this->collection) {
             // If no specific collection, get subcategories from all active products
             return Subcategory::where('category_id', $categoryId)
-                ->where('active', true)
+                ->where('subcategories.active', true)
                 ->withCount('products')
                 ->orderBy('name')
                 ->get();

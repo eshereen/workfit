@@ -75,7 +75,7 @@ class CollectionProducts extends Component
     {
         if ($this->collectionSlug) {
             $this->collection = CollectionModel::where('slug', $this->collectionSlug)
-                ->where('active', true)
+                ->where('collections.active', true)
                 ->first();
         }
     }

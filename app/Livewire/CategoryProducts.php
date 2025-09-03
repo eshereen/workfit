@@ -75,7 +75,7 @@ class CategoryProducts extends Component
     {
         if ($this->categorySlug) {
             $this->category = Category::where('slug', $this->categorySlug)
-                ->where('category.active', true)
+                ->where('categories.active', true)
                 ->first();
         }
     }
