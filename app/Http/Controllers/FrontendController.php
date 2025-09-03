@@ -20,7 +20,6 @@ class FrontendController extends Controller
                 ->take(4)
                 ->get()
                 ->map(function ($category) {
-                    // Load products belonging directly to this category or its subcategories
                     $products = Product::with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
                               ->where('collection_name', 'main_image')
@@ -65,19 +64,17 @@ class FrontendController extends Controller
                 ->get();
         });
 
-
         // Collections
         $collections = cache()->remember('home_collections', 1800, function () {
             return Collection::withCount(['products' => function ($q) {
-                    $q->where('products.active', true); // ✅ correct
+                    $q->where('products.active', true); // ✅ fixed
                 }])
-                ->where('collections.active', true) // ✅ this one is fine, filters collections
+                ->where('collections.active', true)
                 ->take(4)
                 ->get();
         });
 
-
-        // Featured Products (ONLY featured + active)
+        // Featured Products
         $featured = cache()->remember('home_featured_products', 900, function () {
             return Product::select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'featured', 'created_at')
             ->with([
@@ -94,10 +91,11 @@ class FrontendController extends Controller
             ->latest('created_at')
             ->take(8)
             ->get();
-
         });
+
         return view('home', compact('title', 'categories', 'recent', 'collections', 'featured'));
     }
+
 
 
    public function thankyou()
