@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Enums\PaymentStatus;
+use App\Enums\OrderStatus;
 
 class PaymentReturnController extends Controller
 {
@@ -21,7 +23,7 @@ class PaymentReturnController extends Controller
         $payment = Payment::latest()->whereNotNull('order_id')->first();
         if ($payment) {
             $payment->update(['status' => 'canceled']);
-            $payment->order->update(['payment_status' => 'failed', 'status' => 'pending']);
+            $payment->order->update(['payment_status' => PaymentStatus::FAILED, 'status' => OrderStatus::PENDING]);
             return redirect()->route('thankyou', ['order' => $payment->order_id])
                 ->with('error', 'Payment canceled.');
         }

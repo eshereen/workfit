@@ -449,7 +449,7 @@ class ProductIndex extends Component
 
     public function render()
     {
-        if ($this->products) {
+        if ($this->products && !$this->products->isEmpty()) {
             // Use passed products if provided (no pagination needed for home page sections)
             $productsToDisplay = \Illuminate\Database\Eloquent\Collection::make($this->products);
             $productsToDisplay->loadMissing(['category', 'subcategory', 'variants', 'media']); // Load missing relationships efficiently
@@ -511,6 +511,11 @@ class ProductIndex extends Component
                 $perPage = request()->routeIs('home') ? 8 : 12;
                 return $query->paginate($perPage);
             });
+        }
+
+        // Ensure productsToDisplay is never null
+        if (!$productsToDisplay) {
+            $productsToDisplay = collect([]);
         }
 
         // Convert product prices to current currency (optimized)

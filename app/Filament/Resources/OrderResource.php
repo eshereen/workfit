@@ -29,6 +29,7 @@ use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Enums\PaymentStatus;
+use App\Enums\OrderStatus;
 
 class OrderResource extends Resource
 {
@@ -122,7 +123,8 @@ class OrderResource extends Resource
                 Select::make('payment_status')
                     ->options(PaymentStatus::class)
                     ->required(),
-                TextInput::make('status')
+                Select::make('status')
+                    ->options(OrderStatus::class)
                     ->required(),
                 ])->columns(3)->columnSpanFull(),
             ]);
@@ -206,7 +208,23 @@ class OrderResource extends Resource
                         PaymentStatus::VOIDED => 'danger',
                     })
                     ->formatStateUsing(fn (PaymentStatus $state): string => $state->label()),
-                TextColumn::make('status'),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (OrderStatus $state): string => match ($state) {
+                        OrderStatus::PENDING => 'warning',
+                        OrderStatus::CONFIRMED => 'info',
+                        OrderStatus::PROCESSING => 'info',
+                        OrderStatus::SHIPPED => 'primary',
+                        OrderStatus::DELIVERED => 'success',
+                        OrderStatus::CANCELLED => 'danger',
+                        OrderStatus::REFUNDED => 'info',
+                        OrderStatus::RETURNED => 'warning',
+                        OrderStatus::ON_HOLD => 'warning',
+                        OrderStatus::BACKORDERED => 'warning',
+                        OrderStatus::PARTIALLY_SHIPPED => 'primary',
+                        OrderStatus::COMPLETED => 'success',
+                    })
+                    ->formatStateUsing(fn (OrderStatus $state): string => $state->label()),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

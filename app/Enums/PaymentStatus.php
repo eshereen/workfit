@@ -9,6 +9,7 @@ enum PaymentStatus: string
     case PROCESSED = 'processed';
     case CONFIRMED = 'confirmed';
     case COMPLETED = 'completed';
+    case PAID = 'paid';
     case FAILED = 'failed';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
@@ -25,6 +26,7 @@ enum PaymentStatus: string
             self::PROCESSED => 'Processed',
             self::CONFIRMED => 'Confirmed',
             self::COMPLETED => 'Completed',
+            self::PAID => 'Paid',
             self::FAILED => 'Failed',
             self::CANCELLED => 'Cancelled',
             self::REFUNDED => 'Refunded',
@@ -43,6 +45,7 @@ enum PaymentStatus: string
             self::PROCESSED => 'success',
             self::CONFIRMED => 'success',
             self::COMPLETED => 'success',
+            self::PAID => 'success',
             self::FAILED => 'danger',
             self::CANCELLED => 'danger',
             self::REFUNDED => 'info',
@@ -59,6 +62,7 @@ enum PaymentStatus: string
             self::PROCESSED,
             self::CONFIRMED,
             self::COMPLETED,
+            self::PAID,
         ]);
     }
 

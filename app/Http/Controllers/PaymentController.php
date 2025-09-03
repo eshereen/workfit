@@ -7,6 +7,8 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Services\PaymentService;
 use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
+use App\Enums\OrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -47,8 +49,8 @@ class PaymentController extends Controller
                 // For Paymob, we assume success if we reach this point
                 $payment->update(['status' => 'succeeded']);
                 $order->update([
-                    'payment_status' => 'paid',
-                    'status' => 'processing'
+                    'payment_status' => PaymentStatus::PAID,
+                    'status' => OrderStatus::PROCESSING
                 ]);
 
                 Log::info('Paymob payment marked as successful', [
@@ -65,8 +67,8 @@ class PaymentController extends Controller
 
                 // Update order status
                 $order->update([
-                    'payment_status' => 'paid',
-                    'status' => 'processing'
+                    'payment_status' => PaymentStatus::PAID,
+                    'status' => OrderStatus::PROCESSING
                 ]);
             }
 
@@ -93,8 +95,8 @@ class PaymentController extends Controller
         }
 
         $order->update([
-            'payment_status' => 'failed',
-            'status' => 'cancelled'
+            'payment_status' => PaymentStatus::FAILED,
+            'status' => OrderStatus::CANCELLED
         ]);
 
         return redirect()->route('checkout')
@@ -216,8 +218,8 @@ class PaymentController extends Controller
                 // Update order status
                 Log::info('Paymob callback: Updating order status to paid/processing', ['order_id' => $order->id]);
                 $order->update([
-                    'payment_status' => 'paid',
-                    'status' => 'processing'
+                    'payment_status' => PaymentStatus::PAID,
+                    'status' => OrderStatus::PROCESSING
                 ]);
 
                 Log::info('Paymob payment completed successfully', [
@@ -237,8 +239,8 @@ class PaymentController extends Controller
                 }
 
                 $order->update([
-                    'payment_status' => 'failed',
-                    'status' => 'pending'
+                    'payment_status' => PaymentStatus::FAILED,
+                    'status' => OrderStatus::PENDING
                 ]);
 
                 Log::warning('Paymob payment failed', [

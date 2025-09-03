@@ -53,7 +53,8 @@
     @endif
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        @foreach($products as $product)
+        @if($products && $products->count() > 0)
+            @foreach($products as $product)
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
             <div class="relative overflow-hidden aspect-[4/5] product-image-container"
                  style="cursor: pointer;"
@@ -169,8 +170,13 @@
             </div>
         </div>
         @endforeach
+        @else
+        <div class="col-span-full text-center py-8">
+            <p class="text-gray-500">No products found.</p>
+        </div>
+        @endif
     </div>
-    @if(request()->routeIs('products.index'))
+    @if(request()->routeIs('products.index') && $products && $products->hasPages())
     <div class="mt-8">
         {{ $products->links() }}
     </div>
