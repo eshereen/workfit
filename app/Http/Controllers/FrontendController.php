@@ -55,7 +55,7 @@ class FrontendController extends Controller
                               ->whereNotNull('disk');
                     }
                 ])
-                ->where('active', true)
+                ->where('products.active', true)
                 ->whereHas('media', function ($query) {
                     $query->where('collection_name', 'main_image')
                           ->whereNotNull('disk');
@@ -69,7 +69,7 @@ class FrontendController extends Controller
         // Collections
         $collections = cache()->remember('home_collections', 1800, function () {
             return Collection::withCount(['products' => function ($q) {
-                    $q->where('active', true);
+                    $q->where('collections.active', true);
                 }])
                 ->where('collections.active', true)
                 ->take(4)
@@ -88,8 +88,8 @@ class FrontendController extends Controller
                       ->limit(1);
                 }
             ])
-            ->where('active', true)
-            ->where('featured', true)
+            ->where('products.active', true)
+            ->where('products.featured', true)
             ->latest('created_at')
             ->take(8)
             ->get();
