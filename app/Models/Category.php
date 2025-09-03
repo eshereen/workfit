@@ -26,12 +26,13 @@ class Category extends Model implements HasMedia
         return $this->hasManyThrough(
             Product::class,
             Subcategory::class,
-            'category_id',   // Foreign key on subcategories table
-            'subcategory_id', // Foreign key on products table
-            'id',             // Local key on categories table
-            'id'              // Local key on subcategories table
-        );
+            'category_id',     // Foreign key on subcategories
+            'subcategory_id',  // Foreign key on products
+            'id',              // Local key on categories
+            'id'               // Local key on subcategories
+        )->where('products.active', 1); // 👈 disambiguated
     }
+
 
 
     /**
