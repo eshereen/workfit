@@ -127,7 +127,7 @@
                     <div class="bg-white rounded-lg shadow-md p-8 text-center">
                         <h2 class="text-2xl font-semibold mb-4">Your cart is empty</h2>
                         <p class="mb-6">Looks like you haven't added any items to your cart yet.</p>
-                        <a href="{{ route('products.index') }}"
+                        <a href="{{ route('home') }}"
                            class="bg-red-600 text-white py-2 px-6 rounded-lg inline-block hover:bg-red-700 transition">
                             Start Shopping
                         </a>
