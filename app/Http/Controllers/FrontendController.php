@@ -71,8 +71,7 @@ class FrontendController extends Controller
                 'media' => function ($q) {
                     $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
                       ->whereIn('collection_name', ['main_image', 'product_images'])
-                      ->whereNotNull('disk')
-                      ->limit(1);
+                      ->whereNotNull('disk');
                 }
             ])
             ->where('products.active', true)
