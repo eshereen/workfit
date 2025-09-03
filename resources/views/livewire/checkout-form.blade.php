@@ -129,7 +129,6 @@
                 </div>
             </div>
         </div>
-    @endif
 
     <!-- Payment Methods Selector -->
     @livewire('payment-methods-selector')
