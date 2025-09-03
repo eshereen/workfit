@@ -70,7 +70,7 @@ class FrontendController extends Controller
                 'category:id,name,slug',
                 'media' => function ($q) {
                     $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                    ->whereIn('collection_name', ['main_image', 'product_images'])
+                      ->whereIn('collection_name', ['main_image', 'product_images'])
                       ->whereNotNull('disk')
                       ->limit(1);
                 }
