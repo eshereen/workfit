@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Models\SubCategory;
+use App\Models\Subcategory;
 use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -20,18 +20,18 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\SubCategoryResource\Pages;
+use App\Filament\Resources\SubcategoryResource\Pages;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use App\Filament\Resources\SubCategoryResource\RelationManagers;
-use App\Filament\Resources\SubCategoryResource\Pages\EditSubCategory;
-use App\Filament\Resources\SubCategoryResource\Pages\ViewSubCategory;
-use App\Filament\Resources\SubCategoryResource\Pages\CreateSubCategory;
-use App\Filament\Resources\SubCategoryResource\Pages\ListSubCategories;
+use App\Filament\Resources\SubcategoryResource\RelationManagers;
+use App\Filament\Resources\SubcategoryResource\Pages\EditSubcategories;
+use App\Filament\Resources\SubcategoryResource\Pages\ViewSubcategories;
+use App\Filament\Resources\SubcategoryResource\Pages\CreateSubcategories;
+use App\Filament\Resources\SubcategoryResource\Pages\ListSubcategories;
 
-class SubCategoryResource extends Resource
+class SubcategoryResource extends Resource
 {
-    protected static ?string $model = SubCategory::class;
+    protected static ?string $model = Subcategory::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-inbox-stack';
 
@@ -116,10 +116,10 @@ class SubCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSubCategories::route('/'),
-            'create' => CreateSubCategory::route('/create'),
-            'view' => ViewSubCategory::route('/{record}'),
-            'edit' => EditSubCategory::route('/{record}/edit'),
+            'index' => ListSubcategories::route('/'),
+            'create' => CreateSubcategories::route('/create'),
+            'view' => ViewSubcategories::route('/{record}'),
+            'edit' => EditSubcategories::route('/{record}/edit'),
         ];
     }
 }

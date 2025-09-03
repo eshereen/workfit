@@ -4,13 +4,13 @@ namespace App\Filament\Resources\SubCategoryResource\Pages;
 
 use Filament\Actions\ViewAction;
 use Filament\Actions\DeleteAction;
-use App\Filament\Resources\SubCategoryResource;
+use App\Filament\Resources\SubcategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditSubCategory extends EditRecord
+class EditSubcategory extends EditRecord
 {
-    protected static string $resource = SubCategoryResource::class;
+    protected static string $resource = SubcategoryResource::class;
 
     protected function getHeaderActions(): array
     {

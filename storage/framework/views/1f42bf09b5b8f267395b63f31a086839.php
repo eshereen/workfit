@@ -36,9 +36,6 @@
          <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
          <?php if($recent->isNotEmpty()): ?>
-
-
-
         <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
@@ -55,7 +52,6 @@ unset($__params);
 unset($__split);
 if (isset($__slots)) unset($__slots);
 ?>
-    
         <?php endif; ?>
     </section>
 
