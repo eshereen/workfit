@@ -163,23 +163,7 @@
                         </div>
 
                         <!-- Variant Colors (if any) -->
-                        @if($product->variants->count() > 0)
-                            <div class="flex gap-2 mb-3">
-                                @foreach($product->variants->take(5) as $variant)
-                                    @if($variant->color)
-                                        <div
-                                            class="w-4 h-4 rounded-full border border-gray-300"
-                                            style="background-color: {{ $this->getColorCode($variant->color) }}"
-                                            title="{{ ucfirst($variant->color) }}"
-                                        ></div>
-                                    @endif
-                                @endforeach
-                                @if($product->variants->count() > 5)
-                                    <span class="text-xs text-gray-500">+{{ $product->variants->count() - 5 }} more</span>
-                                @endif
-                            </div>
-                        @endif
-
+                      
                         <!-- Action Buttons -->
                         <div class="flex gap-2">
                             @if($product->variants->count() > 0)
