@@ -152,11 +152,34 @@ class CategoryProducts extends Component
 
     public function openVariantModal($productId)
     {
-        $this->selectedProduct = Product::with('variants')->find($productId);
-        $this->selectedVariantId = null;
-        $this->selectedVariant = null;
-        $this->quantity = 1;
-        $this->showVariantModal = true;
+        try {
+            // Debug logging for live server
+            \Log::info('CategoryProducts: openVariantModal called', [
+                'product_id' => $productId,
+                'csrf_token' => csrf_token(),
+                'session_id' => session()->getId(),
+                'user_agent' => request()->userAgent(),
+                'ip' => request()->ip()
+            ]);
+            
+            $this->selectedProduct = Product::with('variants')->find($productId);
+            $this->selectedVariantId = null;
+            $this->selectedVariant = null;
+            $this->quantity = 1;
+            $this->showVariantModal = true;
+            
+            \Log::info('CategoryProducts: openVariantModal completed successfully');
+        } catch (\Exception $e) {
+            \Log::error('CategoryProducts: openVariantModal error', [
+                'error' => $e->getMessage(),
+                'product_id' => $productId
+            ]);
+            
+            $this->dispatch('showNotification', [
+                'message' => 'Unable to load product options. Please try again.',
+                'type' => 'error'
+            ]);
+        }
     }
 
     public function selectVariant($variantId)
@@ -221,6 +244,14 @@ class CategoryProducts extends Component
     public function addSimpleProductToCart($productId, $quantity = 1)
     {
         try {
+            // Debug logging for live server
+            \Log::info('CategoryProducts: addSimpleProductToCart called', [
+                'product_id' => $productId,
+                'quantity' => $quantity,
+                'csrf_token' => csrf_token(),
+                'session_id' => session()->getId()
+            ]);
+            
             $cartService = app(CartService::class);
             $product = Product::find($productId);
 

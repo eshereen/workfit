@@ -293,13 +293,25 @@
             // Start session refresh timer
             startSessionRefresh();
 
-            // Handle Livewire errors
+            // Enhanced Livewire error handling for live server
             Livewire.hook('request', ({ fail }) => {
-                fail(({ status, response }) => {
+                fail(({ status, response, content }) => {
+                    console.log('Livewire request failed:', { status, response, content });
+                    
                     if (status === 419 || (response && response.includes('CSRF')) || (response && response.includes('expired'))) {
                         // Show user-friendly message
                         showNotification('Your session has expired. Refreshing page...', 'error');
-
+                        
+                        // Try to get new CSRF token from response
+                        try {
+                            const data = JSON.parse(content);
+                            if (data.csrf_token) {
+                                document.querySelector('meta[name="csrf-token"]').setAttribute('content', data.csrf_token);
+                            }
+                        } catch (e) {
+                            console.log('Could not parse CSRF response');
+                        }
+                        
                         // CSRF token expired - refresh and retry
                         updateCSRFToken();
                         setTimeout(() => {
@@ -307,7 +319,22 @@
                         }, 2000);
                         return false; // Prevent default error handling
                     }
+                    
+                    // Handle other errors
+                    if (status >= 500) {
+                        showNotification('Server error occurred. Please try again.', 'error');
+                        return false;
+                    }
                 });
+            });
+            
+            // Additional Livewire debugging for live server
+            Livewire.hook('component.initialized', (component) => {
+                console.log('Livewire component initialized:', component.fingerprint.name);
+            });
+            
+            Livewire.hook('element.updating', (fromEl, toEl, component) => {
+                console.log('Livewire updating element for:', component.fingerprint.name);
             });
             Livewire.on('showNotification', (data) => {
                 let message, type;
