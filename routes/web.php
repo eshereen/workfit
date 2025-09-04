@@ -75,13 +75,36 @@ Route::get('/debug/middleware', function () {
 })->name('debug.middleware');
 
 Route::post('/debug/csrf-test', function () {
-    return response()->json([
-        'success' => true,
-        'message' => 'CSRF token is working correctly',
-        'csrf_token' => csrf_token(),
-        'session_id' => session()->getId(),
-        'timestamp' => now()->toISOString(),
-    ]);
+    try {
+        \Log::info('CSRF Test Endpoint Hit', [
+            'csrf_token_from_session' => csrf_token(),
+            'csrf_token_from_header' => request()->header('X-CSRF-TOKEN'),
+            'session_id' => session()->getId(),
+            'all_headers' => request()->headers->all(),
+            'method' => request()->method()
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'CSRF token is working correctly',
+            'csrf_token' => csrf_token(),
+            'session_id' => session()->getId(),
+            'timestamp' => now()->toISOString(),
+            'request_token' => request()->header('X-CSRF-TOKEN'),
+            'tokens_match' => hash_equals(csrf_token(), request()->header('X-CSRF-TOKEN')),
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('CSRF Test Error', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'csrf_token' => csrf_token(),
+        ], 500);
+    }
 })->name('debug.csrf');
 
 // Checkout routes
