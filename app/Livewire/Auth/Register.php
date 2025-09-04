@@ -41,7 +41,10 @@ class Register extends Component
         event(new Registered(($user = User::create($validated))));
         $coupon = Coupon::where('code', 'NEW_USER10')->first();
         // Send welcome email
-        Mail::to($user->email)->later(now()->addSeconds(5), new RegisterMail($user, $coupon));
+      
+        Mail::to($user->email)->queue(
+            (new RegisterMail($user, $coupon))->delay(now()->addSeconds(5))
+        );
 
         Auth::login($user);
 
