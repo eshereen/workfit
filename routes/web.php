@@ -189,9 +189,9 @@ Route::get('dashboard', \App\Livewire\Dashboard::class)
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', Profile::class)->name('profile');
-    Route::get('/profile/password', Password::class)->name('profile.password');
-    Route::get('/profile/appearance', Appearance::class)->name('profile.appearance');
+    Route::get('/profile', Profile::class)->name('settings.profile');
+    Route::get('/profile/password', Password::class)->name('settings.password');
+    Route::get('/profile/appearance', Appearance::class)->name('settings.appearance');
     Route::get('/wishlist',\App\Livewire\WishlistIndex::class)->name('wishlist.index');
     // Route::get('/orders',\App\Livewire\OrdersIndex::class)->name('orders');
     // Route::get('/order/{order}',\App\Livewire\OrderView::class)->name('order.view');
