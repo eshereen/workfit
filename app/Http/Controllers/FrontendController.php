@@ -34,7 +34,12 @@ class FrontendController extends Controller
         // Men's Category - Get only men's category with its products
         $men = cache()->remember('home_men_category', 1800, function () {
             return Category::where('categories.active', true)
-                ->where('categories.slug', 'men ')  // Men's category with trailing space
+                ->where(function($query) {
+                    $query->where('categories.slug', 'men ')  // Local dev
+                          ->orWhere('categories.slug', 'men')   // Alternative
+                          ->orWhere('categories.name', 'LIKE', '%men%')  // Live server
+                          ->orWhere('categories.name', 'LIKE', '%MEN%'); // Live server
+                })
                 ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
@@ -51,7 +56,12 @@ class FrontendController extends Controller
         // Women's Category - Get only women's category with its products
         $women = cache()->remember('home_women_category', 1800, function () {
             return Category::where('categories.active', true)
-                ->where('categories.slug', 'women')  // Women's category
+                ->where(function($query) {
+                    $query->where('categories.slug', 'women')  // Standard
+                          ->orWhere('categories.slug', 'women-1')  // Alternative
+                          ->orWhere('categories.name', 'LIKE', '%women%')  // Live server
+                          ->orWhere('categories.name', 'LIKE', '%Women%'); // Live server
+                })
                 ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')

@@ -197,11 +197,62 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('/order/{order}',\App\Livewire\OrderView::class)->name('order.view');
 });
 
+// Clear all caches route
+Route::get('/debug/clear-all-cache', function () {
+    try {
+        // Clear Laravel caches
+        \Artisan::call('cache:clear');
+        \Artisan::call('route:clear');
+        \Artisan::call('config:clear');
+        \Artisan::call('view:clear');
+
+        // Clear OPcache if available
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+            $opcache_cleared = 'YES';
+        } else {
+            $opcache_cleared = 'NOT AVAILABLE';
+        }
+
+        // Clear APCu cache if available
+        if (function_exists('apcu_clear_cache')) {
+            apcu_clear_cache();
+            $apcu_cleared = 'YES';
+        } else {
+            $apcu_cleared = 'NOT AVAILABLE';
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'All caches cleared successfully',
+            'cleared' => [
+                'laravel_cache' => 'YES',
+                'route_cache' => 'YES',
+                'config_cache' => 'YES',
+                'view_cache' => 'YES',
+                'opcache' => $opcache_cleared,
+                'apcu_cache' => $apcu_cleared,
+            ],
+            'timestamp' => now()->format('Y-m-d H:i:s'),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+})->name('debug.clear-cache');
+
 // Debug route to check homepage data on live server
 Route::get('/debug/homepage-data', function () {
-    // Test men's category
+    // Test men's category (your live server has different slug)
     $men = \App\Models\Category::where('categories.active', true)
-        ->where('categories.slug', 'men ')
+        ->where(function($query) {
+            $query->where('categories.slug', 'men ')
+                  ->orWhere('categories.slug', 'men')
+                  ->orWhere('categories.name', 'LIKE', '%men%')
+                  ->orWhere('categories.name', 'LIKE', '%MEN%');
+        })
         ->with(['directProducts' => function ($query) {
             $query->where('products.active', true)->take(8);
         }])
@@ -240,5 +291,68 @@ Route::get('/debug/homepage-data', function () {
         'cache_cleared' => true
     ]);
 })->name('debug.homepage-data');
+
+// Test actual controller data without cache
+Route::get('/debug/controller-test', function () {
+    // Simulate exact controller logic without cache
+    $men = \App\Models\Category::where('categories.active', true)
+        ->where(function($query) {
+            $query->where('categories.slug', 'men ')
+                  ->orWhere('categories.slug', 'men')
+                  ->orWhere('categories.name', 'LIKE', '%men%')
+                  ->orWhere('categories.name', 'LIKE', '%MEN%');
+        })
+        ->with(['directProducts' => function ($query) {
+            $query->with(['media' => function ($q) {
+                    $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                      ->where('collection_name', 'main_image')
+                      ->whereNotNull('disk')
+                      ->limit(1);
+                }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
+                ->where('products.active', true)
+                ->take(8);
+        }])
+        ->first();
+
+    $women = \App\Models\Category::where('categories.active', true)
+        ->where(function($query) {
+            $query->where('categories.slug', 'women')
+                  ->orWhere('categories.slug', 'women-1')
+                  ->orWhere('categories.name', 'LIKE', '%women%')
+                  ->orWhere('categories.name', 'LIKE', '%Women%');
+        })
+        ->with(['directProducts' => function ($query) {
+            $query->with(['media' => function ($q) {
+                    $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                      ->where('collection_name', 'main_image')
+                      ->whereNotNull('disk')
+                      ->limit(1);
+                }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
+                ->where('products.active', true)
+                ->take(8);
+        }])
+        ->first();
+
+    return response()->json([
+        'men' => [
+            'found' => $men ? 'YES' : 'NO',
+            'category' => $men ? $men->name . ' (ID: ' . $men->id . ')' : 'Not found',
+            'products_count' => $men ? $men->directProducts->count() : 0,
+            'products' => $men ? $men->directProducts->map(function($p) {
+                return $p->name . ' (Category ID: ' . $p->category_id . ')';
+            }) : []
+        ],
+        'women' => [
+            'found' => $women ? 'YES' : 'NO',
+            'category' => $women ? $women->name . ' (ID: ' . $women->id . ')' : 'Not found',
+            'products_count' => $women ? $women->directProducts->count() : 0,
+            'products' => $women ? $women->directProducts->map(function($p) {
+                return $p->name . ' (Category ID: ' . $p->category_id . ')';
+            }) : []
+        ],
+        'note' => 'This tests the exact controller logic without cache',
+        'timestamp' => now()->format('Y-m-d H:i:s'),
+    ]);
+})->name('debug.controller-test');
 
 require __DIR__.'/auth.php';
