@@ -10,6 +10,7 @@ use App\Events\PaymentStatusChanged;
 use App\Listeners\AwardLoyaltyPoints;
 use App\Listeners\HandlePaymentStatusChange;
 use App\Observers\OrderObserver;
+use App\Observers\ProductObserver;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
@@ -45,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         // Temporarily disabled to debug 502 on checkout (emails in observer)
          Order::observe(OrderObserver::class);
         OrderItem::observe(OrderItemObserver::class);
+        Product::observe(ProductObserver::class);
 
         // Share categories with all views - Optimized with caching and eager loading
         View::composer('*', function ($view) {

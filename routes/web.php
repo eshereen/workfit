@@ -44,10 +44,8 @@ Route::post('/checkout/guest', [CheckoutController::class, 'processGuestCheckout
  Route::post('/checkout/currency', [CurrencyController::class, 'updateCheckoutCountry'])->name('checkout.currency.update'); // Removed for Livewire-only approach
 Route::get('/checkout/confirmation/{order}', [CheckoutController::class, 'orderConfirmation'])->name('checkout.confirmation');
 Route::get('/thank-you/{order}', [CheckoutController::class, 'thankYou'])->name('thankyou');
-Route::get('/checkout/test', [CheckoutController::class, 'testCheckout'])->name('checkout.test');
-Route::post('/checkout/debug', [CheckoutController::class, 'debugForm'])->name('checkout.debug');
-Route::post('/checkout/test-cod', [CheckoutController::class, 'testCodPayment'])->name('checkout.test-cod');
-Route::get('/checkout/test-simple-cod', [CheckoutController::class, 'testSimpleCod'])->name('checkout.test-simple-cod');
+
+
 
 
 // PayPal credit card payment route
@@ -70,14 +68,7 @@ Route::get('/paymob/test', function() {
     ]);
 })->name('paymob.test');
 
-// Test route for Paymob callback
-Route::get('/test-paymob-callback', function() {
-    return response()->json([
-        'message' => 'Paymob callback route is working!',
-        'timestamp' => now(),
-        'route_name' => 'paymob.callback'
-    ]);
-})->name('test.paymob.callback');
+
 
 // Payment webhooks
 Route::post('/payments/webhook/{gateway}', [\App\Http\Controllers\PaymentController::class, 'handleWebhook'])->name('webhook.gateway');
@@ -96,6 +87,7 @@ Route::prefix('cart')->group(function () {
     Route::post('/clear', [CartController::class, 'clear'])->name('cart.clear');
     Route::get('/count', [CartController::class, 'count'])->name('cart.count');
 });
+Route::get('/products',[ProductController::class,'index'])->name('products.index');
 Route::get('/newsletter/verify', VerifyController::class)->name('newsletter.verify');
 Route::get('/newsletter/unsubscribe', UnsubscribeController::class)->name('newsletter.unsubscribe');
 //Terms
