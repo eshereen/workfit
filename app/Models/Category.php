@@ -33,6 +33,14 @@ class Category extends Model implements HasMedia
         )->where('products.active', 1); // 👈 disambiguated
     }
 
+    /**
+     * Get products directly associated with this category (not through subcategories)
+     */
+    public function directProducts()
+    {
+        return $this->hasMany(Product::class)->where('products.active', true);
+    }
+
 
 
     /**

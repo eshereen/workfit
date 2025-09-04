@@ -37,8 +37,8 @@
     <section class="px-4">
         <h1 class="text-center font-bold text-5xl mb-2 uppercase">Men's Collection</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
-        @if($men->isNotEmpty())
-       @livewire('product-index',['products'=>$men->first()->products->take(8)])
+        @if($men && $men->directProducts->isNotEmpty())
+       @livewire('product-index',['products'=>$men->directProducts->take(8)])
        @endif
    </section>
 
@@ -67,19 +67,19 @@
     </section>
     <!-- Product Grid - First Category Collection -->
     <section class="py-16 px-4">
-        @if($women->isNotEmpty())
+        @if($women && $women->directProducts->isNotEmpty())
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $women->first()->name }}'S COLLECTION</h2>
+            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $women->name }}'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $women->first()->description }}</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $women->description }}</p>
 
-           @livewire('product-index',['products'=>$women->first()->products->take(8)])
+           @livewire('product-index',['products'=>$women->directProducts->take(8)])
 
 
 
             <div class="text-center mt-12 animate-on-scroll">
-                <a href="{{ route('categories.index', $women->first()->slug) }}" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors">
-                    VIEW ALL {{ $women->first()->name }}'S
+                <a href="{{ route('categories.index', $women->slug) }}" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors">
+                    VIEW ALL {{ $women->name }}'S
                 </a>
             </div>
         </div>
@@ -149,7 +149,7 @@
             <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $categories->get(1)->description }}</p>
 
 
-           @livewire('product-index',['products'=>$categories->get(1)->products->take(8)])
+           @livewire('product-index',['products'=>$categories->get(1)->directProducts->take(8)])
 
 
 

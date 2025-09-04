@@ -17,9 +17,9 @@ class FrontendController extends Controller
         // Load main categories with their own products only
         $categories = cache()->remember('home_categories', 1800, function () {
             return Category::where('categories.active', true)
-                ->orderBy('name', 'asc') // Order by name for consistency
+                ->orderBy('categories.name', 'asc') // Order by name for consistency
                 ->take(4)
-                ->with(['products' => function ($query) {
+                ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
                               ->where('collection_name', 'main_image')
@@ -32,12 +32,11 @@ class FrontendController extends Controller
                 ->get();
         });
 
-        // Men's Category
+        // Men's Category - Get only men's category with its products
         $men = cache()->remember('home_men_category', 1800, function () {
             return Category::where('categories.active', true)
-                ->orderBy('name', 'asc') // Order by name for consistency
-              ->where('slug','men')
-                ->with(['products' => function ($query) {
+                ->where('categories.slug', 'men ')  // Men's category with trailing space
+                ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
                               ->where('collection_name', 'main_image')
@@ -47,14 +46,14 @@ class FrontendController extends Controller
                         ->where('products.active', true)
                         ->take(8);
                 }])
-                ->get();
+                ->first(); // Use first() instead of get() since we only want one category
         });
 
+        // Women's Category - Get only women's category with its products
         $women = cache()->remember('home_women_category', 1800, function () {
             return Category::where('categories.active', true)
-                ->orderBy('name', 'asc') // Order by name for consistency
-              ->where('slug','women')
-                ->with(['products' => function ($query) {
+                ->where('categories.slug', 'women')  // Women's category
+                ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
                               ->where('collection_name', 'main_image')
@@ -64,7 +63,7 @@ class FrontendController extends Controller
                         ->where('products.active', true)
                         ->take(8);
                 }])
-                ->get();
+                ->first(); // Use first() instead of get() since we only want one category
         });
 
         // Recent Products
