@@ -63,16 +63,14 @@ Route::get('/debug/session', function () {
 })->name('debug.session');
 
 Route::get('/debug/middleware', function () {
-    $middleware = [];
-    foreach (app('router')->getMiddleware() as $name => $class) {
-        $middleware[$name] = $class;
-    }
-
     return response()->json([
-        'registered_middleware' => $middleware,
-        'livewire_csrf_active' => class_exists(\App\Http\Middleware\LivewireCSRFMiddleware::class),
-        'csrf_middleware' => \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
-        'app_middleware' => app('Illuminate\Contracts\Http\Kernel')->getMiddleware(),
+        'livewire_csrf_middleware_exists' => class_exists(\App\Http\Middleware\LivewireCSRFMiddleware::class),
+        'csrf_middleware_class' => \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+        'livewire_csrf_file_exists' => file_exists(app_path('Http/Middleware/LivewireCSRFMiddleware.php')),
+        'bootstrap_app_content' => file_get_contents(base_path('bootstrap/app.php')),
+        'middleware_replaced' => str_contains(file_get_contents(base_path('bootstrap/app.php')), 'LivewireCSRFMiddleware'),
+        'laravel_version' => app()->version(),
+        'environment' => app()->environment(),
     ]);
 })->name('debug.middleware');
 

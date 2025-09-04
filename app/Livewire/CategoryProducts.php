@@ -153,26 +153,46 @@ class CategoryProducts extends Component
     public function openVariantModal($productId)
     {
         try {
-            // Debug logging for live server
-            \Log::info('CategoryProducts: openVariantModal called', [
+            // Enhanced debug logging for live server
+            \Log::info('CategoryProducts: openVariantModal STARTED', [
                 'product_id' => $productId,
                 'csrf_token' => csrf_token(),
                 'session_id' => session()->getId(),
                 'user_agent' => request()->userAgent(),
-                'ip' => request()->ip()
+                'ip' => request()->ip(),
+                'livewire_request' => request()->hasHeader('X-Livewire'),
+                'csrf_header' => request()->header('X-CSRF-TOKEN'),
+                'all_headers' => request()->headers->all(),
+                'method' => request()->method(),
+                'url' => request()->url()
             ]);
 
             $this->selectedProduct = Product::with('variants')->find($productId);
+
+            if (!$this->selectedProduct) {
+                \Log::error('CategoryProducts: Product not found', ['product_id' => $productId]);
+                $this->dispatch('showNotification', [
+                    'message' => 'Product not found.',
+                    'type' => 'error'
+                ]);
+                return;
+            }
+
             $this->selectedVariantId = null;
             $this->selectedVariant = null;
             $this->quantity = 1;
             $this->showVariantModal = true;
 
-            \Log::info('CategoryProducts: openVariantModal completed successfully');
+            \Log::info('CategoryProducts: openVariantModal COMPLETED successfully', [
+                'product_id' => $productId,
+                'product_name' => $this->selectedProduct->name,
+                'variants_count' => $this->selectedProduct->variants->count()
+            ]);
         } catch (\Exception $e) {
-            \Log::error('CategoryProducts: openVariantModal error', [
+            \Log::error('CategoryProducts: openVariantModal EXCEPTION', [
                 'error' => $e->getMessage(),
-                'product_id' => $productId
+                'product_id' => $productId,
+                'trace' => $e->getTraceAsString()
             ]);
 
             $this->dispatch('showNotification', [
