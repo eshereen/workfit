@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Append our currency middleware to the web group in a supported way
         $middleware->appendToGroup('web', \App\Http\Middleware\CurrencyMiddleware::class);
+        $middleware->appendToGroup('web', \App\Http\Middleware\CacheControlStatic::class);
+        \App\Http\Middleware\CacheControlStatic::class;
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
