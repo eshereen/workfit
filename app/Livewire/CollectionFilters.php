@@ -93,7 +93,7 @@ class CollectionFilters extends Component
     {
         if (!$this->collection) {
             // If no specific collection, get categories from all active products
-            return Category::where('category.active', true)
+            return Category::where('categories.active', true)
                 ->withCount('products')
                 ->orderBy('name')
                 ->get();
