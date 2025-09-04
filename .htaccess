@@ -29,98 +29,34 @@
 </IfModule>
 
 # ----------------------------------------------------------------------
-# PHP Settings Reset (optional safety)
+# LiteSpeed Specific Cache Control (CRITICAL FOR CSRF)
 # ----------------------------------------------------------------------
-<IfModule mod_php7.c>
-    php_value auto_prepend_file none
-    php_value auto_append_file none
-</IfModule>
-
-# ----------------------------------------------------------------------
-# Gzip / Brotli Compression
-# ----------------------------------------------------------------------
-<IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
-  AddOutputFilterByType DEFLATE application/javascript application/json application/xml
-  AddOutputFilterByType DEFLATE font/ttf font/otf font/woff font/woff2
-  AddOutputFilterByType DEFLATE image/svg+xml image/x-icon
-</IfModule>
-
-<IfModule mod_brotli.c>
-  BrotliCompressionQuality 6
-  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css application/javascript application/json image/svg+xml
-</IfModule>
-
 <IfModule LiteSpeed>
-  # Enable compression
-  SetEnv no-gzip 0
-  SetEnv no-brotli 0
+    # EMERGENCY: Disable ALL caching temporarily
+    RewriteEngine On
+    RewriteRule .* - [E=Cache-Control:no-cache,E=no-cache:1]
 
-  # CRITICAL: Exclude Livewire routes and CSRF-sensitive content from cache
-  RewriteEngine On
-
-  # Exclude authentication, cart, checkout, and Livewire requests from cache
-  RewriteCond %{REQUEST_URI} ^/(login|register|checkout|cart|admin|livewire) [NC,OR]
-  RewriteCond %{REQUEST_METHOD} =POST [OR]
-  RewriteCond %{HTTP:X-Livewire} .* [OR]
-  RewriteCond %{HTTP:X-CSRF-TOKEN} .* [OR]
-  RewriteCond %{HTTP:X-XSRF-TOKEN} .*
-  RewriteRule .* - [E=Cache-Control:no-cache,E=no-cache:1]
-
-  # Enable LSCache only for safe public pages
-  RewriteCond %{REQUEST_URI} !^/(login|register|checkout|cart|admin|livewire) [NC]
-  RewriteCond %{REQUEST_METHOD} =GET
-  RewriteCond %{HTTP:X-Livewire} !.*
-  RewriteRule .* - [E=Cache-Control:public]
-</IfModule>
-
-# ----------------------------------------------------------------------
-# Browser Caching (CSRF-Safe)
-# ----------------------------------------------------------------------
-<IfModule mod_expires.c>
-  ExpiresActive On
-
-  # Long cache for static assets
-  ExpiresByType image/jpg "access plus 1 year"
-  ExpiresByType image/jpeg "access plus 1 year"
-  ExpiresByType image/gif "access plus 1 year"
-  ExpiresByType image/png "access plus 1 year"
-  ExpiresByType image/webp "access plus 1 year"
-  ExpiresByType image/svg+xml "access plus 1 year"
-  ExpiresByType image/x-icon "access plus 1 year"
-
-  ExpiresByType text/css "access plus 1 year"
-  ExpiresByType application/javascript "access plus 1 year"
-
-  ExpiresByType font/ttf "access plus 6 months"
-  ExpiresByType font/otf "access plus 6 months"
-  ExpiresByType font/woff "access plus 6 months"
-  ExpiresByType font/woff2 "access plus 6 months"
-
-  # Short cache for dynamic content to prevent CSRF issues
-  ExpiresByType text/html "access plus 5 minutes"
-  ExpiresByType application/json "access plus 1 minute"
+    # Force no cache headers
+    Header always set Cache-Control "no-cache, no-store, must-revalidate"
+    Header always set Pragma "no-cache"
+    Header always set Expires "0"
 </IfModule>
 
 # ----------------------------------------------------------------------
 # Security Headers (CSRF-Friendly)
 # ----------------------------------------------------------------------
 <IfModule mod_headers.c>
-  Header append Vary Accept-Encoding
-  Header unset ETag
-  Header always set X-Content-Type-Options "nosniff"
-  Header always set X-Frame-Options "SAMEORIGIN"
-  Header always set X-XSS-Protection "1; mode=block"
-  Header always set Referrer-Policy "strict-origin-when-cross-origin"
-  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header append Vary Accept-Encoding
+    Header unset ETag
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
 
-  # Ensure CSRF tokens are not cached by intermediaries
-  <FilesMatch "\.(html|php)$">
-    Header always set Cache-Control "no-cache, no-store, must-revalidate"
-    Header always set Pragma "no-cache"
-    Header always set Expires "0"
-  </FilesMatch>
-
-  # Allow X-CSRF-TOKEN and X-XSRF-TOKEN headers
-  Header always set Access-Control-Allow-Headers "X-CSRF-TOKEN, X-XSRF-TOKEN, X-Livewire, Content-Type, Accept, Authorization"
+    # CRITICAL: Ensure dynamic content is never cached
+    <FilesMatch "\.(html|php)$">
+        Header always set Cache-Control "no-cache, no-store, must-revalidate"
+        Header always set Pragma "no-cache"
+        Header always set Expires "0"
+    </FilesMatch>
 </IfModule>
