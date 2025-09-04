@@ -56,34 +56,10 @@
 </IfModule>
 
 # ----------------------------------------------------------------------
-# LiteSpeed Specific Cache Control (CSRF-Safe + Performance)
+# LiteSpeed Cache DISABLED (CSRF Compatibility)
 # ----------------------------------------------------------------------
-<IfModule LiteSpeed>
-    # Enable advanced compression
-    SetEnv no-gzip 0
-    SetEnv no-brotli 0
-
-    # Exclude CSRF-sensitive requests from cache
-    RewriteEngine On
-    RewriteCond %{REQUEST_METHOD} =POST [OR]
-    RewriteCond %{HTTP:X-Livewire} .* [OR]
-    RewriteCond %{HTTP:X-CSRF-TOKEN} .* [OR]
-    RewriteCond %{HTTP:X-XSRF-TOKEN} .* [OR]
-    RewriteCond %{REQUEST_URI} ^/(login|register|checkout|cart|admin|livewire|debug) [NC]
-    RewriteRule .* - [E=Cache-Control:no-cache,E=no-cache:1]
-
-    # Aggressive caching for static assets (1 year)
-    RewriteCond %{REQUEST_METHOD} =GET
-    RewriteCond %{REQUEST_URI} \.(css|js|woff2?|ttf|eot|svg|png|jpe?g|gif|webp|ico|pdf)$ [NC]
-    RewriteRule .* - [E=Cache-Control:public,E=cache-timeout:31536000]
-
-    # Medium caching for safe dynamic content (5 minutes)
-    RewriteCond %{REQUEST_METHOD} =GET
-    RewriteCond %{HTTP:X-Livewire} !.*
-    RewriteCond %{REQUEST_URI} !^/(login|register|checkout|cart|admin|livewire|debug) [NC]
-    RewriteCond %{REQUEST_URI} !\.(css|js|woff2?|ttf|eot|svg|png|jpe?g|gif|webp|ico|pdf)$ [NC]
-    RewriteRule .* - [E=Cache-Control:public,E=cache-timeout:300]
-</IfModule>
+# LiteSpeed cache rules removed to prevent CSRF token conflicts
+# Performance maintained through browser caching and compression below
 
 # ----------------------------------------------------------------------
 # Advanced Browser Caching (Expires Headers)
