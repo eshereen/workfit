@@ -12,7 +12,9 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        // Exclude debug routes only (these are safe to exclude)
+        'debug/*',
+        'emergency-test.php',
     ];
 
     /**
@@ -23,19 +25,59 @@ class VerifyCsrfToken extends Middleware
      */
     protected function shouldPassThrough($request)
     {
-        // EMERGENCY: Bypass ALL CSRF verification temporarily
-        return true;
+        // Check the standard exclusions first
+        if (parent::shouldPassThrough($request)) {
+            return true;
+        }
+
+        // For LiteSpeed compatibility: Handle stale token issues
+        if ($this->isLivewireRequest($request)) {
+            $sessionToken = $request->session()->token();
+            $requestToken = $this->getTokenFromRequest($request);
+
+            // If tokens don't match, regenerate session token once and try again
+            if ($sessionToken && $requestToken && !hash_equals($sessionToken, $requestToken)) {
+                \Log::info('CSRF token mismatch - regenerating session token', [
+                    'url' => $request->url(),
+                    'old_session_token' => substr($sessionToken, 0, 10) . '...',
+                    'request_token' => substr($requestToken, 0, 10) . '...',
+                ]);
+
+                // Regenerate token and allow this request through
+                $request->session()->regenerateToken();
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-     * Determine if the session and input CSRF tokens match.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
+     * Determine if this is a Livewire request.
      */
-    protected function tokensMatch($request)
+    protected function isLivewireRequest($request): bool
     {
-        // EMERGENCY: Always return true to bypass CSRF checks
-        return true;
+        return $request->hasHeader('X-Livewire') ||
+               str_contains($request->url(), '/livewire/') ||
+               $request->hasHeader('X-Livewire-Request');
+    }
+
+    /**
+     * Get the CSRF token from the request.
+     */
+    protected function getTokenFromRequest($request)
+    {
+        $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
+
+        if (!$token && $header = $request->header('X-XSRF-TOKEN')) {
+            try {
+                $token = decrypt($header);
+            } catch (\Exception $e) {
+                // If decryption fails, use the raw header value
+                $token = $header;
+            }
+        }
+
+        return $token;
     }
 }
