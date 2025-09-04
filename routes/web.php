@@ -35,6 +35,7 @@ Route::prefix('currency')->group(function () {
     Route::post('/reset', [CurrencyController::class, 'resetToDetected'])->name('currency.reset');
 });
 
+
 // CSRF token refresh route
 Route::get('/csrf-token', function () {
     return response()->json(['csrf_token' => csrf_token()]);
@@ -191,7 +192,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', Profile::class)->name('profile');
     Route::get('/profile/password', Password::class)->name('profile.password');
     Route::get('/profile/appearance', Appearance::class)->name('profile.appearance');
-    Route::get('/wishlist',\App\Livewire\WishlistIndex::class)->name('wishlist');
+    Route::get('/wishlist',\App\Livewire\WishlistIndex::class)->name('wishlist.index');
     // Route::get('/orders',\App\Livewire\OrdersIndex::class)->name('orders');
     // Route::get('/order/{order}',\App\Livewire\OrderView::class)->name('order.view');
 });
