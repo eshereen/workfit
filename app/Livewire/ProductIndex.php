@@ -508,15 +508,7 @@ class ProductIndex extends Component
                 return $query->paginate($perPage);
             });
 
-            // Debug: Log what we got from cache
-
-            Log::info('ProductIndex render - products from cache', [
-                'is_null' => $productsToDisplay === null,
-                'is_collection' => $productsToDisplay instanceof \Illuminate\Support\Collection,
-                'is_paginator' => $productsToDisplay instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator,
-                'count' => $productsToDisplay ? $productsToDisplay->count() : 'null',
-                'total' => method_exists($productsToDisplay, 'total') ? $productsToDisplay->total() : 'no total method'
-            ]);
+            // Products fetched successfully from cache
 
             // Don't convert paginated results to collections - this breaks pagination
             if (!$productsToDisplay) {
@@ -539,16 +531,11 @@ class ProductIndex extends Component
             }
 
             // Convert product prices to current currency (optimized)
-            \Log::info('About to convert prices', ['products_count' => $productsToDisplay->count()]);
             $this->convertProductPricesOptimized($productsToDisplay);
-            \Log::info('Price conversion completed');
 
             // Pre-compute variants data to avoid N+1 queries
-            \Log::info('About to precompute variants');
             $this->precomputeVariantsData($productsToDisplay);
-            \Log::info('Variants precomputed');
 
-            \Log::info('About to return view with products', ['products_count' => $productsToDisplay->count()]);
             return view('livewire.product-index', [
                 'products' => $productsToDisplay
             ]);

@@ -33,9 +33,12 @@ Route::prefix('currency')->group(function () {
     Route::post('/change', [CurrencyController::class, 'changeCurrency'])->name('currency.change');
     Route::get('/current', [CurrencyController::class, 'getCurrentCurrency'])->name('currency.current');
     Route::post('/reset', [CurrencyController::class, 'resetToDetected'])->name('currency.reset');
-
-
 });
+
+// CSRF token refresh route
+Route::get('/csrf-token', function () {
+    return response()->json(['csrf_token' => csrf_token()]);
+})->name('csrf.token');
 
 // Checkout routes
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');

@@ -240,8 +240,75 @@
             }, 3000);
         }
 
-                // Listen for Livewire notification events
+                // CSRF and Session Management
+        let sessionRefreshTimer;
+
+        function refreshSession() {
+            fetch('/currency/current', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            }).catch(() => {
+                // Silently fail - this is just to keep session alive
+            });
+        }
+
+        function startSessionRefresh() {
+            // Refresh session every 2.5 hours (before 3 hour expiry)
+            sessionRefreshTimer = setInterval(refreshSession, 150 * 60 * 1000);
+        }
+
+        function updateCSRFToken() {
+            fetch('/csrf-token', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.csrf_token) {
+                    document.querySelector('meta[name="csrf-token"]').setAttribute('content', data.csrf_token);
+                    // Update Livewire's CSRF token if available
+                    if (window.Livewire && window.Livewire.all) {
+                        window.Livewire.all().forEach(component => {
+                            if (component.csrf) {
+                                component.csrf = data.csrf_token;
+                            }
+                        });
+                    }
+                }
+            })
+            .catch(() => {
+                // CSRF token refresh failed - reload page
+                window.location.reload();
+            });
+        }
+
+        // Listen for Livewire notification events
         document.addEventListener('livewire:init', () => {
+            // Start session refresh timer
+            startSessionRefresh();
+
+            // Handle Livewire errors
+            Livewire.hook('request', ({ fail }) => {
+                fail(({ status, response }) => {
+                    if (status === 419 || (response && response.includes('CSRF')) || (response && response.includes('expired'))) {
+                        // Show user-friendly message
+                        showNotification('Your session has expired. Refreshing page...', 'error');
+
+                        // CSRF token expired - refresh and retry
+                        updateCSRFToken();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                        return false; // Prevent default error handling
+                    }
+                });
+            });
             Livewire.on('showNotification', (data) => {
                 let message, type;
 

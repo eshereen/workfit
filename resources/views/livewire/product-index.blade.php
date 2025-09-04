@@ -53,19 +53,7 @@
     @endif
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {{-- DEBUG: Products info --}}
-        @php
-            \Log::info('Products in view', [
-                'products_exists' => isset($products),
-                'products_is_null' => $products === null,
-                'products_count' => $products ? $products->count() : 'null',
-                'products_total' => ($products && method_exists($products, 'total')) ? $products->total() : 'no total method',
-                'products_type' => gettype($products),
-                'products_class' => $products ? get_class($products) : 'null'
-            ]);
-        @endphp
-        {{-- DEBUG: Simplifying the condition --}}
-        @if($products)
+        @if($products && $products->count() > 0)
             @foreach($products as $product)
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
             <div class="relative overflow-hidden aspect-[4/5] product-image-container"
