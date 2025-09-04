@@ -32,6 +32,41 @@ class FrontendController extends Controller
                 ->get();
         });
 
+        // Men's Category
+        $men = cache()->remember('home_men_category', 1800, function () {
+            return Category::where('categories.active', true)
+                ->orderBy('name', 'asc') // Order by name for consistency
+              ->where('slug','men')
+                ->with(['products' => function ($query) {
+                    $query->with(['media' => function ($q) {
+                            $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                              ->where('collection_name', 'main_image')
+                              ->whereNotNull('disk')
+                              ->limit(1);
+                        }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
+                        ->where('products.active', true)
+                        ->take(8);
+                }])
+                ->get();
+        });
+
+        $women = cache()->remember('home_women_category', 1800, function () {
+            return Category::where('categories.active', true)
+                ->orderBy('name', 'asc') // Order by name for consistency
+              ->where('slug','women')
+                ->with(['products' => function ($query) {
+                    $query->with(['media' => function ($q) {
+                            $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                              ->where('collection_name', 'main_image')
+                              ->whereNotNull('disk')
+                              ->limit(1);
+                        }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
+                        ->where('products.active', true)
+                        ->take(8);
+                }])
+                ->get();
+        });
+
         // Recent Products
         $recent = cache()->remember('home_recent_products', 1800, function () {
             return Product::select('id', 'name', 'slug', 'price', 'compare_price', 'category_id', 'active', 'created_at')
@@ -44,7 +79,7 @@ class FrontendController extends Controller
                     }
                 ])
                 ->where('products.active', true)
-               
+
                 ->whereHas('media', function ($query) {
                     $query->where('collection_name', 'main_image')
                           ->whereNotNull('disk');
@@ -84,7 +119,7 @@ class FrontendController extends Controller
             ->get();
         });
 
-        return view('home', compact('title', 'categories', 'recent', 'collections', 'featured'));
+        return view('home', compact('title', 'categories', 'recent', 'collections', 'featured', 'men', 'women'));
     }
 
 
