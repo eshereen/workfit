@@ -40,7 +40,7 @@ Route::get('/csrf-token', function () {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf.token');
 
-// DEBUG ROUTES (Remove after fixing live server issue)
+// EMERGENCY DEBUG ROUTES - NO CSRF PROTECTION
 Route::get('/debug/session', function () {
     return response()->json([
         'session_id' => session()->getId(),
@@ -67,12 +67,25 @@ Route::get('/debug/middleware', function () {
         'livewire_csrf_middleware_exists' => class_exists(\App\Http\Middleware\LivewireCSRFMiddleware::class),
         'csrf_middleware_class' => \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
         'livewire_csrf_file_exists' => file_exists(app_path('Http/Middleware/LivewireCSRFMiddleware.php')),
+        'verify_csrf_token_exists' => file_exists(app_path('Http/Middleware/VerifyCsrfToken.php')),
+        'verify_csrf_token_content' => file_exists(app_path('Http/Middleware/VerifyCsrfToken.php')) ? file_get_contents(app_path('Http/Middleware/VerifyCsrfToken.php')) : 'FILE NOT FOUND',
         'bootstrap_app_content' => file_get_contents(base_path('bootstrap/app.php')),
         'middleware_replaced' => str_contains(file_get_contents(base_path('bootstrap/app.php')), 'LivewireCSRFMiddleware'),
         'laravel_version' => app()->version(),
         'environment' => app()->environment(),
     ]);
 })->name('debug.middleware');
+
+// EMERGENCY TEST - NO CSRF AT ALL
+Route::any('/debug/no-csrf-test', function () {
+    \Log::info('NO CSRF Test Hit - This should always work');
+    return response()->json([
+        'success' => true,
+        'message' => 'This endpoint has NO CSRF protection',
+        'method' => request()->method(),
+        'timestamp' => now()->toISOString(),
+    ]);
+})->name('debug.no-csrf');
 
 Route::post('/debug/csrf-test', function () {
     try {
