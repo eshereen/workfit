@@ -33,7 +33,7 @@ class ProductIndex extends Component
     public $selectedVariant = null;
     public $quantity = 1;
 
-    public $products = null;
+    // Removed: public $products = null; - conflicts with view variable
 
     #[On('wishlistUpdated')]
     public function loadWishlist()
@@ -449,12 +449,8 @@ class ProductIndex extends Component
 
     public function render()
     {
-        if ($this->products) {
-            // Use passed products if provided (no pagination needed for home page sections)
-            $productsToDisplay = \Illuminate\Database\Eloquent\Collection::make($this->products);
-            $productsToDisplay->loadMissing(['category', 'subcategory', 'variants', 'media']); // Load missing relationships efficiently
-        } else {
-            // Existing query logic for when no products are passed
+        try {
+            // Always use the cached query logic since we're not passing products from controller
             $cacheKey = $this->buildCacheKey();
             $cacheTime = request()->routeIs('home') ? 60 : 180;
             $productsToDisplay = cache()->remember($cacheKey, $cacheTime, function () {
@@ -511,17 +507,74 @@ class ProductIndex extends Component
                 $perPage = request()->routeIs('home') ? 8 : 12;
                 return $query->paginate($perPage);
             });
+
+            // Debug: Log what we got from cache
+
+            Log::info('ProductIndex render - products from cache', [
+                'is_null' => $productsToDisplay === null,
+                'is_collection' => $productsToDisplay instanceof \Illuminate\Support\Collection,
+                'is_paginator' => $productsToDisplay instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator,
+                'count' => $productsToDisplay ? $productsToDisplay->count() : 'null',
+                'total' => method_exists($productsToDisplay, 'total') ? $productsToDisplay->total() : 'no total method'
+            ]);
+
+            // Don't convert paginated results to collections - this breaks pagination
+            if (!$productsToDisplay) {
+                // Only fallback if completely null - run query directly
+                $productsToDisplay = Product::with([
+                    'category:id,name,slug',
+                    'media' => function ($query) {
+                        $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                              ->whereIn('collection_name', ['main_image', 'product_images'])
+                              ->whereNotNull('disk')
+                              ->orderBy('collection_name', 'asc')
+                              ->orderBy('id', 'asc');
+                    },
+                    'variants:id,product_id,color,size,price,stock'
+                ])
+                ->select('id', 'name', 'slug', 'description', 'price', 'compare_price', 'category_id', 'subcategory_id', 'active', 'featured', 'created_at')
+                ->where('products.active', true)
+                ->orderBy('created_at', 'desc')
+                ->paginate(12);
+            }
+
+            // Convert product prices to current currency (optimized)
+            \Log::info('About to convert prices', ['products_count' => $productsToDisplay->count()]);
+            $this->convertProductPricesOptimized($productsToDisplay);
+            \Log::info('Price conversion completed');
+
+            // Pre-compute variants data to avoid N+1 queries
+            \Log::info('About to precompute variants');
+            $this->precomputeVariantsData($productsToDisplay);
+            \Log::info('Variants precomputed');
+
+            \Log::info('About to return view with products', ['products_count' => $productsToDisplay->count()]);
+            return view('livewire.product-index', [
+                'products' => $productsToDisplay
+            ]);
+        } catch (\Exception $e) {
+            // Log error and return fallback products query
+            \Log::error('ProductIndex render error: ' . $e->getMessage());
+
+            // Return a basic query as fallback to maintain pagination
+            $fallbackProducts = Product::with([
+                'category:id,name,slug',
+                'media' => function ($query) {
+                    $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
+                          ->whereIn('collection_name', ['main_image', 'product_images'])
+                          ->whereNotNull('disk');
+                },
+                'variants:id,product_id,color,size,price,stock'
+            ])
+            ->select('id', 'name', 'slug', 'description', 'price', 'compare_price', 'category_id', 'subcategory_id', 'active', 'featured', 'created_at')
+            ->where('products.active', true)
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+            return view('livewire.product-index', [
+                'products' => $fallbackProducts
+            ]);
         }
-
-        // Convert product prices to current currency (optimized)
-        $this->convertProductPricesOptimized($productsToDisplay);
-
-        // Pre-compute variants data to avoid N+1 queries
-        $this->precomputeVariantsData($productsToDisplay);
-
-        return view('livewire.product-index', [
-            'products' => $productsToDisplay
-        ]);
     }
 
         /**

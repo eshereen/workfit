@@ -62,7 +62,7 @@ class ProductController extends Controller
             return $products;
         });
 
-        return view('products.index', compact('result', 'currencyInfo', 'title'));
+        return view('products.index', compact('currencyInfo', 'title'));
     }
 
     /**
