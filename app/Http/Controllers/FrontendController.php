@@ -44,6 +44,7 @@ class FrontendController extends Controller
                     }
                 ])
                 ->where('products.active', true)
+               
                 ->whereHas('media', function ($query) {
                     $query->where('collection_name', 'main_image')
                           ->whereNotNull('disk');

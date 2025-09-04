@@ -11,7 +11,7 @@
 
     # Handle X-XSRF-Token Header
     RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:XSRF-Token}]
 
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
@@ -24,7 +24,9 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-# Force PHP restart on each request (temporary)
+# ----------------------------------------------------------------------
+# PHP Settings Reset (optional safety)
+# ----------------------------------------------------------------------
 <IfModule mod_php7.c>
     php_value auto_prepend_file none
     php_value auto_append_file none
@@ -56,8 +58,17 @@
   AddOutputFilterByType DEFLATE text/plain
   AddOutputFilterByType DEFLATE text/xml
 
+  # Do not compress images, archives, videos
   SetEnvIfNoCase Request_URI \
     \.(?:gif|jpg|jpeg|png|webp|mp4|avi|mov|zip|gz|bz2|rar|7z)$ no-gzip dont-vary
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Enable Brotli Compression (if supported)
+# ----------------------------------------------------------------------
+<IfModule mod_brotli.c>
+  BrotliCompressionQuality 6
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css application/javascript application/json image/svg+xml
 </IfModule>
 
 # ----------------------------------------------------------------------
@@ -74,8 +85,8 @@
   ExpiresByType image/svg+xml "access plus 1 year"
   ExpiresByType image/x-icon "access plus 1 year"
 
-  ExpiresByType text/css "access plus 1 month"
-  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
 
   ExpiresByType font/ttf "access plus 6 months"
   ExpiresByType font/otf "access plus 6 months"
@@ -87,9 +98,17 @@
 </IfModule>
 
 # ----------------------------------------------------------------------
-# ETag Disable
+# Cache Headers & Vary Encoding
 # ----------------------------------------------------------------------
 <IfModule mod_headers.c>
+  Header append Vary Accept-Encoding
   Header unset ETag
+
+  # Security Headers
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 </IfModule>
 FileETag None
