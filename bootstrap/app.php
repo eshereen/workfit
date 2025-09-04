@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Providers\LoyaltyServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
-        // TEMPORARY: Use standard CSRF middleware with exclusions for testing
+        // EMERGENCY: Temporarily disabled custom CSRF middleware - using standard with bypasses
         // $middleware->replace(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class, \App\Http\Middleware\LivewireCSRFMiddleware::class);
 
         // Append our currency middleware to the web group in a supported way
