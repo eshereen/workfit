@@ -17,19 +17,19 @@ class LivewireCSRFMiddleware extends VerifyCsrfToken
      */
     public function handle($request, Closure $next): Response
     {
-        // Add debugging for live server
-        if (app()->environment('production')) {
-            Log::info('LivewireCSRFMiddleware: Processing request', [
-                'url' => $request->url(),
-                'method' => $request->method(),
-                'is_livewire' => $request->hasHeader('X-Livewire'),
-                'has_csrf_token' => $request->hasHeader('X-CSRF-TOKEN') || $request->hasHeader('X-XSRF-TOKEN'),
-                'session_token' => $request->session()->token(),
-                'csrf_token' => csrf_token(),
-                'user_agent' => $request->userAgent(),
-                'referer' => $request->header('referer')
-            ]);
-        }
+        // Add debugging for live server (always log for now)
+        Log::info('LivewireCSRFMiddleware: Processing request', [
+            'url' => $request->url(),
+            'method' => $request->method(),
+            'is_livewire' => $request->hasHeader('X-Livewire'),
+            'has_csrf_token' => $request->hasHeader('X-CSRF-TOKEN') || $request->hasHeader('X-XSRF-TOKEN'),
+            'session_token' => $request->session()->token(),
+            'csrf_token' => csrf_token(),
+            'user_agent' => $request->userAgent(),
+            'referer' => $request->header('referer'),
+            'session_id' => $request->session()->getId(),
+            'environment' => app()->environment()
+        ]);
 
         // For Livewire requests, ensure proper token handling
         if ($this->isLivewireRequest($request)) {
@@ -41,13 +41,14 @@ class LivewireCSRFMiddleware extends VerifyCsrfToken
 
             // Regenerate CSRF token if it's expired or invalid
             if (!$this->tokensMatch($request)) {
-                if (app()->environment('production')) {
-                    Log::warning('LivewireCSRFMiddleware: CSRF token mismatch detected', [
-                        'session_token' => $request->session()->token(),
-                        'request_token' => $this->getTokenFromRequest($request),
-                        'session_id' => $request->session()->getId()
-                    ]);
-                }
+                Log::warning('LivewireCSRFMiddleware: CSRF token mismatch detected', [
+                    'session_token' => $request->session()->token(),
+                    'request_token' => $this->getTokenFromRequest($request),
+                    'session_id' => $request->session()->getId(),
+                    'url' => $request->url(),
+                    'method' => $request->method(),
+                    'all_headers' => $request->headers->all()
+                ]);
 
                 // Regenerate session and CSRF token
                 $request->session()->regenerateToken();

@@ -40,41 +40,81 @@ Route::get('/csrf-token', function () {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf.token');
 
+// DEBUG ROUTES (Remove after fixing live server issue)
+Route::get('/debug/session', function () {
+    return response()->json([
+        'session_id' => session()->getId(),
+        'csrf_token' => csrf_token(),
+        'session_token' => session()->token(),
+        'session_data' => session()->all(),
+        'session_driver' => config('session.driver'),
+        'session_lifetime' => config('session.lifetime'),
+        'session_domain' => config('session.domain'),
+        'session_secure' => config('session.secure'),
+        'session_same_site' => config('session.same_site'),
+        'app_env' => app()->environment(),
+        'server_vars' => [
+            'HTTP_HOST' => request()->getHost(),
+            'HTTPS' => request()->isSecure(),
+            'REQUEST_URI' => request()->getRequestUri(),
+            'USER_AGENT' => request()->userAgent(),
+        ]
+    ]);
+})->name('debug.session');
+
+Route::get('/debug/middleware', function () {
+    $middleware = [];
+    foreach (app('router')->getMiddleware() as $name => $class) {
+        $middleware[$name] = $class;
+    }
+
+    return response()->json([
+        'registered_middleware' => $middleware,
+        'livewire_csrf_active' => class_exists(\App\Http\Middleware\LivewireCSRFMiddleware::class),
+        'csrf_middleware' => \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+        'app_middleware' => app('Illuminate\Contracts\Http\Kernel')->getMiddleware(),
+    ]);
+})->name('debug.middleware');
+
+Route::post('/debug/csrf-test', function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'CSRF token is working correctly',
+        'csrf_token' => csrf_token(),
+        'session_id' => session()->getId(),
+        'timestamp' => now()->toISOString(),
+    ]);
+})->name('debug.csrf');
+
 // Checkout routes
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'processCheckout'])->name('checkout.process');
 Route::post('/checkout/guest', [CheckoutController::class, 'processGuestCheckout'])->name('checkout.guest');
- Route::post('/checkout/currency', [CurrencyController::class, 'updateCheckoutCountry'])->name('checkout.currency.update'); // Removed for Livewire-only approach
-Route::get('/checkout/confirmation/{order}', [CheckoutController::class, 'orderConfirmation'])->name('checkout.confirmation');
-Route::get('/thank-you/{order}', [CheckoutController::class, 'thankYou'])->name('thankyou');
 
+// ****Other checkout routes, organized by payment method****
+// PayPal routes
+Route::prefix('checkout/paypal')->group(function () {
+    Route::post('/create', [\App\Http\Controllers\PayPalController::class, 'createOrder'])->name('checkout.paypal.create');
+    Route::post('/capture/{payment}', [\App\Http\Controllers\PayPalController::class, 'captureOrder'])->name('checkout.paypal.capture');
+    Route::get('/success/{payment}', [\App\Http\Controllers\PayPalController::class, 'success'])->name('checkout.paypal.success');
+    Route::get('/cancel/{payment}', [\App\Http\Controllers\PayPalController::class, 'cancel'])->name('checkout.paypal.cancel');
+});
 
+// PayPal Credit Card routes
+Route::prefix('checkout/paypal-credit-card')->group(function () {
+    Route::get('/form/{payment}', [\App\Http\Controllers\PayPalCreditCardController::class, 'showForm'])->name('checkout.paypal.credit-card.form');
+    Route::post('/capture/{payment}', [\App\Http\Controllers\PayPalCreditCardController::class, 'captureOrder'])->name('checkout.paypal.credit-card.capture');
+    Route::get('/success/{payment}', [\App\Http\Controllers\PayPalCreditCardController::class, 'success'])->name('checkout.paypal.credit-card.success');
+    Route::get('/cancel/{payment}', [\App\Http\Controllers\PayPalCreditCardController::class, 'cancel'])->name('checkout.paypal.credit-card.cancel');
+});
 
-
-// PayPal credit card payment route
-Route::get('/checkout/paypal/credit-card/{payment}', [CheckoutController::class, 'showPayPalCreditCard'])->name('checkout.paypal.credit-card');
-Route::post('/checkout/paypal/credit-card/{payment}/capture', [CheckoutController::class, 'capturePayPalCreditCard'])->name('checkout.paypal.credit-card.capture');
-
-// PayPal webhook route
-Route::post('/paypal/webhook', [PayPalWebhookController::class, 'handleWebhook'])->name('paypal.webhook');
-
-// Paymob callback URL - handles both GET and POST requests
-Route::match(['get', 'post'], '/api/paymob/callback', [\App\Http\Controllers\PaymentController::class, 'handlePaymobCallback'])->name('paymob.callback');
-
-// Simple test route to verify the controller method works
-Route::get('/paymob/test', function() {
-    return response()->json([
-        'message' => 'Paymob test route working',
-        'controller_exists' => class_exists(\App\Http\Controllers\PaymentController::class),
-        'method_exists' => method_exists(\App\Http\Controllers\PaymentController::class, 'handlePaymobCallback'),
-        'timestamp' => now()
-    ]);
-})->name('paymob.test');
-
-
-
-// Payment webhooks
-Route::post('/payments/webhook/{gateway}', [\App\Http\Controllers\PaymentController::class, 'handleWebhook'])->name('webhook.gateway');
+// Paymob routes
+Route::prefix('checkout/paymob')->group(function () {
+    Route::post('/create', [\App\Http\Controllers\PaymobController::class, 'createPayment'])->name('checkout.paymob.create');
+    Route::get('/success/{payment}', [\App\Http\Controllers\PaymobController::class, 'success'])->name('checkout.paymob.success');
+    Route::get('/cancel/{payment}', [\App\Http\Controllers\PaymobController::class, 'cancel'])->name('checkout.paymob.cancel');
+    Route::post('/webhook', [\App\Http\Controllers\PaymobController::class, 'webhook'])->name('checkout.paymob.webhook');
+});
 
 // Payment return and cancel (must come AFTER specific routes)
 Route::get('/payments/return/{order}', [\App\Http\Controllers\PaymentController::class, 'handleReturn'])->name('payments.return');
@@ -114,16 +154,12 @@ Route::get('dashboard', \App\Livewire\Dashboard::class)
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
-
-    Route::get('settings/profile', Profile::class)->name('settings.profile');
-    Route::get('settings/password', Password::class)->name('settings.password');
-    Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
-
-    // Wishlist route (Livewire handles the functionality)
-    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::get('/profile', Profile::class)->name('profile');
+    Route::get('/profile/password', Password::class)->name('profile.password');
+    Route::get('/profile/appearance', Appearance::class)->name('profile.appearance');
+    Route::get('/wishlist',\App\Livewire\WishlistIndex::class)->name('wishlist');
+    // Route::get('/orders',\App\Livewire\OrdersIndex::class)->name('orders');
+    // Route::get('/order/{order}',\App\Livewire\OrderView::class)->name('order.view');
 });
 
 require __DIR__.'/auth.php';
-
-
