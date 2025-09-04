@@ -60,7 +60,7 @@ class Category extends Model implements HasMedia
     public function getActiveProductsCount()
     {
         return cache()->remember("category_products_count_{$this->id}", 1800, function () {
-            return $this->products()->where('active', true)->count();
+            return $this->directProducts()->count();
         });
     }
      //register media collections

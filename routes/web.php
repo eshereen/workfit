@@ -197,4 +197,48 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('/order/{order}',\App\Livewire\OrderView::class)->name('order.view');
 });
 
+// Debug route to check homepage data on live server
+Route::get('/debug/homepage-data', function () {
+    // Test men's category
+    $men = \App\Models\Category::where('categories.active', true)
+        ->where('categories.slug', 'men ')
+        ->with(['directProducts' => function ($query) {
+            $query->where('products.active', true)->take(8);
+        }])
+        ->first();
+
+    // Test women's category
+    $women = \App\Models\Category::where('categories.active', true)
+        ->where('categories.slug', 'women')
+        ->with(['directProducts' => function ($query) {
+            $query->where('products.active', true)->take(8);
+        }])
+        ->first();
+
+    return response()->json([
+        'men' => [
+            'category' => $men ? $men->name . ' (ID: ' . $men->id . ')' : 'Not found',
+            'products_count' => $men ? $men->directProducts->count() : 0,
+            'products' => $men ? $men->directProducts->map(function($p) {
+                return $p->name . ' (Category ID: ' . $p->category_id . ')';
+            }) : []
+        ],
+        'women' => [
+            'category' => $women ? $women->name . ' (ID: ' . $women->id . ')' : 'Not found',
+            'products_count' => $women ? $women->directProducts->count() : 0,
+            'products' => $women ? $women->directProducts->map(function($p) {
+                return $p->name . ' (Category ID: ' . $p->category_id . ')';
+            }) : []
+        ],
+        'files_updated' => [
+            'category_model' => method_exists(\App\Models\Category::class, 'directProducts') ? 'YES' : 'NO',
+            'controller_exists' => file_exists(app_path('Http/Controllers/FrontendController.php')) ? 'YES' : 'NO',
+            'view_exists' => file_exists(resource_path('views/home.blade.php')) ? 'YES' : 'NO',
+        ],
+        'timestamp' => now()->format('Y-m-d H:i:s'),
+        'environment' => app()->environment(),
+        'cache_cleared' => true
+    ]);
+})->name('debug.homepage-data');
+
 require __DIR__.'/auth.php';

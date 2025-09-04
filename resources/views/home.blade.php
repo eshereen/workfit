@@ -151,8 +151,6 @@
 
            @livewire('product-index',['products'=>$categories->get(1)->directProducts->take(8)])
 
-
-
             <div class="text-center mt-12 animate-on-scroll">
                 <a href="{{ route('categories.index', $categories->get(1)->slug) }}" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
                     VIEW ALL {{ $categories->get(1)->name }}'S

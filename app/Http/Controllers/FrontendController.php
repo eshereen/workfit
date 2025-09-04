@@ -13,7 +13,6 @@ class FrontendController extends Controller
     public function index()
     {
         $title = 'WorkFit|Home';
-
         // Load main categories with their own products only
         $categories = cache()->remember('home_categories', 1800, function () {
             return Category::where('categories.active', true)
