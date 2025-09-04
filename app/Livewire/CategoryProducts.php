@@ -161,20 +161,20 @@ class CategoryProducts extends Component
                 'user_agent' => request()->userAgent(),
                 'ip' => request()->ip()
             ]);
-            
+
             $this->selectedProduct = Product::with('variants')->find($productId);
             $this->selectedVariantId = null;
             $this->selectedVariant = null;
             $this->quantity = 1;
             $this->showVariantModal = true;
-            
+
             \Log::info('CategoryProducts: openVariantModal completed successfully');
         } catch (\Exception $e) {
             \Log::error('CategoryProducts: openVariantModal error', [
                 'error' => $e->getMessage(),
                 'product_id' => $productId
             ]);
-            
+
             $this->dispatch('showNotification', [
                 'message' => 'Unable to load product options. Please try again.',
                 'type' => 'error'
@@ -251,7 +251,7 @@ class CategoryProducts extends Component
                 'csrf_token' => csrf_token(),
                 'session_id' => session()->getId()
             ]);
-            
+
             $cartService = app(CartService::class);
             $product = Product::find($productId);
 

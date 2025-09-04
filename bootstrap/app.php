@@ -23,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Replace default CSRF middleware with our enhanced Livewire-aware version
         $middleware->replace(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class, \App\Http\Middleware\LivewireCSRFMiddleware::class);
-        
+
         // Append our currency middleware to the web group in a supported way
         $middleware->appendToGroup('web', \App\Http\Middleware\CurrencyMiddleware::class);
         $middleware->appendToGroup('web', \App\Http\Middleware\CacheControlStatic::class);

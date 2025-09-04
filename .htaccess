@@ -12,7 +12,7 @@
     # Handle X-XSRF-Token Header (Critical for Livewire)
     RewriteCond %{HTTP:X-XSRF-TOKEN} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-TOKEN}]
-    
+
     # Handle X-CSRF-TOKEN Header (Alternative for Laravel)
     RewriteCond %{HTTP:X-CSRF-TOKEN} .
     RewriteRule .* - [E=HTTP_X_CSRF_TOKEN:%{HTTP:X-CSRF-TOKEN}]
@@ -58,7 +58,7 @@
 
   # CRITICAL: Exclude Livewire routes and CSRF-sensitive content from cache
   RewriteEngine On
-  
+
   # Exclude authentication, cart, checkout, and Livewire requests from cache
   RewriteCond %{REQUEST_URI} ^/(login|register|checkout|cart|admin|livewire) [NC,OR]
   RewriteCond %{REQUEST_METHOD} =POST [OR]
@@ -66,7 +66,7 @@
   RewriteCond %{HTTP:X-CSRF-TOKEN} .* [OR]
   RewriteCond %{HTTP:X-XSRF-TOKEN} .*
   RewriteRule .* - [E=Cache-Control:no-cache,E=no-cache:1]
-  
+
   # Enable LSCache only for safe public pages
   RewriteCond %{REQUEST_URI} !^/(login|register|checkout|cart|admin|livewire) [NC]
   RewriteCond %{REQUEST_METHOD} =GET
@@ -113,14 +113,14 @@
   Header always set X-XSS-Protection "1; mode=block"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
-  
+
   # Ensure CSRF tokens are not cached by intermediaries
   <FilesMatch "\.(html|php)$">
     Header always set Cache-Control "no-cache, no-store, must-revalidate"
     Header always set Pragma "no-cache"
     Header always set Expires "0"
   </FilesMatch>
-  
+
   # Allow X-CSRF-TOKEN and X-XSRF-TOKEN headers
   Header always set Access-Control-Allow-Headers "X-CSRF-TOKEN, X-XSRF-TOKEN, X-Livewire, Content-Type, Accept, Authorization"
 </IfModule>
