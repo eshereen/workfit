@@ -206,6 +206,23 @@ Route::get('/debug/clear-all-cache', function () {
         \Artisan::call('config:clear');
         \Artisan::call('view:clear');
 
+        // Clear specific homepage cache keys
+        $homepage_keys = [
+            'home_categories',
+            'home_men_category',
+            'home_women_category',
+            'home_recent_products',
+            'home_collections',
+            'home_featured_products'
+        ];
+
+        $keys_cleared = [];
+        foreach ($homepage_keys as $key) {
+            if (cache()->forget($key)) {
+                $keys_cleared[] = $key;
+            }
+        }
+
         // Clear OPcache if available
         if (function_exists('opcache_reset')) {
             opcache_reset();
@@ -230,6 +247,7 @@ Route::get('/debug/clear-all-cache', function () {
                 'route_cache' => 'YES',
                 'config_cache' => 'YES',
                 'view_cache' => 'YES',
+                'homepage_keys' => $keys_cleared,
                 'opcache' => $opcache_cleared,
                 'apcu_cache' => $apcu_cleared,
             ],

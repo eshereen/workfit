@@ -45,7 +45,7 @@
 
     <!-- Full-width Lifestyle Banner -->
     <section class="relative h-96 overflow-hidden animate-on-scroll">
-        <img src="https://images.unsplash.com/photo-1607962837359-5e7e89f86776?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        <img src="{{ asset('imgs/women.jpeg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
              class="w-full h-full object-cover">
@@ -162,10 +162,10 @@
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
-    <section class="relative h-96 overflow-hidden animate-on-scroll">
-        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=70&w=800&auto=format&fit=crop"
+    <section class="relative h-auto overflow-hidden animate-on-scroll">
+        <img src="{{ asset('imgs/men-bg.jpeg')}}"
              width="800"
-             height="400"
+             height="800"
              loading="lazy"
              alt="Lifestyle Banner"
              class="w-full h-full object-cover">

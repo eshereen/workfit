@@ -5,8 +5,14 @@
     <section class="relative h-screen overflow-hidden mt-16">
         <!-- Video Background -->
         <div class="video-container">
-            <video autoplay muted loop playsinline poster="poster.jpg" class="w-full h-full object-cover blur-sm">
+            <!-- Desktop Video -->
+            <video autoplay muted loop playsinline preload="metadata" poster="poster.jpg" class="w-full h-full object-cover blur-sm hidden md:block">
                 <source src="videos/workfit.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <!-- Mobile Video -->
+            <video autoplay muted loop playsinline preload="metadata" poster="poster.jpg" class="w-full h-full object-cover blur-sm md:hidden">
+                <source src="videos/workfit-sm.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
