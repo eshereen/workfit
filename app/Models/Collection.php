@@ -41,31 +41,31 @@ public function registerMediaCollections(?Media $media = null): void
         ->singleFile()
         ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
         ->registerMediaConversions(function (Media $media) {
-            
+
             // Always keep original (JPG/PNG/etc.)
             // Convert optimized versions:
-            
+
             // WebP versions
             $this->addMediaConversion('thumb_webp')
                 ->format('webp')
                 ->width(150)
                 ->height(150)
                 ->sharpen(10)
-                ->quality(85) // balance quality & compression
+
                 ->nonQueued();
 
             $this->addMediaConversion('medium_webp')
                 ->format('webp')
                 ->width(400)
                 ->height(400)
-                ->quality(85)
+
                 ->nonQueued();
 
             $this->addMediaConversion('large_webp')
                 ->format('webp')
                 ->width(800)
                 ->height(800)
-                ->quality(85)
+
                 ->nonQueued();
 
             // AVIF (optional — smaller but more CPU heavy)
@@ -73,21 +73,23 @@ public function registerMediaCollections(?Media $media = null): void
                 ->format('avif')
                 ->width(150)
                 ->height(150)
-                ->quality(80)
+
                 ->nonQueued();
 
             $this->addMediaConversion('medium_avif')
                 ->format('avif')
                 ->width(400)
                 ->height(400)
-                ->quality(80)
+
+
                 ->nonQueued();
 
             $this->addMediaConversion('large_avif')
                 ->format('avif')
                 ->width(800)
                 ->height(800)
-                ->quality(80)
+
+                
                 ->nonQueued();
         });
 

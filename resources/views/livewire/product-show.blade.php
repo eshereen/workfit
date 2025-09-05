@@ -171,7 +171,7 @@
                     <span class="text-red-600 font-medium">Out of Stock</span>
                     @endif
                 </div>
-                <div class="border-t pt-6">
+                <div class="border-t py-6">
                     <h3 class="font-semibold text-lg mb-3">Description</h3>
                     <div class="prose max-w-none">
                         {!! $product->description !!}

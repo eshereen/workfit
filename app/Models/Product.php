@@ -270,6 +270,11 @@ public function registerMediaCollections(?Media $media = null): void
                 ->width(600)
                 ->height(600)
                 ->nonQueued();
+                $this->addMediaConversion('large_webp')
+                ->format('webp')
+                ->width(800)
+                ->height(800)
+                ->nonQueued();
 
             $this->addMediaConversion('zoom_webp')
                 ->format('webp')
