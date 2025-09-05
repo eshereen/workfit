@@ -110,8 +110,8 @@
         <!-- Product Info -->
         <div class="lg:w-1/2">
             @if($currencyCode !== 'USD')
-            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <div class="text-sm text-blue-800 text-center">
+            <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div class="text-sm text-green-800 text-center">
                     @if($isAutoDetected)
                         Prices automatically converted to {{ $currencyCode }} ({{ $currencySymbol }}) based on your location
                     @else
@@ -170,6 +170,12 @@
                     @else
                     <span class="text-red-600 font-medium">Out of Stock</span>
                     @endif
+                </div>
+                <div class="border-t pt-6">
+                    <h3 class="font-semibold text-lg mb-3">Description</h3>
+                    <div class="prose max-w-none">
+                        {!! $product->description !!}
+                    </div>
                 </div>
 
                 @if($product->variants->isNotEmpty())
@@ -288,24 +294,11 @@
                             Adding...
                         </span>
                     </button>
-
-
                 @else
                     <button disabled class="w-full bg-gray-400 text-white py-3 px-6 rounded-lg font-semibold cursor-not-allowed">
                         Out of Stock
                     </button>
-
-
                 @endif
-
-
-            </div>
-
-            <div class="border-t pt-6">
-                <h3 class="font-semibold text-lg mb-3">Description</h3>
-                <div class="prose max-w-none">
-                    {!! $product->description !!}
-                </div>
             </div>
         </div>
     </div>
