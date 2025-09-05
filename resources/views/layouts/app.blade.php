@@ -70,6 +70,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="manifest" href="/site.webmanifest">
+<!--google fonts-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 
      <script>
         tailwind.config = {
@@ -83,6 +87,39 @@
             }
         }
     </script>
+    <style>
+
+
+
+.funnel-display-<uniquifier> {
+  font-family: "Funnel Display", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
+
+.orbitron-<uniquifier> {
+  font-family: "Orbitron", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 800;
+  font-style: normal;
+}
+h1,h2,h3,h4,h5,h6{
+    font-family: "Orbitron", serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+p,a,span,li,ul,ol{
+    font-family: "Funnel Display", serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    text-transform: uppercase;
+}
+    </style>
 
 </head>
 <body class="bg-white text-gray-950 antialiased">

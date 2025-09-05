@@ -247,7 +247,6 @@ Route::get('/debug/clear-all-cache', function () {
                 'route_cache' => 'YES',
                 'config_cache' => 'YES',
                 'view_cache' => 'YES',
-                'homepage_keys' => $keys_cleared,
                 'opcache' => $opcache_cleared,
                 'apcu_cache' => $apcu_cleared,
             ],
