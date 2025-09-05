@@ -44,10 +44,12 @@
 
 
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-96 overflow-hidden animate-on-scroll">
+    <section class="relative h-auto overflow-hidden animate-on-scroll">
         <img src="{{ asset('imgs/women.jpeg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
+             width="800"
+             height="600"
              class="w-full h-full object-cover">
              @if($collections->isNotEmpty())
         <!-- Overlay with only background dark -->
@@ -94,7 +96,7 @@
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
                     <img src="https://images.unsplash.com/photo-1679216129631-fbcec034558c?q=70&w=600&auto=format&fit=crop"
                          width="600"
-                         height="400"
+                         height="600"
                          loading="lazy"
                          alt="Run"
                          class="w-full h-full object-cover hover-zoom">
@@ -109,7 +111,7 @@
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
                     <img src="https://images.unsplash.com/photo-1646072508263-af94f0218bf0?q=70&w=600&auto=format&fit=crop"
                          width="600"
-                         height="400"
+                         height="600"
                          loading="lazy"
                          alt="Train"
                          class="w-full h-full object-cover hover-zoom">
@@ -124,7 +126,7 @@
                 <div class="relative overflow-hidden rounded-lg group animate-on-scroll">
                     <img src="https://images.unsplash.com/photo-1715192383684-24c6614d2b54?q=70&w=600&auto=format&fit=crop"
                          width="600"
-                         height="400"
+                         height="600"
                          loading="lazy"
                          alt="Rec"
                          class="w-full h-full object-cover hover-zoom">
@@ -162,13 +164,13 @@
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
-    <section class="relative h-auto overflow-hidden animate-on-scroll">
-        <img src="{{ asset('imgs/men-bg.jpeg')}}"
+    <section class="relative h-auto overflow-hidden animate-on-scroll ">
+        <img src="{{ asset('imgs/group.jpeg')}}"
              width="800"
              height="800"
              loading="lazy"
              alt="Lifestyle Banner"
-             class="w-full h-full object-cover">
+             class="w-full h-full object-cover bg-fixed">
         <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
             <div class="text-center text-white px-4">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">NEW ARRIVALS</h2>
@@ -189,5 +191,24 @@
        @livewire('product-index',['products'=>$recent])
        @endif
    </section>
+
+   <section class="relative h-auto overflow-hidden animate-on-scroll">
+    <img src="{{ asset('imgs/men-bg.jpeg')}}"
+         width="800"
+         height="600"
+         loading="lazy"
+         alt="Lifestyle Banner"
+         class="w-full h-full object-cover bg-fixed">
+    <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+        <div class="text-center text-white px-4">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">NEW ARRIVALS</h2>
+            <p class="text-xl mb-6 max-w-2xl mx-auto">Be the first to shop our latest collection</p>
+            <a href="{{ route('collections.index') }}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors">
+                SHOP NOW
+            </a>
+        </div>
+    </div>
+</section>
+
 
 @endsection
