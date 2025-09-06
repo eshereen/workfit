@@ -231,7 +231,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Quantity:</label>
                         <div class="flex items-center border rounded-md overflow-hidden">
                             <button type="button"
-                                    wire:click="decrementQuantity"
+                                    wire:click="decrementQty"
                                     wire:loading.attr="disabled"
                                     wire:loading.class="opacity-50 cursor-not-allowed"
                                     class="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors {{ $quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
@@ -248,7 +248,7 @@
                                    class="w-16 text-center border-0 focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                    id="quantity-input">
                             <button type="button"
-                                    wire:click="incrementQuantity"
+                                    wire:click="incrementQty"
                                     wire:loading.attr="disabled"
                                     wire:loading.class="opacity-50 cursor-not-allowed"
                                     class="px-3 py-2 text-gray-600 hover:bg-gray-100 transition-colors {{ $quantity >= ($selectedVariant ? min($selectedVariant->stock, 10) : min($product->quantity, 10)) ? 'opacity-50 cursor-not-allowed' : '' }}"

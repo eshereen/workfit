@@ -89,10 +89,25 @@ class ProductShow extends Component
             // Convert variant prices
             if ($this->product->variants) {
                 foreach ($this->product->variants as $variant) {
-                    if ($variant->price) {
-                        $variant->converted_price = $currencyService->convertFromUSD($variant->price, $this->currencyCode);
-                    }
+                    $this->convertVariantPrice($variant);
                 }
+            }
+        } catch (Exception $e) {
+            // Handle conversion error silently
+        }
+    }
+
+    protected function convertVariantPrice($variant)
+    {
+        if ($this->currencyCode === 'USD') {
+            return; // No conversion needed
+        }
+
+        try {
+            $currencyService = app(CountryCurrencyService::class);
+            
+            if ($variant && $variant->price) {
+                $variant->converted_price = $currencyService->convertFromUSD($variant->price, $this->currencyCode);
             }
         } catch (Exception $e) {
             // Handle conversion error silently
@@ -221,26 +236,12 @@ class ProductShow extends Component
             if ($this->quantity < 1) {
                 $this->quantity = 1;
             }
+            
+            // Convert variant price to current currency
+            $this->convertVariantPrice($this->selectedVariant);
         }
     }
 
-    public function incrementQuantity()
-    {
-        $maxQuantity = $this->selectedVariant
-            ? min($this->selectedVariant->stock, 10)
-            : min($this->product->quantity, 10);
-
-        if ($this->quantity < $maxQuantity) {
-            $this->quantity++;
-        }
-    }
-
-    public function decrementQuantity()
-    {
-        if ($this->quantity > 1) {
-            $this->quantity--;
-        }
-    }
 
     public function addToCart()
     {
