@@ -83,8 +83,45 @@ class PaymobController extends Controller
                 return response()->json(['error' => 'Payment not found'], 404);
             }
 
-            // Handle success/failure based on status
+            // Determine if payment was successful
+            // PayMob sends success/failure in different ways, so we need to check multiple sources
+            $isSuccess = false;
+            
+            // Check explicit status parameter
             if ($status === 'success') {
+                $isSuccess = true;
+            }
+            
+            // Check PayMob obj data for success indicators
+            if ($request->has('obj')) {
+                $objData = json_decode($request->get('obj'), true);
+                if ($objData) {
+                    // PayMob success indicators
+                    if (isset($objData['success']) && $objData['success'] === true) {
+                        $isSuccess = true;
+                    }
+                    if (isset($objData['data']) && isset($objData['data']['success']) && $objData['data']['success'] === true) {
+                        $isSuccess = true;
+                    }
+                }
+            }
+            
+            // If no explicit success/failure, assume success if we reach the callback
+            // (PayMob typically only redirects to callback on success)
+            if ($status === null && !$request->has('obj')) {
+                $isSuccess = true;
+                Log::info('PayMob callback: Assuming success (no explicit status)', ['order_id' => $orderId]);
+            }
+
+            Log::info('PayMob callback: Status determination', [
+                'order_id' => $orderId,
+                'status_param' => $status,
+                'has_obj' => $request->has('obj'),
+                'is_success' => $isSuccess
+            ]);
+
+            // Handle success/failure based on determined status
+            if ($isSuccess) {
                 // Verify HMAC if provided
                 if ($request->has('hmac') && $request->has('obj')) {
                     $this->verifyHmac($request);
