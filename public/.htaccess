@@ -1,10 +1,72 @@
 # ----------------------------------------------------------------------
-# Browser Caching (Expires Headers)
+# Performance & Security Optimizations
 # ----------------------------------------------------------------------
-<IfModule mod_expires.c>
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Handle X-XSRF-Token Header (Critical for Livewire)
+    RewriteCond %{HTTP:X-XSRF-TOKEN} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-TOKEN}]
+
+    # Handle X-CSRF-TOKEN Header (Alternative for Laravel)
+    RewriteCond %{HTTP:X-CSRF-TOKEN} .
+    RewriteRule .* - [E=HTTP_X_CSRF_TOKEN:%{HTTP:X-CSRF-TOKEN}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Compression (Gzip/Brotli) - Massive Performance Boost
+# ----------------------------------------------------------------------
+<IfModule mod_deflate.c>
+    # Enable compression for text-based files
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/ld+json
+
+    # Don't compress images or videos (already compressed)
+    SetEnvIfNoCase Request_URI \
+        \.(?:gif|jpe?g|png|webp|svg|ico|mp4|webm|ogg|mp3)$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.(?:exe|t?gz|zip|bz2|sit|rar)$ no-gzip dont-vary
+</IfModule>
+
+# ----------------------------------------------------------------------
+# LiteSpeed Cache DISABLED (CSRF Compatibility)
+# ----------------------------------------------------------------------
+# LiteSpeed cache rules removed to prevent CSRF token conflicts
+# Performance maintained through browser caching and compression below
+
+# ----------------------------------------------------------------------
+# Advanced Browser Caching (Expires Headers)
+# ----------------------------------------------------------------------
+fModule mod_expires.c>
   ExpiresActive On
 
-  # Static files: long cache
   ExpiresByType image/jpg "access plus 1 year"
   ExpiresByType image/jpeg "access plus 1 year"
   ExpiresByType image/gif "access plus 1 year"
@@ -16,28 +78,86 @@
   ExpiresByType text/css "access plus 1 year"
   ExpiresByType application/javascript "access plus 1 year"
 
-  # Dynamic content: no cache
-  ExpiresByType text/html "access plus 0 seconds"
-  ExpiresByType application/json "access plus 0 seconds"
+  ExpiresByType font/ttf "access plus 6 months"
+  ExpiresByType font/otf "access plus 6 months"
+  ExpiresByType font/woff "access plus 6 months"
+  ExpiresByType font/woff2 "access plus 6 months"
+
+  ExpiresByType text/html "access plus 1 hour"
+  ExpiresByType application/json "access plus 1 hour"
 </IfModule>
 
 # ----------------------------------------------------------------------
-# Force No Cache for Dynamic Content
+# Security Headers (Enhanced)
 # ----------------------------------------------------------------------
 <IfModule mod_headers.c>
-  Header append Vary Accept-Encoding
-  Header unset ETag
+    # Performance headers
+    Header append Vary Accept-Encoding
+    Header unset ETag
+    Header always set Accept-Ranges bytes
 
-  <FilesMatch "\.(html|htm|php|json)$">
-      Header set Cache-Control "no-cache, no-store, must-revalidate"
-      Header set Pragma "no-cache"
-      Header set Expires 0
-  </FilesMatch>
+    # Security headers
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+    # Static assets - aggressive caching
+    <FilesMatch "\.(css|js|woff2?|ttf|eot|svg|png|jpe?g|gif|webp|ico|pdf)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+        Header set Expires "Thu, 31 Dec 2037 23:55:55 GMT"
+    </FilesMatch>
+
+    # Dynamic content - no cache (CSRF-safe)
+    <FilesMatch "\.(html|php)$">
+        Header always set Cache-Control "no-cache, no-store, must-revalidate"
+        Header always set Pragma "no-cache"
+        Header always set Expires "0"
+    </FilesMatch>
 </IfModule>
 
 # ----------------------------------------------------------------------
-# Disable LiteSpeed Cache
+# MIME Types (Performance)
 # ----------------------------------------------------------------------
-<IfModule LiteSpeed>
-    CacheDisable public /
+<IfModule mod_mime.c>
+    # Web fonts
+    AddType font/woff2 .woff2
+    AddType font/woff .woff
+    AddType font/ttf .ttf
+    AddType font/eot .eot
+
+    # Modern formats
+    AddType image/webp .webp
+    AddType image/avif .avif
+    AddType application/manifest+json .webmanifest
+    AddType text/cache-manifest .appcache
+</IfModule>
+
+# ----------------------------------------------------------------------
+# File Protection (Security)
+# ----------------------------------------------------------------------
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "composer.json">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "composer.lock">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "package.json">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block access to sensitive directories
+<IfModule mod_rewrite.c>
+    RewriteRule ^(\.git|bootstrap/cache|tests)/ - [F,L]
 </IfModule>

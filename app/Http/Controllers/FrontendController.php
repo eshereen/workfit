@@ -34,12 +34,7 @@ class FrontendController extends Controller
         // Men's Category - Get only men's category with its products
         $men = cache()->remember('home_men_category', 1800, function () {
             return Category::where('categories.active', true)
-                ->where(function($query) {
-                    $query->where('categories.slug', 'men ')  // Local dev
-                          ->orWhere('categories.slug', 'men')   // Alternative
-                          ->orWhere('categories.name', 'LIKE', '%men%')  // Live server
-                          ->orWhere('categories.name', 'LIKE', '%MEN%'); // Live server
-                })
+                ->where('categories.slug', 'men ')  // Exact match for 'men ' (with trailing space)
                 ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
@@ -52,6 +47,7 @@ class FrontendController extends Controller
                 }])
                 ->first(); // Use first() instead of get() since we only want one category
         });
+    
 
         // Women's Category - Get only women's category with its products
         $women = cache()->remember('home_women_category', 1800, function () {

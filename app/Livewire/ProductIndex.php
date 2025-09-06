@@ -80,9 +80,12 @@ class ProductIndex extends Component
         }
     }
 
-    public function mount()
+    public $passedProducts = null;
+
+    public function mount($products = null)
     {
         try {
+            $this->passedProducts = $products;
             $this->loadWishlist();
             $this->loadCurrencyInfo();
 
@@ -450,10 +453,14 @@ class ProductIndex extends Component
     public function render()
     {
         try {
-            // Always use the cached query logic since we're not passing products from controller
-            $cacheKey = $this->buildCacheKey();
-            $cacheTime = request()->routeIs('home') ? 60 : 180;
-            $productsToDisplay = cache()->remember($cacheKey, $cacheTime, function () {
+            // Use passed products if available (from homepage sections)
+            if ($this->passedProducts && $this->passedProducts->isNotEmpty()) {
+                $productsToDisplay = $this->passedProducts;
+            } else {
+                // Use cached query logic for product index pages
+                $cacheKey = $this->buildCacheKey();
+                $cacheTime = request()->routeIs('home') ? 60 : 180;
+                $productsToDisplay = cache()->remember($cacheKey, $cacheTime, function () {
                 // Optimized eager loading with specific selects
                 $with = [
                     'category:id,name,slug',
@@ -507,6 +514,7 @@ class ProductIndex extends Component
                 $perPage = request()->routeIs('home') ? 8 : 12;
                 return $query->paginate($perPage);
             });
+            }
 
             // Products fetched successfully from cache
 
