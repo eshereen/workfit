@@ -1,5 +1,4 @@
-@extends('layouts.app')
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Hero Section -->
     <section class="relative h-96 overflow-hidden mt-16">
         <img src=https://images.unsplash.com/photo-1631010231931-d2c396b444ec?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Shipping & Returns" class="w-full h-full object-cover">
@@ -214,4 +213,6 @@
         </div>
     </main>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/shereenelshayp/Herd/workfit/resources/views/return.blade.php ENDPATH**/ ?>
