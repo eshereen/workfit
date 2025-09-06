@@ -293,6 +293,46 @@ class PaymentController extends Controller
     }
 
     /**
+     * Show order confirmation/details page
+     */
+    public function confirmation(Order $order, Request $request)
+    {
+        try {
+            // Check if this is a guest order and verify token
+            if ($order->is_guest) {
+                $token = $request->get('token');
+                if (!$token || $token !== $order->guest_token) {
+                    return redirect()->route('home')->with('error', 'Invalid order access token.');
+                }
+            }
+
+            // Get currency information for display
+            $currencyInfo = [
+                'currency_code' => $order->currency ?? 'USD',
+                'currency_symbol' => $this->getCurrencySymbol($order->currency ?? 'USD'),
+                'is_auto_detected' => false
+            ];
+
+            Log::info('Order confirmation page accessed', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'is_guest' => $order->is_guest,
+                'has_token' => $request->has('token')
+            ]);
+
+            return view('checkout.confirmation', compact('order', 'currencyInfo'));
+
+        } catch (Exception $e) {
+            Log::error('Order confirmation page error: ' . $e->getMessage(), [
+                'order_id' => $order->id ?? 'unknown',
+                'exception' => $e
+            ]);
+
+            return redirect()->route('home')->with('error', 'Unable to display order confirmation.');
+        }
+    }
+
+    /**
      * Get currency symbol for display
      */
     private function getCurrencySymbol($currencyCode)
