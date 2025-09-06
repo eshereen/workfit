@@ -148,7 +148,7 @@
             @if($categories->count() > 1)
             <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $categories->get(0)->name }}'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $categories->get(1)->description }}</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $categories->get(0)->description }}</p>
 
 
            @livewire('product-index',['products'=>$categories->get(0)->directProducts->take(8)])
