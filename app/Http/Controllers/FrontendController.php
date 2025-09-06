@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class FrontendController extends Controller
 {
-    public function index()
+    public function home_index()
     {
         $title = 'WorkFit|Home';
         // Load main categories with their own products only

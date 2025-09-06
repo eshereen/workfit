@@ -19,7 +19,7 @@ use App\Http\Controllers\PayPalWebhookController;
 use App\Http\Controllers\Newsletter\VerifyController;
 use App\Http\Controllers\Newsletter\UnsubscribeController;
 
-Route::get('/', [FrontendController::class, 'index'])->name('home');
+Route::get('/', [FrontendController::class, 'home_index'])->name('home');
 /*** Products Pages */
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
