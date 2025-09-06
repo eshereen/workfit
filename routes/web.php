@@ -43,6 +43,27 @@ Route::get('/csrf-token', function () {
 })->name('csrf.token');
 
 // EMERGENCY DEBUG ROUTES - NO CSRF PROTECTION
+Route::get('/debug/order-item/{id}', function ($id) {
+    $orderItem = \App\Models\OrderItem::with(['product', 'variant'])->find($id);
+    
+    if (!$orderItem) {
+        return response()->json(['error' => 'Order item not found']);
+    }
+    
+    return response()->json([
+        'order_item_id' => $orderItem->id,
+        'product_variant_id' => $orderItem->product_variant_id,
+        'product_name' => $orderItem->product?->name,
+        'variant_data' => $orderItem->variant ? [
+            'id' => $orderItem->variant->id,
+            'sku' => $orderItem->variant->sku,
+            'color' => $orderItem->variant->color,
+            'size' => $orderItem->variant->size,
+        ] : null,
+        'raw_data' => $orderItem->toArray()
+    ]);
+})->name('debug.order-item');
+
 Route::get('/debug/session', function () {
     return response()->json([
         'session_id' => session()->getId(),

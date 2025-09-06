@@ -14,6 +14,7 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use App\Filament\Resources\OrderItems\OrderItemResource;
 use Filament\Resources\RelationManagers\RelationManager;
+use Illuminate\Support\Facades\Log;
 
 class ItemsRelationManager extends RelationManager
 {
@@ -35,7 +36,18 @@ class ItemsRelationManager extends RelationManager
                 TextColumn::make('variant.sku')
                     ->label('SKU')
                     ->placeholder('No variant')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(function ($record) {
+                        // Debug: Log the variant data
+                        \Log::info('OrderItem Debug', [
+                            'order_item_id' => $record->id,
+                            'product_variant_id' => $record->product_variant_id,
+                            'variant_loaded' => $record->relationLoaded('variant'),
+                            'variant_data' => $record->variant ? $record->variant->toArray() : 'null'
+                        ]);
+                        
+                        return $record->variant?->sku ?? 'No variant';
+                    }),
                 TextColumn::make('variant.color')
                     ->label('Color')
                     ->placeholder('No variant'),
