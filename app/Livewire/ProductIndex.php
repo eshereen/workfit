@@ -456,6 +456,8 @@ class ProductIndex extends Component
             // Use passed products if available (from homepage sections)
             if ($this->passedProducts && $this->passedProducts->isNotEmpty()) {
                 $productsToDisplay = $this->passedProducts;
+                // Convert currency for passed products
+                $this->convertProductPricesOptimized($productsToDisplay);
             } else {
                 // Use cached query logic for product index pages
                 $cacheKey = $this->buildCacheKey();
@@ -538,8 +540,10 @@ class ProductIndex extends Component
                 ->paginate(12);
             }
 
-            // Convert product prices to current currency (optimized)
-            $this->convertProductPricesOptimized($productsToDisplay);
+            // Convert product prices to current currency (optimized) - only if not already converted
+            if (!($this->passedProducts && $this->passedProducts->isNotEmpty())) {
+                $this->convertProductPricesOptimized($productsToDisplay);
+            }
 
             // Pre-compute variants data to avoid N+1 queries
             $this->precomputeVariantsData($productsToDisplay);
