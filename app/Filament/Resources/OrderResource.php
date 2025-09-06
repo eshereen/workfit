@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Order;
+use App\Enums\PaymentStatus;
+use App\Enums\OrderStatus;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
@@ -118,9 +120,11 @@ class OrderResource extends Resource
                 TextInput::make('payment_method')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('payment_status')
+                Select::make('payment_status')
+                    ->options(PaymentStatus::options())
                     ->required(),
-                TextInput::make('status')
+                Select::make('status')
+                    ->options(OrderStatus::options())
                     ->required(),
                 ])->columns(3)->columnSpanFull(),
             ]);

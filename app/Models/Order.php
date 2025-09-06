@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Services\CountryCurrencyService;
+use App\Enums\PaymentStatus;
+use App\Enums\OrderStatus;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -53,6 +55,8 @@ class Order extends Model
         'billing_building_number' => 'string',
         'shipping_building_number' => 'string',
         'use_billing_for_shipping' => 'boolean',
+        'payment_status' => PaymentStatus::class,
+        'status' => OrderStatus::class,
     ];
 
 
