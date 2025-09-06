@@ -1,4 +1,4 @@
-<div class="relative currency-selector" x-data="{ open: false }"
+<div class="relative currency-selector x-cloak" x-data="{ open: false }"
           x-init="$watch('open', value => $wire?.set('showDropdown', value))"
      @currency-changed.window="open = false"
      wire:key="{{ $this->getId() }}"
@@ -351,11 +351,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.showNotification) {
                     window.showNotification(`Currency changed to ${currencyCode}`, 'success');
                 }
-                
+
                 // Force page reload to update navbar symbol
                 console.log('🔄 Reloading page to update navbar symbol');
                 window.location.reload();
-                
+
                 return;
             } else {
                 console.error('❌ Currency change failed:', data.message);
