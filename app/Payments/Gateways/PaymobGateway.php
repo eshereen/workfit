@@ -132,19 +132,19 @@ class PaymobGateway implements PaymentGateway
 
         Log::info('Paymob billing data prepared', ['billing_data' => $billingData]);
 
-        // Build callback URLs - using Laravel's url() helper for better reliability
+        // Build callback URLs - PayMob will send data in obj parameter, not query params
         try {
-            // Primary method: Use Laravel's url() helper
-            $successUrl = url('/api/paymob/callback') . '?order_id=' . $order->id . '&status=success';
-            $failureUrl = url('/api/paymob/callback') . '?order_id=' . $order->id . '&status=failure';
+            // Use Laravel's url() helper for better reliability
+            $successUrl = url('/api/paymob/callback');
+            $failureUrl = url('/api/paymob/callback');
         } catch (Exception $e) {
             // Fallback method: Manual URL construction
             $appUrl = config('app.url');
             $baseUrl = rtrim($appUrl, '/'); // Remove any trailing slashes
 
             // Construct URLs with explicit slash
-            $successUrl = $baseUrl . '/' . ltrim('api/paymob/callback?order_id=' . $order->id . '&status=success', '/');
-            $failureUrl = $baseUrl . '/' . ltrim('api/paymob/callback?order_id=' . $order->id . '&status=failure', '/');
+            $successUrl = $baseUrl . '/api/paymob/callback';
+            $failureUrl = $baseUrl . '/api/paymob/callback';
         }
 
         Log::info('Paymob callback URLs', [

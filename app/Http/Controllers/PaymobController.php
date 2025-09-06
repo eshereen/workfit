@@ -25,20 +25,51 @@ class PaymobController extends Controller
     {
         Log::info('PayMob callback received', [
             'all_params' => $request->all(),
+            'query_params' => $request->query(),
             'order_id' => $request->get('order_id'),
             'status' => $request->get('status'),
             'hmac' => $request->get('hmac'),
-            'obj' => $request->get('obj')
+            'obj' => $request->get('obj'),
+            'method' => $request->method()
         ]);
 
         try {
-            $orderId = $request->get('order_id');
-            $status = $request->get('status');
+            // Try to get order_id from different sources
+            $orderId = $request->get('order_id') 
+                      ?? $request->query('order_id')
+                      ?? $request->input('order_id');
+            
+            // If no order_id in query params, try to extract from PayMob obj data
+            if (!$orderId && $request->has('obj')) {
+                $objData = json_decode($request->get('obj'), true);
+                if ($objData && isset($objData['merchant_order_id'])) {
+                    $orderId = $objData['merchant_order_id'];
+                }
+            }
+            
+            // If still no order_id, try to find by payment reference
+            if (!$orderId) {
+                // Look for payment by provider_reference in case PayMob sends order ID differently
+                $payment = Payment::where('provider', 'paymob')
+                    ->where('status', 'pending_redirect')
+                    ->latest()
+                    ->first();
+                
+                if ($payment) {
+                    $orderId = $payment->order_id;
+                    Log::info('PayMob callback: Found order by payment reference', ['order_id' => $orderId]);
+                }
+            }
             
             if (!$orderId) {
-                Log::error('PayMob callback: No order_id provided');
+                Log::error('PayMob callback: No order_id found in any format', [
+                    'request_data' => $request->all(),
+                    'query_data' => $request->query()
+                ]);
                 return response()->json(['error' => 'Order ID required'], 400);
             }
+
+            $status = $request->get('status') ?? $request->query('status');
 
             $order = Order::find($orderId);
             if (!$order) {
