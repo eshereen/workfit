@@ -146,15 +146,15 @@
         @if($categories->isNotEmpty())
         <div class="container mx-auto">
             @if($categories->count() > 1)
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $categories->get(1)->name }}'S COLLECTION</h2>
+            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $categories->get(0)->name }}'S COLLECTION</h2>
 
             <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $categories->get(1)->description }}</p>
 
 
-           @livewire('product-index',['products'=>$categories->get(1)->directProducts->take(8)])
+           @livewire('product-index',['products'=>$categories->get(0)->directProducts->take(8)])
 
             <div class="text-center mt-12 animate-on-scroll">
-                <a href="{{ route('categories.index', $categories->get(1)->slug) }}" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
+                <a href="{{ route('categories.index', $categories->get(0)->slug) }}" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
                     VIEW ALL {{ $categories->get(1)->name }}'S
                 </a>
             </div>
