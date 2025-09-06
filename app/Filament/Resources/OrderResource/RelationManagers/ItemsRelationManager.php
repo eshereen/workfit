@@ -26,14 +26,31 @@ class ItemsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['product', 'variant']))
             ->columns([
-                TextColumn::make('product.name'),
-                TextColumn::make('product.variants.sku'),
-                TextColumn::make('quantity'),
-                TextColumn::make('price'),
+                TextColumn::make('product.name')
+                    ->label('Product')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('variant.sku')
+                    ->label('SKU')
+                    ->placeholder('No variant')
+                    ->searchable(),
+                TextColumn::make('variant.color')
+                    ->label('Color')
+                    ->placeholder('No variant'),
+                TextColumn::make('variant.size')
+                    ->label('Size')
+                    ->placeholder('No variant'),
+                TextColumn::make('quantity')
+                    ->sortable(),
+                TextColumn::make('price')
+                    ->money('USD')
+                    ->sortable(),
             ])
             ->headerActions([
                 CreateAction::make(),
+            
              
             ])
             ->recordActions([
