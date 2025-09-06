@@ -261,5 +261,52 @@ class PaymentController extends Controller
         }
     }
 
+    /**
+     * Show thank you page with order details
+     */
+    public function thankYou(Order $order)
+    {
+        try {
+            // Get currency information for display
+            $currencyInfo = [
+                'currency_code' => $order->currency ?? 'USD',
+                'currency_symbol' => $this->getCurrencySymbol($order->currency ?? 'USD'),
+                'is_auto_detected' => false // You can implement auto-detection logic here
+            ];
+
+            Log::info('Thank you page accessed', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'payment_status' => $order->payment_status
+            ]);
+
+            return view('checkout.thank-you', compact('order', 'currencyInfo'));
+
+        } catch (Exception $e) {
+            Log::error('Thank you page error: ' . $e->getMessage(), [
+                'order_id' => $order->id ?? 'unknown',
+                'exception' => $e
+            ]);
+
+            return redirect()->route('home')->with('error', 'Unable to display order confirmation.');
+        }
+    }
+
+    /**
+     * Get currency symbol for display
+     */
+    private function getCurrencySymbol($currencyCode)
+    {
+        $symbols = [
+            'USD' => '$',
+            'EUR' => '€',
+            'GBP' => '£',
+            'EGP' => 'E£',
+            'AED' => 'د.إ',
+            'SAR' => 'ر.س',
+        ];
+
+        return $symbols[$currencyCode] ?? '$';
+    }
 
 }
