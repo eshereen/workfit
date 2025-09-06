@@ -143,13 +143,30 @@ Route::prefix('checkout/paypal-credit-card')->group(function () {
     Route::get('/cancel/{payment}', [\App\Http\Controllers\PayPalCreditCardController::class, 'cancel'])->name('checkout.paypal.credit-card.cancel');
 });
 
-// Paymob routes
-Route::prefix('checkout/paymob')->group(function () {
-    Route::post('/create', [\App\Http\Controllers\PaymobController::class, 'createPayment'])->name('checkout.paymob.create');
-    Route::get('/success/{payment}', [\App\Http\Controllers\PaymobController::class, 'success'])->name('checkout.paymob.success');
-    Route::get('/cancel/{payment}', [\App\Http\Controllers\PaymobController::class, 'cancel'])->name('checkout.paymob.cancel');
-    Route::post('/webhook', [\App\Http\Controllers\PaymobController::class, 'webhook'])->name('checkout.paymob.webhook');
-});
+// Thank you page route (used by PaymentReturnController)
+Route::get('/thankyou/{order}', [\App\Http\Controllers\CheckoutController::class, 'thankYou'])->name('thankyou');
+
+// Checkout thank you page route
+Route::get('/checkout/thank-you/{order}', [\App\Http\Controllers\CheckoutController::class, 'thankYou'])->name('checkout.thank-you');
+
+// Checkout success and failure routes
+Route::get('/checkout/success/{order}', function ($orderNumber) {
+    $order = \App\Models\Order::where('order_number', $orderNumber)->first();
+    if (!$order) {
+        abort(404, 'Order not found');
+    }
+    return view('checkout.success', compact('order'));
+})->name('checkout.success');
+
+Route::get('/checkout/failure/{order}', function ($orderNumber) {
+    $order = \App\Models\Order::where('order_number', $orderNumber)->first();
+    if (!$order) {
+        abort(404, 'Order not found');
+    }
+    return view('checkout.failure', compact('order'));
+})->name('checkout.failure');
+
+// Paymob routes (removed - PaymobController doesn't exist, using PaymentReturnController instead)
 
 // Payment return and cancel (must come AFTER specific routes)
 Route::get('/payments/return/{order}', [\App\Http\Controllers\PaymentController::class, 'handleReturn'])->name('payments.return');
