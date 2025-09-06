@@ -177,7 +177,7 @@ if (isset($__slots)) unset($__slots);
             <?php if($categories->count() > 1): ?>
             <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase"><?php echo e($categories->get(0)->name); ?>'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($categories->get(1)->description); ?></p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll"><?php echo e($categories->get(0)->description); ?></p>
 
 
            <?php

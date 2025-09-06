@@ -36,8 +36,10 @@ class FrontendController extends Controller
                 ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                              ->where('collection_name', ['main_image','product_images']);
-
+                              ->whereIn('collection_name', ['main_image', 'product_images'])
+                              ->whereNotNull('disk')
+                              ->orderBy('collection_name', 'asc')
+                              ->orderBy('id', 'asc');
                         }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
                         ->where('products.active', true)
                         ->take(8);
@@ -51,16 +53,17 @@ class FrontendController extends Controller
             return Category::where('categories.active', true)
                 ->where(function($query) {
                     $query->where('categories.slug', 'women')  // Standard
-                         
+
                           ->orWhere('categories.name', 'LIKE', '%women%')  // Live server
                           ->orWhere('categories.name', 'LIKE', '%Women%'); // Live server
                 })
                 ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                              ->where('collection_name', ['main_image','product_images']);
-
-
+                              ->whereIn('collection_name', ['main_image', 'product_images'])
+                              ->whereNotNull('disk')
+                              ->orderBy('collection_name', 'asc')
+                              ->orderBy('id', 'asc');
                         }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
                         ->where('products.active', true)
                         ->take(8);

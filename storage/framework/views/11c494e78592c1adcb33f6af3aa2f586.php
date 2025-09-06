@@ -79,9 +79,16 @@
 
                     
                     <?php
-                        $galleryImage = $product->getFirstMediaUrl('product_images');
+                        $galleryImages = $product->getMedia('product_images');
+                        $galleryImage = null;
+                        foreach($galleryImages as $img) {
+                            if($img->getUrl() !== $mainImage) {
+                                $galleryImage = $img->getUrl();
+                                break;
+                            }
+                        }
                     ?>
-                    <!--[if BLOCK]><![endif]--><?php if($galleryImage && $galleryImage !== $mainImage): ?>
+                    <!--[if BLOCK]><![endif]--><?php if($galleryImage): ?>
                         <img src="<?php echo e($galleryImage); ?>"
                              alt="<?php echo e($product->name); ?>"
                              class="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 gallery-image"

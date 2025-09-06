@@ -77,9 +77,16 @@
 
                     {{-- Gallery image (if exists) --}}
                     @php
-                        $galleryImage = $product->getFirstMediaUrl('product_images');
+                        $galleryImages = $product->getMedia('product_images');
+                        $galleryImage = null;
+                        foreach($galleryImages as $img) {
+                            if($img->getUrl() !== $mainImage) {
+                                $galleryImage = $img->getUrl();
+                                break;
+                            }
+                        }
                     @endphp
-                    @if($galleryImage && $galleryImage !== $mainImage)
+                    @if($galleryImage)
                         <img src="{{ $galleryImage }}"
                              alt="{{ $product->name }}"
                              class="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 gallery-image"
