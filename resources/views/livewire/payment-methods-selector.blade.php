@@ -16,8 +16,8 @@
                                 <path d="M20.067 8.478c.492.315.844.825.844 1.478 0 .653-.352 1.163-.844 1.478-.492.315-1.163.478-1.844.478H17.5v-2.956h.723c.681 0 1.352.163 1.844.478zM20.067 12.478c.492.315.844.825.844 1.478 0 .653-.352 1.163-.844 1.478-.492.315-1.163.478-1.844.478H17.5v-2.956h.723c.681 0 1.352.163 1.844.478z"/>
                             </svg>
                         @elseif($method === 'paymob')
-                            <svg class="w-6 h-6 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                             </svg>
 
                         @elseif($method === 'cash_on_delivery')
@@ -25,13 +25,19 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                             </svg>
                         @endif
-                        <span class="font-medium text-gray-900">{{ ucfirst(str_replace('_',' ', $method)) }}</span>
+                        <span class="font-medium text-gray-900">
+                            @if($method === 'paymob')
+                                Credit Card
+                            @else
+                                {{ ucfirst(str_replace('_',' ', $method)) }}
+                            @endif
+                        </span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1">
                         @if($method === 'paypal')
                             Pay with your PayPal account
                         @elseif($method === 'paymob')
-                            Local payment solution for Egypt and MENA region
+                            Pay securely with your credit or debit card
 
                         @elseif($method === 'cash_on_delivery')
                             Pay with cash when your order is delivered
