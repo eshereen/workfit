@@ -86,52 +86,58 @@ class Order extends Model
 
     public function getShippingAddressAttribute()
     {
-                // If we have raw JSON data, decode it
-        if (is_string($this->attributes['shipping_address'] ?? null)) {
-            $decoded = json_decode($this->attributes['shipping_address'], true);
-            Log::info('Shipping address decoded from JSON', [
-                'original' => $this->attributes['shipping_address'],
-                'decoded' => $decoded
-            ]);
-            return $decoded ?? [];
+        $address = $this->attributes['shipping_address'] ?? null;
+        
+        // If it's null or empty, return null
+        if (empty($address)) {
+            return null;
         }
-
+        
+        // If it's a string, check if it's JSON
+        if (is_string($address)) {
+            $decoded = json_decode($address, true);
+            // If JSON decode was successful, return the decoded array
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+            // Otherwise, return the string as-is
+            return $address;
+        }
+        
         // If it's already an array, return it
-        if (is_array($this->attributes['shipping_address'] ?? null)) {
-            Log::info('Shipping address already an array', [
-                'address' => $this->attributes['shipping_address']
-            ]);
-            return $this->attributes['shipping_address'];
+        if (is_array($address)) {
+            return $address;
         }
-
-        // Fallback to empty array
-        Log::info('Shipping address fallback to empty array');
-        return [];
+        
+        return null;
     }
 
-        public function getBillingAddressAttribute()
+    public function getBillingAddressAttribute()
     {
-        // If we have raw JSON data, decode it
-        if (is_string($this->attributes['billing_address'] ?? null)) {
-            $decoded = json_decode($this->attributes['billing_address'], true);
-            Log::info('Billing address decoded from JSON', [
-                'original' => $this->attributes['billing_address'],
-                'decoded' => $decoded
-            ]);
-            return $decoded ?? [];
+        $address = $this->attributes['billing_address'] ?? null;
+        
+        // If it's null or empty, return null
+        if (empty($address)) {
+            return null;
         }
-
+        
+        // If it's a string, check if it's JSON
+        if (is_string($address)) {
+            $decoded = json_decode($address, true);
+            // If JSON decode was successful, return the decoded array
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+            // Otherwise, return the string as-is
+            return $address;
+        }
+        
         // If it's already an array, return it
-        if (is_array($this->attributes['billing_address'] ?? null)) {
-            Log::info('Billing address already an array', [
-                'address' => $this->attributes['billing_address']
-            ]);
-            return $this->attributes['billing_address'];
+        if (is_array($address)) {
+            return $address;
         }
-
-        // Fallback to empty array
-        Log::info('Billing address fallback to empty array');
-        return [];
+        
+        return null;
     }
 
     public function getCurrencySymbolAttribute()

@@ -70,6 +70,44 @@ class OrderResource extends Resource
                     ->tel()
                     ->maxLength(255),
                 ])->columns(3)->columnSpanFull(),
+                Section::make('Billing Address')
+                ->schema([
+                TextInput::make('billing_address')
+                    ->required()
+                    ->maxLength(255)
+                    ->label('Address')
+                    ->placeholder('Enter billing address')
+                    ->columnSpan(2)
+                    ->default(fn ($record) => $record?->billing_address ?? ''),
+                TextInput::make('billing_building_number')
+                    ->maxLength(255)
+                    ->label('Building Number')
+                    ->placeholder('Building number (optional)')
+                    ->default(fn ($record) => $record?->billing_building_number ?? ''),
+                ])->columns(3)->columnSpanFull(),
+                
+                Section::make('Shipping Address')
+                ->schema([
+                Toggle::make('use_billing_for_shipping')
+                    ->label('Use billing address for shipping')
+                    ->live()
+                    ->columnSpanFull()
+                    ->default(fn ($record) => $record?->use_billing_for_shipping ?? false),
+                TextInput::make('shipping_address')
+                    ->maxLength(255)
+                    ->label('Address')
+                    ->placeholder('Enter shipping address')
+                    ->visible(fn ($get) => !$get('use_billing_for_shipping'))
+                    ->columnSpan(2)
+                    ->default(fn ($record) => $record?->shipping_address ?? ''),
+                TextInput::make('shipping_building_number')
+                    ->maxLength(255)
+                    ->label('Building Number')
+                    ->placeholder('Building number (optional)')
+                    ->visible(fn ($get) => !$get('use_billing_for_shipping'))
+                    ->default(fn ($record) => $record?->shipping_building_number ?? ''),
+                ])->columns(3)->columnSpanFull(),
+                
                 Section::make('Order Summary')
                 ->schema([
                 TextInput::make('subtotal')
@@ -94,21 +132,8 @@ class OrderResource extends Resource
                     ->required()
                     ->maxLength(3)
                     ->default('USD'),
-                TextInput::make('billing_address')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('billing_building_number')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('shipping_address')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('shipping_building_number')
-                    ->required()
-                    ->maxLength(255),
-                Toggle::make('use_billing_for_shipping')
-                    ->required(),
                 Textarea::make('notes')
+                    ->label('Order Notes')
                     ->columnSpanFull(),
                 ])->columns(3)->columnSpanFull(),
                 Section::make('Order Status')
