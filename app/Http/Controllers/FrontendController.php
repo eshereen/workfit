@@ -38,16 +38,15 @@ class FrontendController extends Controller
                 ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                              ->where('collection_name', 'main_image')
-                              ->whereNotNull('disk')
-                              ->limit(1);
+                              ->where('collection_name', ['main_image','product_images']);
+
                         }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
                         ->where('products.active', true)
                         ->take(8);
                 }])
                 ->first(); // Use first() instead of get() since we only want one category
         });
-    
+
 
         // Women's Category - Get only women's category with its products
         $women = cache()->remember('home_women_category', 1800, function () {
@@ -61,9 +60,8 @@ class FrontendController extends Controller
                 ->with(['directProducts' => function ($query) {
                     $query->with(['media' => function ($q) {
                             $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk')
-                              ->where('collection_name', 'main_image')
-                              ->whereNotNull('disk')
-                              ->limit(1);
+                              ->where('collection_name', ['main_image','product_images']);
+
                         }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
                         ->where('products.active', true)
                         ->take(8);
