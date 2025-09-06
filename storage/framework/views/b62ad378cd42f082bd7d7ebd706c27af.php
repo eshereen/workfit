@@ -8,6 +8,7 @@
 
 <!--[if BLOCK]><![endif]--><?php if(request()->routeIs('home')): ?>
     <button @click="open = !open"
+    type="button"
             class="flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-white group-hover:text-gray-900 hover:text-red-600  rounded-md transition-colors ">
             <?php else: ?>
      <button @click="open = !open"
@@ -218,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Listen for Livewire events from other components
     document.addEventListener('livewire:init', () => {
         Livewire.on('currency-changed', (data) => {
-            console.log('💱 CurrencySelector: Received currency-changed event:', data);
+
         });
 
         Livewire.on('country-changed', (data) => {
@@ -302,24 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Global test function for currency update
-    window.testCurrencyFromConsole = function(currency = 'AUD') {
-        console.log('🧪 Testing currency update from console to:', currency);
 
-        const currencySelector = document.querySelector('.currency-selector[wire\\:id]');
-        if (currencySelector && window.Livewire) {
-            const wireId = currencySelector.getAttribute('wire:id');
-            const component = window.Livewire.find(wireId);
-            if (component) {
-                console.log('📞 Calling updateToCurrency on currency selector');
-                component.call('updateToCurrency', currency);
-            } else {
-                console.error('❌ Currency component not found');
-            }
-        } else {
-            console.error('❌ Currency selector element not found');
-        }
-    };
 
         // Simple JavaScript function to change currency (bypassing Livewire frontend issues)
     window.changeCurrencyManual = function(currencyCode) {
