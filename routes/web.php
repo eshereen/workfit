@@ -80,6 +80,9 @@ Route::match(['GET', 'POST'], '/api/paymob/callback', [\App\Http\Controllers\Pay
 Route::get('/payments/return/{order}', [\App\Http\Controllers\PaymentController::class, 'handleReturn'])->name('payments.return');
 Route::get('/payments/cancel/{order}', [\App\Http\Controllers\PaymentController::class, 'handleCancel'])->name('payments.cancel');
 
+// Thank you page route
+Route::get('/thankyou/{order}', [\App\Http\Controllers\PaymentController::class, 'thankYou'])->name('thankyou');
+
 
 //cart
 Route::prefix('cart')->group(function () {

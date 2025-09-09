@@ -41,11 +41,30 @@ class PaymobController extends Controller
                       ?? $request->query('order_id')
                       ?? $request->input('order_id');
 
+            // Also check for merchant_order_id in query params
+            if (!$orderId) {
+                $merchantOrderId = $request->get('merchant_order_id') ?? $request->query('merchant_order_id');
+                if ($merchantOrderId) {
+                    // Extract the order number from merchant order ID (format: order_number-timestamp)
+                    $orderNumber = explode('-', $merchantOrderId)[0];
+                    $order = Order::where('order_number', $orderNumber)->first();
+                    if ($order) {
+                        $orderId = $order->id;
+                    }
+                }
+            }
+
             // If no order_id in query params, try to extract from PayMob obj data
             if (!$orderId && $request->has('obj')) {
                 $objData = json_decode($request->get('obj'), true);
                 if ($objData && isset($objData['merchant_order_id'])) {
-                    $orderId = $objData['merchant_order_id'];
+                    $merchantOrderId = $objData['merchant_order_id'];
+                    // Extract the order number from merchant order ID (format: order_number-timestamp)
+                    $orderNumber = explode('-', $merchantOrderId)[0];
+                    $order = Order::where('order_number', $orderNumber)->first();
+                    if ($order) {
+                        $orderId = $order->id;
+                    }
                 }
             }
 
@@ -91,6 +110,12 @@ class PaymobController extends Controller
 
             // Check explicit status parameter
             if ($status === 'success') {
+                $isSuccess = true;
+            }
+
+            // Check success parameter in query
+            $successParam = $request->get('success') ?? $request->query('success');
+            if ($successParam === 'true' || $successParam === true) {
                 $isSuccess = true;
             }
 
