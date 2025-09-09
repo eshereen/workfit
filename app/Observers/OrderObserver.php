@@ -44,7 +44,7 @@ class OrderObserver
         }
 
         // Restore stock when order is cancelled
-        if ($order->wasChanged('status') && $order->status === 'cancelled') {
+        if ($order->wasChanged('status') && $order->status->value === 'cancelled') {
             foreach ($order->items as $item) {
                 if ($item->product_variant_id) {
                     $variant = \App\Models\ProductVariant::find($item->product_variant_id);

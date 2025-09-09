@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Payment;
+use App\Enums\PaymentStatus;
+use App\Enums\OrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -35,10 +37,10 @@ class PaymobController extends Controller
 
         try {
             // Try to get order_id from different sources
-            $orderId = $request->get('order_id') 
+            $orderId = $request->get('order_id')
                       ?? $request->query('order_id')
                       ?? $request->input('order_id');
-            
+
             // If no order_id in query params, try to extract from PayMob obj data
             if (!$orderId && $request->has('obj')) {
                 $objData = json_decode($request->get('obj'), true);
@@ -46,7 +48,7 @@ class PaymobController extends Controller
                     $orderId = $objData['merchant_order_id'];
                 }
             }
-            
+
             // If still no order_id, try to find by payment reference
             if (!$orderId) {
                 // Look for payment by provider_reference in case PayMob sends order ID differently
@@ -54,13 +56,13 @@ class PaymobController extends Controller
                     ->where('status', 'pending_redirect')
                     ->latest()
                     ->first();
-                
+
                 if ($payment) {
                     $orderId = $payment->order_id;
                     Log::info('PayMob callback: Found order by payment reference', ['order_id' => $orderId]);
                 }
             }
-            
+
             if (!$orderId) {
                 Log::error('PayMob callback: No order_id found in any format', [
                     'request_data' => $request->all(),
@@ -86,12 +88,12 @@ class PaymobController extends Controller
             // Determine if payment was successful
             // PayMob sends success/failure in different ways, so we need to check multiple sources
             $isSuccess = false;
-            
+
             // Check explicit status parameter
             if ($status === 'success') {
                 $isSuccess = true;
             }
-            
+
             // Check PayMob obj data for success indicators
             if ($request->has('obj')) {
                 $objData = json_decode($request->get('obj'), true);
@@ -105,7 +107,7 @@ class PaymobController extends Controller
                     }
                 }
             }
-            
+
             // If no explicit success/failure, assume success if we reach the callback
             // (PayMob typically only redirects to callback on success)
             if ($status === null && !$request->has('obj')) {
@@ -138,8 +140,8 @@ class PaymobController extends Controller
                     ]);
 
                     $order->update([
-                        'payment_status' => 'paid',
-                        'status' => 'processing'
+                        'payment_status' => PaymentStatus::PAID,
+                        'status' => OrderStatus::PROCESSING
                     ]);
                 });
 
@@ -164,8 +166,8 @@ class PaymobController extends Controller
                     ]);
 
                     $order->update([
-                        'payment_status' => 'failed',
-                        'status' => 'pending'
+                        'payment_status' => PaymentStatus::FAILED,
+                        'status' => OrderStatus::PENDING
                     ]);
                 });
 
@@ -223,17 +225,17 @@ class PaymobController extends Controller
     public function webhook(Request $request)
     {
         Log::info('PayMob webhook received', ['payload' => $request->all()]);
-        
+
         try {
             $this->paymobGateway->handleWebhook($request->all(), $request->header('X-HMAC'));
-            
+
             return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
             Log::error('PayMob webhook error', [
                 'error' => $e->getMessage(),
                 'payload' => $request->all()
             ]);
-            
+
             return response()->json(['error' => 'Webhook processing failed'], 500);
         }
     }
