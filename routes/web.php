@@ -83,6 +83,9 @@ Route::get('/payments/cancel/{order}', [\App\Http\Controllers\PaymentController:
 // Thank you page route
 Route::get('/thankyou/{order}', [\App\Http\Controllers\PaymentController::class, 'thankYou'])->name('thankyou');
 
+// Order confirmation page route
+Route::get('/checkout/confirmation/{order}', [\App\Http\Controllers\PaymentController::class, 'confirmation'])->name('checkout.confirmation');
+
 
 //cart
 Route::prefix('cart')->group(function () {
