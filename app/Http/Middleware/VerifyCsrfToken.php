@@ -15,6 +15,8 @@ class VerifyCsrfToken extends Middleware
         // Exclude debug routes only (these are safe to exclude)
         'debug/*',
         'emergency-test.php',
+        // Exclude PayMob callback (external webhook)
+        'api/paymob/callback',
     ];
 
     /**
@@ -30,7 +32,20 @@ class VerifyCsrfToken extends Middleware
             return true;
         }
 
-        // For LiteSpeed compatibility: Handle stale token issues
+        // For localhost: Be more lenient with CSRF for development
+        if (app()->environment('local')) {
+            // Allow Livewire requests on localhost
+            if ($this->isLivewireRequest($request)) {
+                return true;
+            }
+
+            // Allow Filament requests on localhost
+            if ($this->isFilamentRequest($request)) {
+                return true;
+            }
+        }
+
+        // For Livewire requests: Handle stale token issues
         if ($this->isLivewireRequest($request)) {
             $sessionToken = $request->session()->token();
             $requestToken = $this->getTokenFromRequest($request);
@@ -60,6 +75,16 @@ class VerifyCsrfToken extends Middleware
         return $request->hasHeader('X-Livewire') ||
                str_contains($request->url(), '/livewire/') ||
                $request->hasHeader('X-Livewire-Request');
+    }
+
+    /**
+     * Determine if this is a Filament request.
+     */
+    protected function isFilamentRequest($request): bool
+    {
+        return str_contains($request->url(), '/admin/') ||
+               str_contains($request->url(), '/filament/') ||
+               $request->hasHeader('X-Filament');
     }
 
     /**

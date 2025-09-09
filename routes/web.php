@@ -73,6 +73,9 @@ Route::prefix('checkout/paymob')->group(function () {
     Route::post('/webhook', [\App\Http\Controllers\PaymobController::class, 'webhook'])->name('checkout.paymob.webhook');
 });
 
+// PayMob API callback route (for external callbacks)
+Route::match(['GET', 'POST'], '/api/paymob/callback', [\App\Http\Controllers\PaymobController::class, 'callback'])->name('api.paymob.callback');
+
 // Payment return and cancel (must come AFTER specific routes)
 Route::get('/payments/return/{order}', [\App\Http\Controllers\PaymentController::class, 'handleReturn'])->name('payments.return');
 Route::get('/payments/cancel/{order}', [\App\Http\Controllers\PaymentController::class, 'handleCancel'])->name('payments.cancel');
