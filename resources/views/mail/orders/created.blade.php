@@ -9,7 +9,7 @@
     Your order has been created successfully.
     Order ID: {{ $order->id }}
     Order Date: {{ optional($order->created_at)->format('d-m-Y') }}
-    Order Status: {{ $order->status }}
+    Order Status: {{ $order->status->value }}
     Order Total: {{ $order->total_amount }}
 
     @if($order->relationLoaded('items') || $order->items()->exists())

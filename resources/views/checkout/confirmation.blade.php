@@ -60,13 +60,13 @@
                                     <div class="flex justify-between">
                                         <span class="text-gray-600">Status:</span>
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            {{ ucfirst($order->status) }}
+                                            {{ ucfirst($order->status->value) }}
                                         </span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-gray-600">Payment Status:</span>
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            {{ ucfirst($order->payment_status) }}
+                                            {{ ucfirst($order->payment_status->value) }}
                                         </span>
                                     </div>
                                     <div class="flex justify-between">

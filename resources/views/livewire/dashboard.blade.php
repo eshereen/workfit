@@ -22,10 +22,10 @@
                                     {{ $order->currency }} {{ number_format($order->total_amount, 2) }}
                                 </p>
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    {{ $order->status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                                       ($order->status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                    {{ $order->status->value === 'delivered' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                       ($order->status->value === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200') }}">
-                                    {{ ucfirst($order->status) }}
+                                    {{ ucfirst($order->status->value) }}
                                 </span>
                             </div>
                         </div>
