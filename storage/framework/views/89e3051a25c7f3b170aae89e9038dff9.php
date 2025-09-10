@@ -29,9 +29,9 @@
             <div class="animate-on-scroll">
                 <h4 class="font-bold mb-4">SHOP</h4>
                 <ul class="space-y-2">
-                    @foreach ($categories as $category)
-                    <li><a href="{{ route('categories.index', $category->slug) }}" class="text-gray-200hover:text-red-600 transition-colors capitalize">{{ $category->name }}</a></li>
-                    @endforeach
+                    <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li><a href="<?php echo e(route('categories.index', $category->slug)); ?>" class="text-gray-200hover:text-red-600 transition-colors capitalize"><?php echo e($category->name); ?></a></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                 </ul>
             </div>
@@ -40,11 +40,11 @@
             <div class="animate-on-scroll">
                 <h4 class="font-bold mb-4">SUPPORT</h4>
                 <ul class="space-y-2">
-                     <li><a href="{{ route('about') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">About Us</a></li>
-                    <li><a href="{{ route('contact.index') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Contact Us</a></li>
-                    <li><a href="{{ route('terms') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Terms & Conditions</a></li>
-                    <li><a href="{{ route('return') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Shipping & Returns</a></li>
-                    <li><a href="{{ route('privacy') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">privacy Policy</a></li>
+                     <li><a href="<?php echo e(route('about')); ?>" class="text-gray-200 hover:text-red-600 transition-colors capitalize">About Us</a></li>
+                    <li><a href="<?php echo e(route('contact.index')); ?>" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Contact Us</a></li>
+                    <li><a href="<?php echo e(route('terms')); ?>" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Terms & Conditions</a></li>
+                    <li><a href="<?php echo e(route('return')); ?>" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Shipping & Returns</a></li>
+                    <li><a href="<?php echo e(route('privacy')); ?>" class="text-gray-200 hover:text-red-600 transition-colors capitalize">privacy Policy</a></li>
 
                 </ul>
             </div>
@@ -53,7 +53,22 @@
             <div class="animate-on-scroll">
                 <h4 class="font-bold mb-4">JOIN OUR NEWSLETTER</h4>
                 <p class="text-gray-200mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
-                <livewire:newsletter.subscribe-form />
+                <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('newsletter.subscribe-form', []);
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-2391806995-0', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
             </div>
         </div>
         <div class="border-t border-gray-600 pt-8 text-center text-gray-200 animate-on-scroll">
@@ -64,3 +79,4 @@
 </footer>
 
 
+<?php /**PATH /Users/shereenelshayp/Herd/workfit/resources/views/layouts/footer.blade.php ENDPATH**/ ?>
