@@ -15,7 +15,7 @@ class CountryCurrencyService
     public function detectCountry()
     {
         $ip = request()->ip();
-        
+
         // Skip detection for localhost/development
         if (in_array($ip, ['127.0.0.1', '::1', 'localhost'])) {
             return [
@@ -24,7 +24,7 @@ class CountryCurrencyService
                 'currency_code' => 'USD'
             ];
         }
-        
+
         // Cache detection per IP to avoid repeated slow lookups
         return Cache::remember("detected_country_{$ip}", now()->addDay(), function () use ($ip) {
             Log::info("CountryCurrencyService: Detecting country for IP: {$ip}");
@@ -32,9 +32,9 @@ class CountryCurrencyService
             try {
                 // Set a timeout to prevent hanging
                 $location = Location::get($ip);
-                Log::info("CountryCurrencyService: Location result", ['location' => $location]);
+                Log::info("CountryCurrencyService: Location result", ['location' => $location, 'location_type' => gettype($location)]);
 
-                if ($location) {
+                if ($location && is_object($location) && isset($location->countryCode)) {
                     $result = [
                         'country_code' => $location->countryCode,
                         'country_name' => $location->countryName,
@@ -42,6 +42,8 @@ class CountryCurrencyService
                     ];
                     Log::info("CountryCurrencyService: Detection successful", $result);
                     return $result;
+                } else {
+                    Log::warning("CountryCurrencyService: Invalid location object", ['location' => $location, 'type' => gettype($location)]);
                 }
             } catch (Exception $e) {
                 Log::error("CountryCurrencyService: Location detection failed: " . $e->getMessage());
@@ -128,7 +130,7 @@ class CountryCurrencyService
                 $country = Country::find(Session::get('preferred_country_id'));
             } else {
                 // Try to find a country with this currency
-                $country = Country::select('id','code','currency_code','currency_sympol')
+                $country = Country::select('id','code','currency_code')
                     ->where('currency_code', $currencyCode)
                     ->first();
             }
