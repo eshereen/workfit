@@ -2,19 +2,19 @@
      x-data="{ open: false }"
      x-init="$watch('open', value => $wire?.set('showDropdown', value))"
      @currency-changed.window="open = false"
-     wire:key="{{ $this->getId() }}"
-     data-component-id="{{ $this->getId() }}"
+     wire:key="<?php echo e($this->getId()); ?>"
+     data-component-id="<?php echo e($this->getId()); ?>"
      data-component-name="currency-selector">
 
-    @if(request()->routeIs('home'))
+    <!--[if BLOCK]><![endif]--><?php if(request()->routeIs('home')): ?>
         <button @click="open = !open" type="button"
                 class="flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-white group-hover:text-gray-900 hover:text-red-600 rounded-md transition-colors">
-    @else
+    <?php else: ?>
         <button @click="open = !open" type="button"
                 class="flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-gray-900 hover:text-red-600 rounded-md transition-colors">
-    @endif
-        <span class="text-lg">{{ $currentSymbol }}</span>
-        <span class="hidden sm:inline">{{ $currentCurrency }}</span>
+    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <span class="text-lg"><?php echo e($currentSymbol); ?></span>
+        <span class="hidden sm:inline"><?php echo e($currentCurrency); ?></span>
         <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg>
@@ -33,19 +33,20 @@
 
         <div class="py-1">
             <!-- Auto-detected currency info -->
-            @if($isAutoDetected && $detectedCountry)
+            <!--[if BLOCK]><![endif]--><?php if($isAutoDetected && $detectedCountry): ?>
             <div class="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
                 <div class="flex items-center">
                     <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    Auto-detected from {{ $detectedCountry }}
+                    Auto-detected from <?php echo e($detectedCountry); ?>
+
                 </div>
             </div>
-            @endif
+            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
             <!-- Currency options -->
-            @foreach ([
+            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = [
                 'USD' => '$ USD - US Dollar',
                 'EGP' => 'E£ EGP - Egyptian Pound',
                 'EUR' => '€ EUR - Euro',
@@ -56,25 +57,25 @@
                 'CAD' => 'C$ CAD - Canadian Dollar',
                 'JPY' => '¥ JPY - Japanese Yen',
                 'CHF' => 'CHF CHF - Swiss Franc',
-            ] as $code => $label)
-                <button type="button" onclick="changeCurrencyManual('{{ $code }}')" @click="open = false"
-                        class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === $code ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
+            ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $code => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <button type="button" onclick="changeCurrencyManual('<?php echo e($code); ?>')" @click="open = false"
+                        class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 <?php echo e($currentCurrency === $code ? 'bg-gray-50 text-gray-900' : 'text-gray-700'); ?>">
                     <div class="flex items-center justify-between">
                         <span class="flex items-center">
-                            <span class="text-lg mr-2">{{ explode(' ', $label)[0] }}</span>
-                            <span>{{ substr($label, strpos($label, ' ') + 1) }}</span>
+                            <span class="text-lg mr-2"><?php echo e(explode(' ', $label)[0]); ?></span>
+                            <span><?php echo e(substr($label, strpos($label, ' ') + 1)); ?></span>
                         </span>
-                        @if($currentCurrency === $code)
+                        <!--[if BLOCK]><![endif]--><?php if($currentCurrency === $code): ?>
                             <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                             </svg>
-                        @endif
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                     </div>
                 </button>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
 
             <!-- Reset -->
-            @if($isAutoDetected && $detectedCountry && $currentCurrency !== Session::get('detected_currency', 'USD'))
+            <!--[if BLOCK]><![endif]--><?php if($isAutoDetected && $detectedCountry && $currentCurrency !== Session::get('detected_currency', 'USD')): ?>
             <div class="border-t border-gray-100">
                 <button type="button" wire:click="resetToDetected()" @click="open = false"
                         class="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
@@ -86,7 +87,7 @@
                     </div>
                 </button>
             </div>
-            @endif
+            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         </div>
     </div>
 </div>
@@ -237,3 +238,4 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 </script>
+<?php /**PATH /Users/shereenelshayp/Herd/workfit/resources/views/livewire/currency-selector.blade.php ENDPATH**/ ?>

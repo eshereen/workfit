@@ -157,6 +157,22 @@ class ProductShow extends Component
         $this->convertProductPrices();
     }
 
+    #[On('currency-changed')]
+    public function handleCurrencyChanged($currencyCode = null)
+    {
+        Log::info('ProductShow: Received currency-changed event', ['currency_code' => $currencyCode]);
+        $this->loadCurrencyInfo();
+        $this->convertProductPrices();
+    }
+
+    #[On('global-currency-changed')]
+    public function handleGlobalCurrencyChanged($currencyCode = null)
+    {
+        Log::info('ProductShow: Received global-currency-changed event', ['currency_code' => $currencyCode]);
+        $this->loadCurrencyInfo();
+        $this->convertProductPrices();
+    }
+
     public function incrementQty()
     {
         Log::info('incrementQty method called', [

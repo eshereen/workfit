@@ -68,6 +68,20 @@ class ProductIndex extends Component
         ]);
     }
 
+    #[On('currency-changed')]
+    public function handleCurrencyChanged($currencyCode = null)
+    {
+        Log::info('ProductIndex: Received currency-changed event', ['currency_code' => $currencyCode]);
+        $this->loadCurrencyInfo();
+    }
+
+    #[On('global-currency-changed')]
+    public function handleGlobalCurrencyChanged($currencyCode = null)
+    {
+        Log::info('ProductIndex: Received global-currency-changed event', ['currency_code' => $currencyCode]);
+        $this->loadCurrencyInfo();
+    }
+
     // Alternative method to handle currency changes
     public function handleCurrencyChange($currencyCode = null)
     {
