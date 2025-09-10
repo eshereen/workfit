@@ -190,8 +190,6 @@ class CartIndex extends Component
     }
 
     #[On('currencyChanged')]
-    #[On('currency-changed')]
-    #[On('global-currency-changed')]
     public function refreshCurrency()
     {
         Log::info('Currency changed event received, refreshing...');

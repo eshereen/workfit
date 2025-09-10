@@ -1,7 +1,5 @@
 <?php
 
-use App\Livewire\OrderView;
-use App\Livewire\OrdersIndex;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Appearance;
@@ -126,8 +124,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/password', Password::class)->name('settings.password');
     Route::get('/profile/appearance', Appearance::class)->name('settings.appearance');
     Route::get('/wishlist',\App\Livewire\WishlistIndex::class)->name('wishlist.index');
-   // Route::get('/orders',OrdersIndex::class)->name('orders');
-    // Route::get('/order/{order}',OrderView::class)->name('order.view');
+    // Route::get('/orders',\App\Livewire\OrdersIndex::class)->name('orders');
+    // Route::get('/order/{order}',\App\Livewire\OrderView::class)->name('order.view');
 });
 
 

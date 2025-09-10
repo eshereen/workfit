@@ -132,17 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         component.$refresh();
                     }
                 }
-
-                // Dispatch global events for other components to listen to
-                window.dispatchEvent(new CustomEvent('currency-changed', { detail: currencyCode }));
-                window.dispatchEvent(new CustomEvent('global-currency-changed', { detail: currencyCode }));
-
-                // Also dispatch Livewire events
-                if (window.Livewire) {
-                    window.Livewire.dispatch('currencyChanged', { currency: currencyCode });
-                    window.Livewire.dispatch('currency-changed', { currency: currencyCode });
-                    window.Livewire.dispatch('global-currency-changed', { currency: currencyCode });
-                }
             } else {
                 console.error('❌ Currency change failed:', data.message);
             }
@@ -162,15 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (component) {
                 component.call('resetToDetected');
                 component.$refresh();
-
-                // Dispatch global events for other components to listen to
-                window.dispatchEvent(new CustomEvent('currency-changed', { detail: null }));
-                window.dispatchEvent(new CustomEvent('global-currency-changed', { detail: null }));
-
-                // Also dispatch Livewire events
-                window.Livewire.dispatch('currencyChanged', { currency: null });
-                window.Livewire.dispatch('currency-changed', { currency: null });
-                window.Livewire.dispatch('global-currency-changed', { currency: null });
             }
         }
     };

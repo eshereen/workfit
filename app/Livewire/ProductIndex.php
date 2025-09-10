@@ -52,9 +52,7 @@ class ProductIndex extends Component
         }
     }
 
-    #[On('currencyChanged')]
-    #[On('currency-changed')]
-    #[On('global-currency-changed')]
+        #[On('currencyChanged')]
     public function refreshCurrency()
     {
         Log::info('Currency change event received in ProductIndex');

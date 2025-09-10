@@ -32,9 +32,9 @@ class CountryCurrencyService
             try {
                 // Set a timeout to prevent hanging
                 $location = Location::get($ip);
-                Log::info("CountryCurrencyService: Location result", ['location' => $location, 'location_type' => gettype($location)]);
+                Log::info("CountryCurrencyService: Location result", ['location' => $location]);
 
-                if ($location && is_object($location) && isset($location->countryCode)) {
+                if ($location) {
                     $result = [
                         'country_code' => $location->countryCode,
                         'country_name' => $location->countryName,
@@ -42,8 +42,6 @@ class CountryCurrencyService
                     ];
                     Log::info("CountryCurrencyService: Detection successful", $result);
                     return $result;
-                } else {
-                    Log::warning("CountryCurrencyService: Invalid location object", ['location' => $location, 'type' => gettype($location)]);
                 }
             } catch (Exception $e) {
                 Log::error("CountryCurrencyService: Location detection failed: " . $e->getMessage());
@@ -130,7 +128,7 @@ class CountryCurrencyService
                 $country = Country::find(Session::get('preferred_country_id'));
             } else {
                 // Try to find a country with this currency
-                $country = Country::select('id','code','currency_code')
+                $country = Country::select('id','code','currency_code','currency_sympol')
                     ->where('currency_code', $currencyCode)
                     ->first();
             }
