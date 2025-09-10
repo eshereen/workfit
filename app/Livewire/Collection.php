@@ -46,6 +46,8 @@ class Collection extends Component
     }
 
     #[On('currencyChanged')]
+    #[On('currency-changed')]
+    #[On('global-currency-changed')]
     public function refreshCurrency()
     {
         Log::info('Currency change event received in Collection');

@@ -54,6 +54,8 @@ class OrderSummary extends Component
     }
 
     #[On('currencyChanged')]
+    #[On('currency-changed')]
+    #[On('global-currency-changed')]
     public function handleCurrencyChangedEvent($currencyCode)
     {
         Log::info('OrderSummary: Received currencyChanged event', ['currency_code' => $currencyCode]);

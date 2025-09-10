@@ -105,7 +105,7 @@ class ProductShow extends Component
 
         try {
             $currencyService = app(CountryCurrencyService::class);
-            
+
             if ($variant && $variant->price) {
                 $variant->converted_price = $currencyService->convertFromUSD($variant->price, $this->currencyCode);
             }
@@ -151,6 +151,8 @@ class ProductShow extends Component
     }
 
     #[On('currencyChanged')]
+    #[On('currency-changed')]
+    #[On('global-currency-changed')]
     public function refreshCurrency()
     {
         $this->loadCurrencyInfo();
@@ -236,7 +238,7 @@ class ProductShow extends Component
             if ($this->quantity < 1) {
                 $this->quantity = 1;
             }
-            
+
             // Convert variant price to current currency
             $this->convertVariantPrice($this->selectedVariant);
         }
