@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use App\Mail\ContactMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
@@ -30,7 +31,7 @@ class ContactController extends Controller
         try {
             Mail::to('workfitheadoffice@gmail.com')->later(now()->addSeconds(5), new ContactMail($contact));
         } catch (\Exception $e) {
-            \Log::error('Failed to send contact email: ' . $e->getMessage());
+            Log::error('Failed to send contact email: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'Contact message sent successfully');

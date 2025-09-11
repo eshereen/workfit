@@ -101,7 +101,7 @@ class PaypalGateway
             'payment_id' => $payment->id,
             'requires_frontend_processing' => true,
             'payment_type' => 'credit_card',
-            'redirect_url' => route('checkout.paypal.credit-card', ['payment' => $payment->id])
+            'redirect_url' => route('checkout.paypal.credit-card.form', ['payment' => $payment->id])
         ];
     }
 

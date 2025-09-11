@@ -47,8 +47,7 @@ Route::post('/checkout', [CheckoutController::class, 'processCheckout'])->name('
 Route::post('/checkout/guest', [CheckoutController::class, 'processGuestCheckout'])->name('checkout.guest');
 
 // ****Other checkout routes, organized by payment method****
-// PayPal routes (commented out - controllers not implemented)
-/*
+// PayPal routes
 Route::prefix('checkout/paypal')->group(function () {
     Route::post('/create', [\App\Http\Controllers\PayPalController::class, 'createOrder'])->name('checkout.paypal.create');
     Route::post('/capture/{payment}', [\App\Http\Controllers\PayPalController::class, 'captureOrder'])->name('checkout.paypal.capture');
@@ -56,14 +55,13 @@ Route::prefix('checkout/paypal')->group(function () {
     Route::get('/cancel/{payment}', [\App\Http\Controllers\PayPalController::class, 'cancel'])->name('checkout.paypal.cancel');
 });
 
-// PayPal Credit Card routes (commented out - controllers not implemented)
+// PayPal Credit Card routes
 Route::prefix('checkout/paypal-credit-card')->group(function () {
     Route::get('/form/{payment}', [\App\Http\Controllers\PayPalCreditCardController::class, 'showForm'])->name('checkout.paypal.credit-card.form');
     Route::post('/capture/{payment}', [\App\Http\Controllers\PayPalCreditCardController::class, 'captureOrder'])->name('checkout.paypal.credit-card.capture');
     Route::get('/success/{payment}', [\App\Http\Controllers\PayPalCreditCardController::class, 'success'])->name('checkout.paypal.credit-card.success');
     Route::get('/cancel/{payment}', [\App\Http\Controllers\PayPalCreditCardController::class, 'cancel'])->name('checkout.paypal.credit-card.cancel');
 });
-*/
 
 // Paymob routes
 Route::prefix('checkout/paymob')->group(function () {
