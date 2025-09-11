@@ -96,51 +96,72 @@
                     <p class="text-gray-600 max-w-2xl mx-auto">Fill out the form below and we'll get back to you as soon as possible</p>
                 </div>
 
-                <div x-show="formSubmitted" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                    <p class="font-bold">Thank you for your message!</p>
-                    <p>We've received your inquiry and will get back to you within 24 hours.</p>
-                </div>
+                @if(session('success'))
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                        <p class="font-bold">Thank you for your message!</p>
+                        <p>We've received your inquiry and will get back to you within 24 hours.</p>
+                    </div>
+                @endif
 
-                <form @submit.prevent="submitForm()" class="bg-white p-8 rounded-lg shadow-md animate-on-scroll">
+                @if($errors->any())
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                        <p class="font-bold">Please correct the following errors:</p>
+                        <ul class="list-disc list-inside mt-2">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('contact.store') }}" class="bg-white p-8 rounded-lg shadow-md animate-on-scroll">
+                    @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                            <input type="text" id="name" x-model="formData.name"
-                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
-                                   :class="formErrors.name ? 'border-red-500' : ''">
-                            <p x-show="formErrors.name" class="text-red-500 text-sm mt-1" x-text="formErrors.name"></p>
+                            <input type="text" id="name" name="name" value="{{ old('name') }}"
+                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent @error('name') border-red-500 @enderror"
+                                   required>
+                            @error('name')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                            <input type="email" id="email" x-model="formData.email"
-                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
-                                   :class="formErrors.email ? 'border-red-500' : ''">
-                            <p x-show="formErrors.email" class="text-red-500 text-sm mt-1" x-text="formErrors.email"></p>
+                            <input type="email" id="email" name="email" value="{{ old('email') }}"
+                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent @error('email') border-red-500 @enderror"
+                                   required>
+                            @error('email')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="mb-6">
                         <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
-                        <input type="text" id="subject" x-model="formData.subject"
-                               class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
-                               :class="formErrors.subject ? 'border-red-500' : ''">
-                        <p x-show="formErrors.subject" class="text-red-500 text-sm mt-1" x-text="formErrors.subject"></p>
+                        <input type="text" id="subject" name="subject" value="{{ old('subject') }}"
+                               class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent @error('subject') border-red-500 @enderror"
+                               required>
+                        @error('subject')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="mb-6">
                         <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
-                        <textarea id="message" x-model="formData.message" rows="6"
-                                  class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none resize-none"
-                                  :class="formErrors.message ? 'border-red-500' : ''"></textarea>
-                        <p x-show="formErrors.message" class="text-red-500 text-sm mt-1" x-text="formErrors.message"></p>
+                        <textarea id="message" name="message" rows="6"
+                                  class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none @error('message') border-red-500 @enderror"
+                                  required>{{ old('message') }}</textarea>
+                        @error('message')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="text-center">
-                        <button type="submit" :disabled="submitting"
-                                class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-colors disabled:opacity-50">
-                            <span x-show="!submitting">SEND MESSAGE</span>
-                            <span x-show="submitting">SENDING...</span>
+                        <button type="submit"
+                                class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+                            SEND MESSAGE
                         </button>
                     </div>
                 </form>
