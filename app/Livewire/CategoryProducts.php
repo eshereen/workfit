@@ -283,6 +283,22 @@ class CategoryProducts extends Component
                 return;
             }
 
+            // Check stock before adding to cart
+            if ($product->quantity < $quantity) {
+                if ($product->quantity <= 0) {
+                    $this->dispatch('showNotification', [
+                        'message' => 'This product is currently out of stock.',
+                        'type' => 'error'
+                    ]);
+                } else {
+                    $this->dispatch('showNotification', [
+                        'message' => 'Only ' . $product->quantity . ' items available in stock.',
+                        'type' => 'error'
+                    ]);
+                }
+                return;
+            }
+
             $cartService->addItem($product, $quantity);
 
             $this->dispatch('cartUpdated');

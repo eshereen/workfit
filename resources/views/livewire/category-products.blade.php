@@ -120,12 +120,21 @@
                                             <i class="fas fa-eye mr-2"></i>View Options
                                         </button>
                                     @else
-                                        <button
-                                            wire:click="addSimpleProductToCart({{ $product->id }})"
-                                            class="bg-white text-gray-900 px-4 py-2 rounded-full hover:bg-red-600 hover:text-white transition-colors"
-                                        >
-                                            <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
-                                        </button>
+                                        @if($product->quantity > 0)
+                                            <button
+                                                wire:click="addSimpleProductToCart({{ $product->id }})"
+                                                class="bg-white text-gray-900 px-4 py-2 rounded-full hover:bg-red-600 hover:text-white transition-colors"
+                                            >
+                                                <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
+                                            </button>
+                                        @else
+                                            <button
+                                                disabled
+                                                class="bg-gray-300 text-gray-500 px-4 py-2 rounded-full cursor-not-allowed opacity-50"
+                                            >
+                                                <i class="fas fa-times mr-2"></i>Out of Stock
+                                            </button>
+                                        @endif
                                     @endif
                                 </div>
                             </div>
@@ -157,26 +166,35 @@
                             </div>
 
                             <!-- Variant Colors (if any) -->
-                          
 
-                            <!-- Action Buttons -->
-                            <div class="flex gap-2">
-                                @if($product->variants->count() > 0)
-                                    <button
-                                        wire:click="openVariantModal({{ $product->id }})"
-                                        class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
-                                    >
-                                        View Options
-                                    </button>
-                                @else
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-2">
+                            @if($product->variants->count() > 0)
+                                <button
+                                    wire:click="openVariantModal({{ $product->id }})"
+                                    class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+                                >
+                                    View Options
+                                </button>
+                            @else
+                                @if($product->quantity > 0)
                                     <button
                                         wire:click="addSimpleProductToCart({{ $product->id }})"
                                         class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
                                     >
                                         Add to Cart
                                     </button>
+                                @else
+                                    <button
+                                        disabled
+                                        class="flex-1 bg-gray-400 text-gray-500 py-2 px-4 rounded-lg cursor-not-allowed opacity-50"
+                                    >
+                                        Out of Stock
+                                    </button>
                                 @endif
-                            </div>
+                            @endif
+                        </div>
                         </div>
                     </div>
                 @endforeach
