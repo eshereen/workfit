@@ -60,7 +60,7 @@
                         <i class="fas fa-map-marker-alt text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-2">VISIT US</h3>
-                    <p class="text-gray-600 mb-4">123 Fitness Street<br>Active City, AC 12345</p>
+                    <p class="text-gray-600 mb-4"> - شارع جسر السويس - روكسي<br>عمارات االمريلاند</p>
                     <p class="text-gray-600">Monday - Friday: 9am - 6pm<br>Saturday: 10am - 4pm<br>Sunday: Closed</p>
                 </div>
 
@@ -71,7 +71,7 @@
                     </div>
                     <h3 class="text-xl font-bold mb-2">CALL US</h3>
                     <p class="text-gray-600 mb-4">Customer Service<br>Monday - Friday: 9am - 6pm EST</p>
-                    <a href="tel:+15551234567" class="text-red-600 font-bold text-lg hover:underline">(555) 123-4567</a>
+                    <a href="tel:+15551234567" class="text-red-600 font-bold text-lg hover:underline">01124689117</a>
                 </div>
 
                 <!-- Contact Card 3 -->
@@ -148,51 +148,6 @@
         </div>
     </section>
 
-    <!-- Social Media Section -->
-    <section class="py-16 px-4">
-        <div class="container mx-auto">
-            <div class="text-center mb-12 animate-on-scroll">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">CONNECT WITH US</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Follow us on social media for the latest updates, fitness tips, and exclusive offers</p>
-            </div>
 
-            <div class="flex justify-center space-x-8 animate-on-scroll">
-                <a href="#" class="social-icon text-gray-600 hover:text-red-600 transition-colors">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100">
-                        <i class="fab fa-facebook text-2xl"></i>
-                    </div>
-                    <p class="mt-2 text-sm">Facebook</p>
-                </a>
-
-                <a href="#" class="social-icon text-gray-600 hover:text-red-600 transition-colors">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100">
-                        <i class="fab fa-instagram text-2xl"></i>
-                    </div>
-                    <p class="mt-2 text-sm">Instagram</p>
-                </a>
-
-                <a href="#" class="social-icon text-gray-600 hover:text-red-600 transition-colors">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100">
-                        <i class="fab fa-twitter text-2xl"></i>
-                    </div>
-                    <p class="mt-2 text-sm">Twitter</p>
-                </a>
-
-                <a href="#" class="social-icon text-gray-600 hover:text-red-600 transition-colors">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100">
-                        <i class="fab fa-youtube text-2xl"></i>
-                    </div>
-                    <p class="mt-2 text-sm">YouTube</p>
-                </a>
-
-                <a href="#" class="social-icon text-gray-600 hover:text-red-600 transition-colors">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100">
-                        <i class="fab fa-tiktok text-2xl"></i>
-                    </div>
-                    <p class="mt-2 text-sm">TikTok</p>
-                </a>
-            </div>
-        </div>
-    </section>
 </div>
 @endsection
