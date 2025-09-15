@@ -52,7 +52,7 @@
     @endif
     @endif
 
-    <div class="grid grid-cols-1 sm:grid-cols-2  gap-10">
+    <div class="grid grid-cols-1 md:grid-cols-2  gap-10">
         @if($products && $products->count() > 0)
             @foreach($products as $product)
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
