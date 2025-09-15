@@ -66,10 +66,12 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 <!--Favicons-->
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Workfit" />
+<link rel="manifest" href="/site.webmanifest" />
 <!--google fonts-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -134,7 +136,7 @@ x-transition:leave-end="opacity-0"
 class="fixed inset-0 z-50 flex items-center justify-center bg-white"
 style="background: rgba(255,255,255,0.95);"
 >
-<img src="/imgs/workfit_logo_black.png" alt="Loading..." class="w-32 h-32 animate-spin">
+<img src="/imgs/workfit_logo_black.png" alt="Loading..." class="w-32 h-32 animate-pulse">
 </div>
 
     @include('layouts.navbar')

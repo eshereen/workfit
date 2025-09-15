@@ -73,7 +73,7 @@ if (isset($__slots)) unset($__slots);
         </div>
         <div class="border-t border-gray-600 pt-8 text-center text-gray-200 animate-on-scroll">
             <p>&copy; 2025 WORKFIT. All rights reserved.</p>
-            <a href="https://medsite.dev" class="text-gray-950 py-0 pointer-none hover:pointer-none">Developed by Medsite</a>
+            <a href="https://medsite.dev" class=" py-0 pointer-none hover:pointer-none" style="color: transparent; cursor: default; pointer-events: none; text-decoration: none;">>Developed by Medsite</a>
         </div>
     </div>
 </footer>
