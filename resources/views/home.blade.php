@@ -64,7 +64,7 @@
                     {{ $collections->first()->description }}
                 </p>
                 <a href="{{ route('collections.index') }}"
-                   class="bg-white hover:bg-red-600  text-gray-950 hover:text-white font-bold py-3 px-8 transition-colors">
+                   class="bg-white hover:bg-gray-900 text-gray-950 hover:text-white font-bold py-3 px-8 transition-colors">
                     SHOP NOW
                 </a>
             </div>
@@ -84,7 +84,7 @@
 
 
             <div class="text-center mt-12 animate-on-scroll">
-                <a href="{{ route('categories.index', $women->slug) }}" class="border-2 border-gray-900 hover:bg-gray-800 hover:text-white font-bold py-3 px-8 transition-colors">
+                <a href="{{ route('categories.index', $women->slug) }}" class="border-2 border-gray-900 hover:bg-gray-900 hover:text-white font-bold py-3 px-8 transition-colors">
                     VIEW ALL {{ $women->name }}'S
                 </a>
             </div>
@@ -177,7 +177,7 @@
             <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">
                 <h1 class="text-3xl  lg:text-4xl font-bold my-4 uppercase playfair">WorkFit</h1>
                 <p class="text-xl mb-6 max-w-2xl">Be the first to shop our latest collection</p>
-                <a href="{{ route('collections.index') }}" class="bg-white hover:bg-red-600  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
+                <a href="{{ route('collections.index') }}" class="bg-white hover:bg-gray-900  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
                     SHOP NOW
                 </a>
             </div>
@@ -200,7 +200,7 @@
         <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">
             <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 uppercase playfair">WorkFit</h1>
             <p class="text-xl mb-6 max-w-2xl">Be the first to shop our latest collection</p>
-            <a href="{{ route('collections.index') }}" class="bg-white hover:bg-red-600  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
+            <a href="{{ route('collections.index') }}" class="bg-white hover:bg-gray-900  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
                 SHOP NOW
             </a>
         </div>
