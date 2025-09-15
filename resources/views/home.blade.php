@@ -48,8 +48,8 @@
 
 
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-[1200px] overflow-hidden animate-on-scroll">
-        <img src="{{ asset('imgs/women.png')}}"
+    <section class="relative h-[1200px] bg-cover overflow-hidden animate-on-scroll">
+        <img src="{{ asset('imgs/women.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
 
