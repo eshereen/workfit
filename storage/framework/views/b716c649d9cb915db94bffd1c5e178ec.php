@@ -35,7 +35,7 @@
            <a href="<?php echo e(route('location')); ?>" class=" hidden lg:block font-xs uppercase hover:text-red-600 transition-colors <?php echo e(request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900'); ?>">Location</a>
 
            <!-- Currency Selector -->
-           <?php echo $__env->make('components.currency-selector', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+      
 
            <a href="<?php echo e(route('login')); ?>" class=" hidden lg:block font-xs hover:text-red-600 uppercase transition-colors <?php echo e(request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900'); ?>">Account</a>
 

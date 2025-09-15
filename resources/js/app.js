@@ -1,9 +1,6 @@
 "use strict";
-import Alpine from 'alpinejs';
 
-window.Alpine = Alpine;
-Alpine.start();
-
+// Note: Alpine.js is already included with Livewire, so we don't need to import it separately
 console.log('[app.js] loaded');
 
 // Mobile menu toggle (used by inline or programmatic click)

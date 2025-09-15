@@ -1,4 +1,22 @@
 <div class="flex items-center space-x-4">
+    <!-- Search Component -->
+    <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('product-search');
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-4246752050-0', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
+
     <!-- Wishlist Link -->
     <!--[if BLOCK]><![endif]--><?php if(auth()->guard()->check()): ?>
     <a href="<?php echo e(route('wishlist.index')); ?>" class="relative font-xs hover:text-red-600 transition-colors <?php echo e(request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-400'); ?>">

@@ -137,7 +137,7 @@ x-transition:leave-end="opacity-0"
 class="fixed inset-0 z-50 flex items-center justify-center bg-white"
 style="background: rgba(255,255,255,0.95);"
 >
-<img src="/imgs/workfit_logo_black.png" alt="Loading..." class="w-32 h-32 animate-spin">
+<img src="/imgs/workfit_logo_black.png" alt="Loading..." class="w-32 h-32 animate-pulse">
 </div>
 
     <?php echo $__env->make('layouts.navbar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>

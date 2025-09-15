@@ -35,7 +35,7 @@
            <a href="{{ route('location') }}" class=" hidden lg:block font-xs uppercase hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Location</a>
 
            <!-- Currency Selector -->
-           @include('components.currency-selector')
+      
 
            <a href="{{ route('login') }}" class=" hidden lg:block font-xs hover:text-red-600 uppercase transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-900' }}">Account</a>
 
