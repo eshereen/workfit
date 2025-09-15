@@ -247,12 +247,12 @@ h1 {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #FF0000;
+    background: #808080;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #cc0000;
+    background: #808080;
 }
 
 /* Video container styles for hero section */

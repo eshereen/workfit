@@ -154,9 +154,6 @@ style="background: rgba(255,255,255,0.95);"
     <!-- Livewire Scripts (includes Alpine.js) -->
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scripts(); ?>
 
-
-
-
     <!-- Performance optimization script -->
     <script>
         // Lazy loading optimization
@@ -238,8 +235,6 @@ style="background: rgba(255,255,255,0.95);"
             document.addEventListener('livewire:load', initializeHoverEffect);
         });
     </script>
-
-
 
     <!-- Notification System Script -->
     <script>

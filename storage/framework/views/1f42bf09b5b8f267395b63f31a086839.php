@@ -1,6 +1,21 @@
 <?php $__env->startSection('content'); ?>
     
-   
+ <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('promo-modal');
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-0', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
     <!-- Hero Section with Video Background -->
     <section class="relative -top-28 h-screen overflow-hidden">
         <!-- Video Background -->
@@ -34,7 +49,7 @@
     </section>
 
     <!-- Men Products -->
-    <section class="container mx-auto">
+    <section class="container mx-auto h-full">
         <h1 class="text-center font-bold sm:text-3xl md:text-4xl lg:text-5xl mb-2 uppercase">Men's Collection</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
 
@@ -45,7 +60,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$men->directProducts->take(4)]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-0', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-1', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 
@@ -56,7 +71,7 @@ unset($__split);
 if (isset($__slots)) unset($__slots);
 ?>
        <?php endif; ?>
-      
+
    </section>
 
 
@@ -99,7 +114,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$women->directProducts->take(8)]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-1', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-2', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 
@@ -113,7 +128,7 @@ if (isset($__slots)) unset($__slots);
 
 
             <div class="text-center mt-12 animate-on-scroll">
-                <a href="<?php echo e(route('categories.index', $women->slug)); ?>" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors">
+                <a href="<?php echo e(route('categories.index', $women->slug)); ?>" class="border-2 border-gray-900 hover:bg-gray-800 hover:text-white font-bold py-3 px-8 transition-colors">
                     VIEW ALL <?php echo e($women->name); ?>'S
                 </a>
             </div>
@@ -190,7 +205,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$categories->get(0)->directProducts->take(8)]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-2', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-3', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 
@@ -240,7 +255,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$recent]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-3', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-4', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 

@@ -2,7 +2,7 @@
 
 @section('content')
     {{-- Promotional Modal --}}
- @livewire('promo-modal') 
+ @livewire('promo-modal')
     <!-- Hero Section with Video Background -->
     <section class="relative -top-28 h-screen overflow-hidden">
         <!-- Video Background -->
@@ -36,7 +36,7 @@
     </section>
 
     <!-- Men Products -->
-    <section class="container mx-auto">
+    <section class="container mx-auto h-full">
         <h1 class="text-center font-bold sm:text-3xl md:text-4xl lg:text-5xl mb-2 uppercase">Men's Collection</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
 
@@ -84,7 +84,7 @@
 
 
             <div class="text-center mt-12 animate-on-scroll">
-                <a href="{{ route('categories.index', $women->slug) }}" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors">
+                <a href="{{ route('categories.index', $women->slug) }}" class="border-2 border-gray-900 hover:bg-gray-800 hover:text-white font-bold py-3 px-8 transition-colors">
                     VIEW ALL {{ $women->name }}'S
                 </a>
             </div>
