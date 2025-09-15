@@ -13,33 +13,23 @@ class ProductSearch extends Component
 
     public function updatedSearch()
     {
-        \Log::info('ProductSearch updatedSearch called', [
-            'search' => $this->search,
-            'length' => strlen($this->search)
-        ]);
-
         if (strlen($this->search) >= 2) {
-            try {
-                $this->searchResults = Product::where('active', true)
-                    ->where('name', 'like', '%' . $this->search . '%')
-                    ->with(['media', 'category', 'subcategory'])
-                    ->take(5)
-                    ->get();
+            $this->searchResults = Product::where('active', true)
+                ->where(function($query) {
+                    $query->where('name', 'like', '%' . $this->search . '%')
+                          ->orWhere('description', 'like', '%' . $this->search . '%')
+                          ->orWhereHas('category', function($q) {
+                              $q->where('name', 'like', '%' . $this->search . '%');
+                          })
+                          ->orWhereHas('subcategory', function($q) {
+                              $q->where('name', 'like', '%' . $this->search . '%');
+                          });
+                })
+                ->with(['media', 'category', 'subcategory'])
+                ->take(5)
+                ->get();
 
-                \Log::info('ProductSearch results found', [
-                    'count' => $this->searchResults->count(),
-                    'results' => $this->searchResults->pluck('name')
-                ]);
-
-                $this->showResults = true;
-            } catch (\Exception $e) {
-                \Log::error('ProductSearch error', [
-                    'error' => $e->getMessage(),
-                    'search' => $this->search
-                ]);
-                $this->searchResults = [];
-                $this->showResults = false;
-            }
+            $this->showResults = true;
         } else {
             $this->searchResults = [];
             $this->showResults = false;
@@ -66,26 +56,8 @@ class ProductSearch extends Component
         $this->showResults = false;
     }
 
-    public function testSearch()
-    {
-        \Log::info('Test search method called');
-        $this->search = 'test';
-        $this->updatedSearch();
-    }
-
-    public function mount()
-    {
-        \Log::info('ProductSearch component mounted');
-    }
-
     public function render()
     {
-        \Log::info('ProductSearch render called', [
-            'search' => $this->search,
-            'results_count' => count($this->searchResults),
-            'show_results' => $this->showResults
-        ]);
-
         return view('livewire.product-search');
     }
 }

@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+    {{-- Promotional Modal --}}
+    @livewire('promo-modal')
     <!-- Hero Section with Video Background -->
     <section class="relative -top-28 h-screen overflow-hidden">
         <!-- Video Background -->

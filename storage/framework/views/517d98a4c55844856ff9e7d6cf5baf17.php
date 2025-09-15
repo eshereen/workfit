@@ -33,14 +33,6 @@
                         class="w-full px-4 py-2 text-lg border-0 focus:outline-none focus:ring-0 bg-transparent placeholder-gray-500"
                         autofocus
                     >
-                    <!-- Debug info -->
-                    <!--[if BLOCK]><![endif]--><?php if(app()->environment('local')): ?>
-                        <div class="text-xs text-gray-500 mt-1">
-                            Search: "<?php echo e($search); ?>" | Results: <?php echo e(count($searchResults)); ?> | Show: <?php echo e($showResults ? 'true' : 'false'); ?>
-
-                            <button wire:click="testSearch" class="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded">Test Search</button>
-                        </div>
-                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                 </div>
 
                 <!-- Close Button -->
