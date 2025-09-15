@@ -1,21 +1,6 @@
 <?php $__env->startSection('content'); ?>
     
-    <?php
-$__split = function ($name, $params = []) {
-    return [$name, $params];
-};
-[$__name, $__params] = $__split('promo-modal');
-
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-0', $__slots ?? [], get_defined_vars());
-
-echo $__html;
-
-unset($__html);
-unset($__name);
-unset($__params);
-unset($__split);
-if (isset($__slots)) unset($__slots);
-?>
+   
     <!-- Hero Section with Video Background -->
     <section class="relative -top-28 h-screen overflow-hidden">
         <!-- Video Background -->
@@ -52,14 +37,15 @@ if (isset($__slots)) unset($__slots);
     <section class="container mx-auto">
         <h1 class="text-center font-bold sm:text-3xl md:text-4xl lg:text-5xl mb-2 uppercase">Men's Collection</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
+
         <?php if($men && $men->directProducts->isNotEmpty()): ?>
        <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
-[$__name, $__params] = $__split('product-index',['products'=>$men->directProducts->take(8)]);
+[$__name, $__params] = $__split('product-index',['products'=>$men->directProducts->take(4)]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-1', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-0', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 
@@ -70,12 +56,13 @@ unset($__split);
 if (isset($__slots)) unset($__slots);
 ?>
        <?php endif; ?>
+      
    </section>
 
 
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-auto overflow-hidden animate-on-scroll">
-        <img src="<?php echo e(asset('imgs/women.jpeg')); ?>"
+    <section class="relative h-[1200px] overflow-hidden animate-on-scroll">
+        <img src="<?php echo e(asset('imgs/women.png')); ?>"
              loading="lazy"
              alt="Lifestyle Banner"
 
@@ -112,7 +99,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$women->directProducts->take(8)]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-2', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-1', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 
@@ -203,7 +190,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$categories->get(0)->directProducts->take(8)]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-3', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-2', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 
@@ -225,7 +212,7 @@ if (isset($__slots)) unset($__slots);
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
-    <section class="relative w-full h-screen overflow-hidden animate-on-scroll my-20">
+    <section class="relative w-full h-[1200px] overflow-hidden animate-on-scroll my-20">
         <img src="<?php echo e(asset('imgs/group.jpeg')); ?>"
              loading="lazy"
              alt="Lifestyle Banner"
@@ -253,7 +240,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('product-index',['products'=>$recent]);
 
-$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-4', $__slots ?? [], get_defined_vars());
+$__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-3', $__slots ?? [], get_defined_vars());
 
 echo $__html;
 
@@ -266,8 +253,7 @@ if (isset($__slots)) unset($__slots);
        <?php endif; ?>
    </section>
 
-   <section class="relative overflow-hidden animate-on-scroll bg-cover bg-fixed"
-    style="background-image: url('<?php echo e(asset('imgs/men-bg.jpeg')); ?>'); height: 800px;">
+   <section class="relative h-[1200px] overflow-hidden animate-on-scroll bg-[url(/imgs/bg-footer.jpg)] bg-cover bg-top">
 
     <div class="absolute inset-0 bg-black/50 w-full">
         <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">

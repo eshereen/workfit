@@ -1,12 +1,12 @@
  <!-- Footer -->
  <footer class="bg-gray-950 text-white py-12 px-4">
     <div class="container mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-center md:text-left">
             <!-- Brand -->
             <div class="animate-on-scroll">
                 <h3 class="text-2xl font-bold mb-4">WORKFIT</h3>
                 <p class="text-gray-200 mb-4">Premium activewear for performance and style.</p>
-                <div class="flex space-x-4">
+                <div class="flex space-x-4 justify-center md:justify-start">
                     <a href="https://www.facebook.com/WorkfitEgypt" class="text-gray-200 hover:text-red-600 transition-colors">
                         <i class="fab fa-facebook text-xl"></i>
                     </a>

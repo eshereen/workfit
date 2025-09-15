@@ -2,7 +2,7 @@
 
 @section('content')
     {{-- Promotional Modal --}}
-    @livewire('promo-modal')
+ @livewire('promo-modal') 
     <!-- Hero Section with Video Background -->
     <section class="relative -top-28 h-screen overflow-hidden">
         <!-- Video Background -->
@@ -39,15 +39,17 @@
     <section class="container mx-auto">
         <h1 class="text-center font-bold sm:text-3xl md:text-4xl lg:text-5xl mb-2 uppercase">Men's Collection</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
+
         @if($men && $men->directProducts->isNotEmpty())
-       @livewire('product-index',['products'=>$men->directProducts->take(8)])
+       @livewire('product-index',['products'=>$men->directProducts->take(4)])
        @endif
+
    </section>
 
 
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-auto overflow-hidden animate-on-scroll">
-        <img src="{{ asset('imgs/women.jpeg')}}"
+    <section class="relative h-[1200px] overflow-hidden animate-on-scroll">
+        <img src="{{ asset('imgs/women.png')}}"
              loading="lazy"
              alt="Lifestyle Banner"
 
@@ -166,7 +168,7 @@
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
-    <section class="relative w-full h-screen overflow-hidden animate-on-scroll my-20">
+    <section class="relative w-full h-[1200px] overflow-hidden animate-on-scroll my-20">
         <img src="{{ asset('imgs/group.jpeg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
@@ -192,8 +194,7 @@
        @endif
    </section>
 
-   <section class="relative overflow-hidden animate-on-scroll bg-cover bg-fixed"
-    style="background-image: url('{{ asset('imgs/men-bg.jpeg') }}'); height: 800px;">
+   <section class="relative h-[1200px] overflow-hidden animate-on-scroll bg-[url(/imgs/bg-footer.jpg)] bg-cover bg-top">
 
     <div class="absolute inset-0 bg-black/50 w-full">
         <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">

@@ -37,6 +37,21 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 min-h-[500px]">
                 <!-- Left section - Registration CTA -->
+                   <!-- Right section - Image -->
+                   <div class="relative h-64 md:h-auto">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&auto=format&fit=crop"
+                         alt="WorkFit Activewear Collection"
+                         class="w-full h-full object-cover">
+
+                    <!-- Image overlay with branding -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent">
+                        <div class="absolute bottom-6 left-6 text-white">
+                            <h3 class="text-2xl font-bold mb-2">WorkFit</h3>
+                            <p class="text-sm opacity-90">Premium Activewear</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right section - Registration CTA -->
                 <div class="p-8 md:p-12 flex flex-col justify-center bg-gray-50">
                     <div class="text-center md:text-left">
                         <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -86,20 +101,7 @@
                     </div>
                 </div>
 
-                <!-- Right section - Image -->
-                <div class="relative h-64 md:h-auto">
-                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&auto=format&fit=crop"
-                         alt="WorkFit Activewear Collection"
-                         class="w-full h-full object-cover">
 
-                    <!-- Image overlay with branding -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent">
-                        <div class="absolute bottom-6 left-6 text-white">
-                            <h3 class="text-2xl font-bold mb-2">WorkFit</h3>
-                            <p class="text-sm opacity-90">Premium Activewear</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
