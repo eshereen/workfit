@@ -1,4 +1,7 @@
 <div class="flex items-center space-x-4">
+    <!-- Search Component -->
+    @livewire('product-search')
+
     <!-- Wishlist Link -->
     @auth
     <a href="{{ route('wishlist.index') }}" class="relative font-xs hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-400' }}">

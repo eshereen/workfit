@@ -1,4 +1,9 @@
 "use strict";
+import Alpine from 'alpinejs';
+
+window.Alpine = Alpine;
+Alpine.start();
+
 console.log('[app.js] loaded');
 
 // Mobile menu toggle (used by inline or programmatic click)

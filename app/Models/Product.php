@@ -26,10 +26,25 @@ class Product extends Model implements HasMedia
         'active' => 'boolean',
 
     ];
+
+    protected $appends = ['quantity', 'has_variants'];
+
     public function __toString(): string
-{
-    return $this->name ?? 'Unnamed Product';
-}
+    {
+        return $this->name ?? 'Unnamed Product';
+    }
+
+    /**
+     * Get the quantity attribute (sum of all variant quantities or 0 if no variants)
+     */
+    public function getQuantityAttribute()
+    {
+        if ($this->variants->count() > 0) {
+            return $this->variants->sum('stock');
+        }
+        return 0; // Products without variants are considered out of stock for cart purposes
+    }
+
 
      public function category()
     {

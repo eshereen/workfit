@@ -22,6 +22,7 @@ use App\Http\Controllers\Newsletter\UnsubscribeController;
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 /*** Products Pages */
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/collections', [CollectionController::class, 'index'])->name('collections.index');
 Route::get('/collection/{collection:slug}', [CollectionController::class, 'show'])->name('collection.show');
