@@ -62,6 +62,15 @@
                  onmouseleave="this.querySelector('.main-image').style.opacity='1'; this.querySelector('.gallery-image').style.opacity='0';"
                  onclick="window.location.href='{{ route('product.show', $product->slug) }}'">
 
+                <!-- Flash Sale Badge -->
+                @if($product->compare_price > 0)
+                <div class="absolute top-2 left-2 z-30">
+                    <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">
+                        Flash Sale
+                    </span>
+                </div>
+                @endif
+
                 <div class="block relative w-full h-full">
                     {{-- Main image --}}
                     @php
