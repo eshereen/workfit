@@ -66,12 +66,11 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
-<!--Favicons-->
-<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<!--Favicons--><link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Workfit" />
+<meta name="apple-mobile-web-app-title" content="MyWebSite" />
 <link rel="manifest" href="/site.webmanifest" />
 <!--google fonts-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -137,7 +136,7 @@ x-transition:leave-end="opacity-0"
 class="fixed inset-0 z-50 flex items-center justify-center bg-white"
 style="background: rgba(255,255,255,0.95);"
 >
-<img src="/imgs/workfit_logo_black.png" alt="Loading..." class="w-32 h-32 animate-pulse">
+<img src="/imgs/workfit_logo_black.png" alt="Loading..." class="w-32  animate-pulse">
 </div>
 
     <?php echo $__env->make('layouts.navbar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>

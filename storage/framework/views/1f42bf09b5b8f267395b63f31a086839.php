@@ -76,8 +76,8 @@ if (isset($__slots)) unset($__slots);
 
 
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-[1200px] overflow-hidden animate-on-scroll">
-        <img src="<?php echo e(asset('imgs/women.png')); ?>"
+    <section class="relative h-[1200px] bg-cover overflow-hidden animate-on-scroll">
+        <img src="<?php echo e(asset('imgs/women.jpg')); ?>"
              loading="lazy"
              alt="Lifestyle Banner"
 
@@ -93,7 +93,7 @@ if (isset($__slots)) unset($__slots);
 
                 </p>
                 <a href="<?php echo e(route('collections.index')); ?>"
-                   class="bg-white hover:bg-red-600  text-gray-950 hover:text-white font-bold py-3 px-8 transition-colors">
+                   class="bg-white hover:bg-gray-900 text-gray-950 hover:text-white font-bold py-3 px-8 transition-colors">
                     SHOP NOW
                 </a>
             </div>
@@ -128,7 +128,7 @@ if (isset($__slots)) unset($__slots);
 
 
             <div class="text-center mt-12 animate-on-scroll">
-                <a href="<?php echo e(route('categories.index', $women->slug)); ?>" class="border-2 border-gray-900 hover:bg-gray-800 hover:text-white font-bold py-3 px-8 transition-colors">
+                <a href="<?php echo e(route('categories.index', $women->slug)); ?>" class="border-2 border-gray-900 hover:bg-gray-900 hover:text-white font-bold py-3 px-8 transition-colors">
                     VIEW ALL <?php echo e($women->name); ?>'S
                 </a>
             </div>
@@ -203,7 +203,7 @@ if (isset($__slots)) unset($__slots);
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
-[$__name, $__params] = $__split('product-index',['products'=>$categories->get(0)->directProducts->take(8)]);
+[$__name, $__params] = $__split('product-index',['products'=>$categories->get(0)->directProducts->take(4)]);
 
 $__html = app('livewire')->mount($__name, $__params, 'lw-3234203928-3', $__slots ?? [], get_defined_vars());
 
@@ -217,8 +217,8 @@ if (isset($__slots)) unset($__slots);
 ?>
 
             <div class="text-center mt-12 animate-on-scroll">
-                <a href="<?php echo e(route('categories.index', $categories->get(0)->slug)); ?>" class="border-2 border-red-600 hover:bg-red-600 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
-                    VIEW ALL <?php echo e($categories->get(1)->name); ?>'S
+                <a href="<?php echo e(route('categories.index', $categories->get(0)->slug)); ?>" class="border-2 border-gray-900 hover:bg-gray-800 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
+                    VIEW ALL <?php echo e($categories->get(0)->name); ?>'S
                 </a>
             </div>
             <?php endif; ?>
@@ -236,7 +236,7 @@ if (isset($__slots)) unset($__slots);
             <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">
                 <h1 class="text-3xl  lg:text-4xl font-bold my-4 uppercase playfair">WorkFit</h1>
                 <p class="text-xl mb-6 max-w-2xl">Be the first to shop our latest collection</p>
-                <a href="<?php echo e(route('collections.index')); ?>" class="bg-white hover:bg-red-600  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
+                <a href="<?php echo e(route('collections.index')); ?>" class="bg-white hover:bg-gray-900  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
                     SHOP NOW
                 </a>
             </div>
@@ -274,7 +274,7 @@ if (isset($__slots)) unset($__slots);
         <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">
             <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 uppercase playfair">WorkFit</h1>
             <p class="text-xl mb-6 max-w-2xl">Be the first to shop our latest collection</p>
-            <a href="<?php echo e(route('collections.index')); ?>" class="bg-white hover:bg-red-600  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
+            <a href="<?php echo e(route('collections.index')); ?>" class="bg-white hover:bg-gray-900  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
                 SHOP NOW
             </a>
         </div>

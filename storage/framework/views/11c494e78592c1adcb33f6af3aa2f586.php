@@ -54,7 +54,7 @@
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-    <div class="grid grid-cols-1 sm:grid-cols-2  gap-10">
+    <div class="grid grid-cols-1 md:grid-cols-2  gap-10">
         <!--[if BLOCK]><![endif]--><?php if($products && $products->count() > 0): ?>
             <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition mb-20">
@@ -63,6 +63,15 @@
                  onmouseenter="this.querySelector('.main-image').style.opacity='0'; this.querySelector('.gallery-image').style.opacity='1';"
                  onmouseleave="this.querySelector('.main-image').style.opacity='1'; this.querySelector('.gallery-image').style.opacity='0';"
                  onclick="window.location.href='<?php echo e(route('product.show', $product->slug)); ?>'">
+
+                <!-- Flash Sale Badge -->
+                <!--[if BLOCK]><![endif]--><?php if($product->compare_price > 0): ?>
+                <div class="absolute top-2 left-2 z-30">
+                    <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">
+                        Flash Sale
+                    </span>
+                </div>
+                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
                 <div class="block relative w-full h-full">
                     
