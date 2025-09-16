@@ -1,7 +1,10 @@
 <div class="relative" x-data="{ showSearch: false }" @click.away="showSearch = false">
     <!-- Search Button (Default State) -->
     <button @click="showSearch = !showSearch"
-            class="relative font-xs hover:text-red-600 transition-colors {{ request()->routeIs('home') ? 'text-white group-hover:text-gray-900' : 'text-gray-800' }}">
+            class="relative font-xs hover:text-red-600 transition-colors"
+            :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"
+            x-data="{ isHome: {{ request()->routeIs('home') ? 'true' : 'false' }}, scrolled: false }"
+            x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 10 })">
         <i class="fas fa-search text-xl"></i>
     </button>
 
