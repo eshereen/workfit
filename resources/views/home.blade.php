@@ -43,6 +43,11 @@
         @if($men && $men->directProducts->isNotEmpty())
        @livewire('product-index',['products'=>$men->directProducts->take(4)])
        @endif
+       <div class="text-center mb-12 animate-on-scroll">
+        <a href="{{ route('categories.index', $men->slug) }}" class="border-2 border-gray-900 hover:bg-gray-900 hover:text-white font-bold py-3 px-8 transition-colors">
+            VIEW ALL {{ $men->name }}'S
+        </a>
+    </div>
 
    </section>
 
@@ -79,7 +84,7 @@
 
             <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $women->description }}</p>
 
-           @livewire('product-index',['products'=>$women->directProducts->take(8)])
+           @livewire('product-index',['products'=>$women->directProducts->take(4)])
 
 
 
@@ -169,7 +174,7 @@
 
     <!-- Full-width Lifestyle Banner 2 -->
     <section class="relative w-full h-[1200px] overflow-hidden animate-on-scroll my-20">
-        <img src="{{ asset('imgs/group.jpeg')}}"
+        <img src="{{ asset('imgs/group.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
              class="w-full h-full object-cover">
