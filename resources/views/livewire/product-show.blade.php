@@ -19,16 +19,19 @@
         <div class="lg:w-1/2"
         x-data="{
            currentImage: '{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}',
+           currentZoomImage: '{{ $product->getFirstMediaUrl('main_image', 'zoom_webp') }}',
            images: [
                {
                    large: '{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}',
+                   zoom: '{{ $product->getFirstMediaUrl('main_image', 'zoom_webp') }}',
                    medium: '{{ $product->getFirstMediaUrl('main_image', 'medium_webp') }}',
                    thumb: '{{ $product->getFirstMediaUrl('main_image', 'thumb_webp') }}',
                    avif: '{{ $product->getFirstMediaUrl('main_image', 'medium_avif') }}',
                },
                @foreach($product->getMedia('product_images') as $image)
                {
-                   large: '{{ $image->getUrl('zoom_webp') }}',
+                   large: '{{ $image->getUrl('large_webp') }}',
+                   zoom: '{{ $image->getUrl('zoom_webp') }}',
                    medium: '{{ $image->getUrl('medium_webp') }}',
                    thumb: '{{ $image->getUrl('thumb_webp') }}',
                    avif: '{{ $image->getUrl('medium_avif') }}',
@@ -55,11 +58,10 @@
 
       <!-- Base product image (always visible) -->
       <picture class="w-full h-auto cursor-zoom-in select-none block">
-        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
-        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
-        <img src="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}"
+        <img :src="currentImage"
              alt="{{ $product->name }}"
-             class="w-full h-auto block"
+             class="w-full h-auto block object-cover object-center"
+             style="object-position: center;"
              width="800"
              height="800"
              decoding="async"
@@ -74,9 +76,9 @@
            x-transition.opacity
            :style="`
               opacity:1;
-              background-image: url(${currentImage});
+              background-image: url(${currentZoomImage});
               background-repeat: no-repeat;
-              background-size: 200%; /* zoom level */
+              background-size: 250%; /* zoom level */
               background-position: ${(zoomX / zoomW) * 100}% ${(zoomY / zoomH) * 100}%;
            `">
       </div>
@@ -88,14 +90,15 @@
            <template x-for="(image, index) in images" :key="index">
                <div class="border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors"
                     :class="currentImage === image.large ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'"
-                    @click="currentImage = image.large">
+                    @click="currentImage = image.large; currentZoomImage = image.zoom">
 
                    <picture class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
                        <source :srcset="image.avif" type="image/avif">
                        <source :srcset="image.medium" type="image/webp">
                        <img :src="image.thumb"
                             alt="{{ $product->name }}"
-                            class="w-full h-24 object-cover"
+                            class="w-full h-24 object-cover object-center"
+                            style="object-position: center;"
                             width="150"
                             height="150"
                             loading="lazy"
