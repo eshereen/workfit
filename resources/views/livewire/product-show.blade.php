@@ -16,68 +16,95 @@
 
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Product Images -->
-        <div class="lg:w-1/2">
-            @php
-                $mainImage = $product->getFirstMediaUrl('main_image') ?: '/imgs/workfit.png';
-                $allImages = collect([$product->getFirstMediaUrl('main_image')])->merge(
-                    $product->getMedia('product_images')->map->getUrl()
-                )->filter()->values();
-            @endphp
+        <div class="lg:w-1/2"
+        x-data="{
+           currentImage: '{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}',
+           images: [
+               {
+                   large: '{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}',
+                   medium: '{{ $product->getFirstMediaUrl('main_image', 'medium_webp') }}',
+                   thumb: '{{ $product->getFirstMediaUrl('main_image', 'thumb_webp') }}',
+                   avif: '{{ $product->getFirstMediaUrl('main_image', 'medium_avif') }}',
+               },
+               @foreach($product->getMedia('product_images') as $image)
+               {
+                   large: '{{ $image->getUrl('zoom_webp') }}',
+                   medium: '{{ $image->getUrl('medium_webp') }}',
+                   thumb: '{{ $image->getUrl('thumb_webp') }}',
+                   avif: '{{ $image->getUrl('medium_avif') }}',
+               },
+               @endforeach
+           ]
+        }">
 
-            <div x-data="{
-                currentIndex: 0,
-                images: {{ $allImages->toJson() }},
-                showZoom: false,
-                zoomX: 0,
-                zoomY: 0
-            }">
-                <!-- Main Image Display -->
-                <div class="mb-4 relative bg-white rounded-lg shadow-md overflow-hidden">
-                    <div class="w-full aspect-square flex items-center justify-center p-4"
-                         @mousemove="showZoom = true; zoomX = $event.offsetX; zoomY = $event.offsetY"
-                         @mouseleave="showZoom = false">
-                        
-                        <img :src="images[currentIndex]" 
-                             alt="{{ $product->name }}"
-                             class="max-w-full max-h-full object-contain cursor-zoom-in"
-                             style="max-width: 100%; max-height: 100%;">
-                             
-                        <!-- Zoom Overlay -->
-                        <div x-show="showZoom" 
-                             class="absolute inset-0 bg-no-repeat pointer-events-none rounded-lg"
-                             :style="`
-                                background-image: url(${images[currentIndex]});
-                                background-size: 300%;
-                                background-position: ${(zoomX / $el.parentElement.clientWidth) * 100}% ${(zoomY / $el.parentElement.clientHeight) * 100}%;
-                             `"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0"
-                             x-transition:enter-end="opacity-100"
-                             x-transition:leave="transition ease-in duration-150"
-                             x-transition:leave-start="opacity-100"
-                             x-transition:leave-end="opacity-0">
-                        </div>
-                    </div>
-                </div>
+       <!-- Main image with zoom -->
+       <div class="mb-4 relative overflow-hidden rounded-lg shadow-md"
+       x-data="{
+          zoom: false,
+          zoomX: 0,
+          zoomY: 0,
+          zoomW: 0,
+          zoomH: 0
+       }"
+       @mousemove="zoom = true;
+                   zoomX = $event.offsetX;
+                   zoomY = $event.offsetY;
+                   zoomW = $event.target.clientWidth;
+                   zoomH = $event.target.clientHeight"
+       @mouseleave="zoom = false">
 
-                <!-- Thumbnails -->
-                <div class="grid grid-cols-4 gap-2 sm:gap-3">
-                    <template x-for="(image, index) in images" :key="index">
-                        <div class="aspect-square border-2 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 bg-white"
-                             :class="currentIndex === index ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200 hover:border-gray-400'"
-                             @click="currentIndex = index">
-                            
-                            <div class="w-full h-full flex items-center justify-center p-2">
-                                <img :src="image" 
-                                     alt="{{ $product->name }}"
-                                     class="max-w-full max-h-full object-contain"
-                                     loading="lazy">
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-        </div>
+      <!-- Base product image (always visible) -->
+      <picture class="w-full h-auto cursor-zoom-in select-none block">
+        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
+        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
+        <img src="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}"
+             alt="{{ $product->name }}"
+             class="w-full h-auto block"
+             width="800"
+             height="800"
+             decoding="async"
+             fetchpriority="high">
+    </picture>
+
+
+      <!-- Zoom overlay (on top, transparent by default) -->
+      <div x-show="zoom"
+           class="absolute inset-0 pointer-events-none transition-opacity duration-200"
+           style="opacity:0;"
+           x-transition.opacity
+           :style="`
+              opacity:1;
+              background-image: url(${currentImage});
+              background-repeat: no-repeat;
+              background-size: 200%; /* zoom level */
+              background-position: ${(zoomX / zoomW) * 100}% ${(zoomY / zoomH) * 100}%;
+           `">
+      </div>
+  </div>
+
+
+       <!-- Thumbnails -->
+       <div class="grid grid-cols-4 gap-2">
+           <template x-for="(image, index) in images" :key="index">
+               <div class="border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors"
+                    :class="currentImage === image.large ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'"
+                    @click="currentImage = image.large">
+
+                   <picture class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
+                       <source :srcset="image.avif" type="image/avif">
+                       <source :srcset="image.medium" type="image/webp">
+                       <img :src="image.thumb"
+                            alt="{{ $product->name }}"
+                            class="w-full h-24 object-cover"
+                            width="150"
+                            height="150"
+                            loading="lazy"
+                            decoding="async">
+                   </picture>
+               </div>
+           </template>
+       </div>
+   </div>
 
 
         <!-- Product Info -->
