@@ -85,9 +85,6 @@
             <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $women->description }}</p>
 
            @livewire('product-index',['products'=>$women->directProducts->take(4), 'useBestSellerLogic' => true, 'category' => $women->id])
-
-
-
             <div class="text-center mt-12 animate-on-scroll">
                 <a href="{{ route('categories.index', $women->slug) }}" class="border-2 border-gray-900 hover:bg-gray-900 hover:text-white font-bold py-3 px-8 transition-colors">
                     VIEW ALL {{ $women->name }}'S

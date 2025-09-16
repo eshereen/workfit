@@ -89,7 +89,7 @@ class FrontendController extends Controller
                           ->whereNotNull('disk');
                 })
                 ->latest('created_at')
-                ->take(8)
+                ->take(4)
                 ->get();
         });
 
