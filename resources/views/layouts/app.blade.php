@@ -113,7 +113,7 @@ h1,h2,h3,h4,h5,h6{
     letter-spacing: 0.06em;
     text-transform: uppercase;
 }
-p,a,span,li,ul,ol{
+p,a,span,li,ul,ol,button{
     font-family: "Funnel Display", serif;
     font-optical-sizing: auto;
     font-weight: 300;

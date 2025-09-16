@@ -9,15 +9,19 @@ use Livewire\Component;
 class CategoryFilters extends Component
 {
     public $categorySlug;
+    public $subcategorySlug;
     public $category;
+    public $subcategory;
     public $selectedCategories = [];
     public $selectedSubcategories = [];
     public $expandedCategories = [];
 
-    public function mount($categorySlug = null)
+    public function mount($categorySlug = null, $subcategorySlug = null)
     {
         $this->categorySlug = $categorySlug;
+        $this->subcategorySlug = $subcategorySlug;
         $this->loadCategory();
+        $this->loadSubcategory();
     }
 
     public function loadCategory()
@@ -25,6 +29,16 @@ class CategoryFilters extends Component
         if ($this->categorySlug) {
             $this->category = Category::where('slug', $this->categorySlug)
                 ->where('categories.active', true)
+                ->first();
+        }
+    }
+
+    public function loadSubcategory()
+    {
+        if ($this->subcategorySlug && $this->category) {
+            $this->subcategory = Subcategory::where('slug', $this->subcategorySlug)
+                ->where('category_id', $this->category->id)
+                ->where('active', true)
                 ->first();
         }
     }

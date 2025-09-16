@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Exception;
 use App\Models\Category;
+use App\Models\Subcategory;
 use App\Models\Product;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
@@ -18,7 +19,9 @@ class CategoryProducts extends Component
     use WithPagination;
 
     public $categorySlug;
+    public $subcategorySlug;
     public $category;
+    public $subcategory;
     public $selectedCategories = [];
     public $selectedSubcategories = [];
     public $search = '';
@@ -63,10 +66,12 @@ class CategoryProducts extends Component
         $this->dispatch('$refresh');
     }
 
-    public function mount($categorySlug = null)
+    public function mount($categorySlug = null, $subcategorySlug = null)
     {
         $this->categorySlug = $categorySlug;
+        $this->subcategorySlug = $subcategorySlug;
         $this->loadCategory();
+        $this->loadSubcategory();
         $this->loadWishlist();
         $this->loadCurrencyInfo();
     }
@@ -76,6 +81,16 @@ class CategoryProducts extends Component
         if ($this->categorySlug) {
             $this->category = Category::where('slug', $this->categorySlug)
                 ->where('categories.active', true)
+                ->first();
+        }
+    }
+
+    public function loadSubcategory()
+    {
+        if ($this->subcategorySlug && $this->category) {
+            $this->subcategory = Subcategory::where('slug', $this->subcategorySlug)
+                ->where('category_id', $this->category->id)
+                ->where('active', true)
                 ->first();
         }
     }
@@ -325,6 +340,11 @@ class CategoryProducts extends Component
             $query->where('category_id', $this->category->id);
         }
 
+        // If a specific subcategory is selected, filter by it
+        if ($this->subcategory) {
+            $query->where('subcategory_id', $this->subcategory->id);
+        }
+
         // Apply category filter
         if ($this->selectedCategories) {
             $query->whereIn('category_id', $this->selectedCategories);
@@ -358,7 +378,8 @@ class CategoryProducts extends Component
 
         return view('livewire.category-products', [
             'products' => $products,
-            'category' => $this->category
+            'category' => $this->category,
+            'subcategory' => $this->subcategory
         ]);
     }
 

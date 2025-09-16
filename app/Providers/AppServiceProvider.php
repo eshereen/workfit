@@ -52,7 +52,9 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $categories = cache()->remember('header_categories', 1800, function () {
                 return Category::where('categories.active', true)
-                    ->with(['media'])
+                    ->with(['media', 'subcategories' => function ($query) {
+                        $query->where('subcategories.active', true)->orderBy('name');
+                    }])
                     ->withCount(['products' => function ($query) {
                         $query->where('products.active', true);
                     }])
@@ -65,7 +67,18 @@ class AppServiceProvider extends ServiceProvider
                     });
             });
 
+            // Get collections for dropdown
+            $collections = cache()->remember('header_collections', 1800, function () {
+                return \App\Models\Collection::where('collections.active', true)
+                    ->withCount(['products' => function ($query) {
+                        $query->where('products.active', true);
+                    }])
+                    ->orderBy('name')
+                    ->get();
+            });
+
             $view->with('categories', $categories);
+            $view->with('collections', $collections);
         });
 
         // Share all categories for category pages - Cached separately
@@ -96,10 +109,22 @@ class AppServiceProvider extends ServiceProvider
             Cache::forget('all_categories');
         });
 
+        // Cache clearing events for collections
+        Event::listen(['eloquent.created: App\Models\Collection', 'eloquent.updated: App\Models\Collection', 'eloquent.deleted: App\Models\Collection'], function () {
+            Cache::forget('header_collections');
+        });
+
+        // Cache clearing events for subcategories
+        Event::listen(['eloquent.created: App\Models\Subcategory', 'eloquent.updated: App\Models\Subcategory', 'eloquent.deleted: App\Models\Subcategory'], function () {
+            Cache::forget('header_categories');
+            Cache::forget('all_categories');
+        });
+
         // Cache clearing events for products (affects category counts)
         Event::listen(['eloquent.created: App\Models\Product', 'eloquent.updated: App\Models\Product', 'eloquent.deleted: App\Models\Product'], function () {
             Cache::forget('header_categories');
             Cache::forget('all_categories');
+            Cache::forget('header_collections');
         });
 
         // Optimize database queries with query logging in development

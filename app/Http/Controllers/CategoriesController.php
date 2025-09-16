@@ -47,4 +47,27 @@ class CategoriesController extends Controller
             'categorySlug' => null
         ]);
     }
+
+    /**
+     * Display products for a specific subcategory within a category.
+     */
+    public function subcategory($categorySlug, $subcategorySlug)
+    {
+        $category = Category::where('categories.slug', $categorySlug)
+            ->where('categories.active', true)
+            ->firstOrFail();
+
+        $subcategory = Subcategory::where('subcategories.slug', $subcategorySlug)
+            ->where('category_id', $category->id)
+            ->where('subcategories.active', true)
+            ->with(['products.category', 'products.subcategory', 'products.media', 'products.variants'])
+            ->firstOrFail();
+
+        return view('subcategory', [
+            'category' => $category,
+            'subcategory' => $subcategory,
+            'categorySlug' => $category->slug,
+            'subcategorySlug' => $subcategory->slug
+        ]);
+    }
 }

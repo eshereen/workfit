@@ -27,6 +27,7 @@ Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name(
 Route::get('/collections', [CollectionController::class, 'index'])->name('collections.index');
 Route::get('/collection/{collection:slug}', [CollectionController::class, 'show'])->name('collection.show');
 Route::get('/categories', [CategoriesController::class, 'all'])->name('categories.all');
+Route::get('/categories/{categorySlug}/subcategory/{subcategorySlug}', [CategoriesController::class, 'subcategory'])->name('categories.subcategory');
 Route::get('/categories/{categorySlug?}', [CategoriesController::class, 'index'])->name('categories.index');
 
 // Currency routes
