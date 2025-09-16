@@ -127,6 +127,19 @@ class AppServiceProvider extends ServiceProvider
             Cache::forget('header_collections');
         });
 
+        // Cache clearing events for orders and order items (affects best seller calculations)
+        Event::listen(['eloquent.created: App\Models\Order', 'eloquent.updated: App\Models\Order', 'eloquent.deleted: App\Models\Order'], function () {
+            // Clear best seller cache when orders change
+            $bestSellerService = app(\App\Services\BestSellerService::class);
+            $bestSellerService->clearCache();
+        });
+
+        Event::listen(['eloquent.created: App\Models\OrderItem', 'eloquent.updated: App\Models\OrderItem', 'eloquent.deleted: App\Models\OrderItem'], function () {
+            // Clear best seller cache when order items change
+            $bestSellerService = app(\App\Services\BestSellerService::class);
+            $bestSellerService->clearCache();
+        });
+
         // Optimize database queries with query logging in development
         if (app()->environment('local')) {
             DB::listen(function ($query) {

@@ -8,6 +8,7 @@ use App\Models\Subcategory;
 use App\Models\Product;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
+use App\Services\BestSellerService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
@@ -169,7 +170,7 @@ class CategoryProducts extends Component
     {
         try {
             // Enhanced debug logging for live server
-            \Log::info('CategoryProducts: openVariantModal STARTED', [
+            Log::info('CategoryProducts: openVariantModal STARTED', [
                 'product_id' => $productId,
                 'csrf_token' => csrf_token(),
                 'session_id' => session()->getId(),
@@ -185,7 +186,8 @@ class CategoryProducts extends Component
             $this->selectedProduct = Product::with('variants')->find($productId);
 
             if (!$this->selectedProduct) {
-                \Log::error('CategoryProducts: Product not found', ['product_id' => $productId]);
+                
+                Log::error('CategoryProducts: Product not found', ['product_id' => $productId]);
                 $this->dispatch('showNotification', [
                     'message' => 'Product not found.',
                     'type' => 'error'
@@ -198,13 +200,13 @@ class CategoryProducts extends Component
             $this->quantity = 1;
             $this->showVariantModal = true;
 
-            \Log::info('CategoryProducts: openVariantModal COMPLETED successfully', [
+            Log::info('CategoryProducts: openVariantModal COMPLETED successfully', [
                 'product_id' => $productId,
                 'product_name' => $this->selectedProduct->name,
                 'variants_count' => $this->selectedProduct->variants->count()
             ]);
         } catch (\Exception $e) {
-            \Log::error('CategoryProducts: openVariantModal EXCEPTION', [
+            Log::error('CategoryProducts: openVariantModal EXCEPTION', [
                 'error' => $e->getMessage(),
                 'product_id' => $productId,
                 'trace' => $e->getTraceAsString()
@@ -280,7 +282,7 @@ class CategoryProducts extends Component
     {
         try {
             // Debug logging for live server
-            \Log::info('CategoryProducts: addSimpleProductToCart called', [
+            Log::info('CategoryProducts: addSimpleProductToCart called', [
                 'product_id' => $productId,
                 'quantity' => $quantity,
                 'csrf_token' => csrf_token(),
@@ -360,21 +362,39 @@ class CategoryProducts extends Component
             $query->where('name', 'like', '%' . $this->search . '%');
         }
 
-        // Apply sorting
-        switch ($this->sortBy) {
-            case 'price_low':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'newest':
-            default:
-                $query->latest();
-                break;
-        }
+        // Apply best seller logic for newest sort
+        if ($this->sortBy === 'newest') {
+            $bestSellerService = app(BestSellerService::class);
+            $products = $bestSellerService->getProductsWithBestSellerPriority(
+                $query, 
+                12, 
+                $this->category ? $this->category->id : null
+            );
+            
+            // Convert to paginated format
+            $products = new \Illuminate\Pagination\LengthAwarePaginator(
+                $products,
+                $products->count(),
+                12,
+                1,
+                ['path' => request()->url(), 'pageName' => 'page']
+            );
+        } else {
+            // Apply sorting for other cases
+            switch ($this->sortBy) {
+                case 'price_low':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_high':
+                    $query->orderBy('price', 'desc');
+                    break;
+                default:
+                    $query->latest();
+                    break;
+            }
 
-        $products = $query->paginate(12);
+            $products = $query->paginate(12);
+        }
 
         return view('livewire.category-products', [
             'products' => $products,
@@ -397,5 +417,14 @@ class CategoryProducts extends Component
         $b = hexdec(substr($hex, 4, 2));
         $luminance = (0.299 * $r + 0.587 * $g + 0.114 * $b) / 255;
         return $luminance > 0.5 ? '#000000' : '#FFFFFF';
+    }
+
+    /**
+     * Check if a product is a best seller
+     */
+    public function isBestSeller($productId)
+    {
+        $bestSellerService = app(BestSellerService::class);
+        return $bestSellerService->isBestSeller($productId, $this->category ? $this->category->id : null);
     }
 }

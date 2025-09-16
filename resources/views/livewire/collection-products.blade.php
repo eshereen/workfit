@@ -68,6 +68,23 @@
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <!-- Product Image -->
                     <div class="relative group" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                        <!-- Badges -->
+                        <div class="absolute top-2 left-2 z-30 flex flex-col gap-1">
+                            <!-- Best Seller Badge -->
+                            @if($this->isBestSeller($product->id))
+                            <span class="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">
+                                Best Seller
+                            </span>
+                            @endif
+                            
+                            <!-- Flash Sale Badge -->
+                            @if($product->compare_price > 0)
+                            <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">
+                                Flash Sale
+                            </span>
+                            @endif
+                        </div>
+                        
                         <a href="{{ route('product.show', $product->slug) }}" class="block relative z-10 w-full h-64">
                             @if($product->media->count() > 0)
                                 {{-- Main image --}}

@@ -7,6 +7,7 @@ use App\Models\Collection as CollectionModel;
 use App\Models\Product;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
+use App\Services\BestSellerService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
@@ -292,21 +293,40 @@ class CollectionProducts extends Component
             $query->where('name', 'like', '%' . $this->search . '%');
         }
 
-        // Apply sorting
-        switch ($this->sortBy) {
-            case 'price_low':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'newest':
-            default:
-                $query->latest();
-                break;
-        }
+        // Apply best seller logic for newest sort
+        if ($this->sortBy === 'newest') {
+            $bestSellerService = app(BestSellerService::class);
+            $products = $bestSellerService->getProductsWithBestSellerPriority(
+                $query, 
+                12, 
+                null,
+                $this->collection->id
+            );
+            
+            // Convert to paginated format
+            $products = new \Illuminate\Pagination\LengthAwarePaginator(
+                $products,
+                $products->count(),
+                12,
+                1,
+                ['path' => request()->url(), 'pageName' => 'page']
+            );
+        } else {
+            // Apply sorting for other cases
+            switch ($this->sortBy) {
+                case 'price_low':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_high':
+                    $query->orderBy('price', 'desc');
+                    break;
+                default:
+                    $query->latest();
+                    break;
+            }
 
-        $products = $query->paginate(12);
+            $products = $query->paginate(12);
+        }
 
         return view('livewire.collection-products', [
             'products' => $products,
@@ -355,5 +375,14 @@ class CollectionProducts extends Component
             ->unique('id')
             ->filter()
             ->sortBy('name');
+    }
+
+    /**
+     * Check if a product is a best seller
+     */
+    public function isBestSeller($productId)
+    {
+        $bestSellerService = app(BestSellerService::class);
+        return $bestSellerService->isBestSeller($productId, null, $this->collection ? $this->collection->id : null);
     }
 }

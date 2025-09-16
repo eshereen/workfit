@@ -11,7 +11,7 @@
 
             <div class="flex gap-2">
                 <input type="email" wire:model.defer="email"
-                       class="flex-grow px-4 py-2 border border-gray-300 focus:outline-none focus:border-red-600 text-gray-900"
+                       class="flex-grow px-4 py-2 border border-gray-300 focus:outline-none focus:border-red-600 text-gray-200"
                        placeholder="Enter your email"
                        required>
 

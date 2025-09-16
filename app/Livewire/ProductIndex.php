@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
+use App\Services\BestSellerService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
@@ -25,6 +26,7 @@ class ProductIndex extends Component
     public $currencyCode = 'USD';
     public $currencySymbol = '$';
     public $isAutoDetected = false;
+    public $useBestSellerLogic = false;
 
     // Cart modal properties
     public $showVariantModal = false;
@@ -527,6 +529,28 @@ class ProductIndex extends Component
                     $query->where('category_id', $this->category);
                 }
 
+                // Apply best seller logic if enabled
+                if ($this->useBestSellerLogic && $this->sortBy === 'newest') {
+                    $bestSellerService = app(BestSellerService::class);
+                    $perPage = request()->routeIs('home') ? 8 : 12;
+                    
+                    // Get products with best seller priority
+                    $products = $bestSellerService->getProductsWithBestSellerPriority(
+                        $query, 
+                        $perPage, 
+                        $this->category
+                    );
+                    
+                    // Convert to paginated format
+                    return new \Illuminate\Pagination\LengthAwarePaginator(
+                        $products,
+                        $products->count(),
+                        $perPage,
+                        1,
+                        ['path' => request()->url(), 'pageName' => 'page']
+                    );
+                }
+
                 // Optimized sorting
                 switch ($this->sortBy) {
                     case 'price_low':
@@ -537,7 +561,7 @@ class ProductIndex extends Component
                         break;
                     case 'newest':
                     default:
-                        $query->orderBy('created_at', 'desc');
+                        $query->orderBy('featured', 'desc')->orderBy('created_at', 'desc');
                         break;
                 }
 
@@ -581,7 +605,7 @@ class ProductIndex extends Component
             ]);
         } catch (\Exception $e) {
             // Log error and return fallback products query
-            \Log::error('ProductIndex render error: ' . $e->getMessage());
+            Log::error('ProductIndex render error: ' . $e->getMessage());
 
             // Return a basic query as fallback to maintain pagination
             $fallbackProducts = Product::with([
@@ -798,5 +822,18 @@ class ProductIndex extends Component
 
         // Return black for light backgrounds, white for dark backgrounds
         return $luminance > 0.5 ? '#000000' : '#FFFFFF';
+    }
+
+    /**
+     * Check if a product is a best seller
+     */
+    public function isBestSeller($productId)
+    {
+        if (!$this->useBestSellerLogic) {
+            return false;
+        }
+        
+        $bestSellerService = app(BestSellerService::class);
+        return $bestSellerService->isBestSeller($productId, $this->category);
     }
 }

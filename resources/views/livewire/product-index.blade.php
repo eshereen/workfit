@@ -62,14 +62,22 @@
                  onmouseleave="this.querySelector('.main-image').style.opacity='1'; this.querySelector('.gallery-image').style.opacity='0';"
                  onclick="window.location.href='{{ route('product.show', $product->slug) }}'">
 
-                <!-- Flash Sale Badge -->
-                @if($product->compare_price > 0)
-                <div class="absolute top-2 -left-5 z-30 ">
+                <!-- Badges -->
+                <div class="absolute top-2 left-0 z-30 flex flex-col gap-1">
+                    <!-- Best Seller Badge -->
+                    @if($this->isBestSeller($product->id))
+                    <span class="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">
+                        Best Seller
+                    </span>
+                    @endif
+                    
+                    <!-- Flash Sale Badge -->
+                    @if($product->compare_price > 0)
                     <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">
                         Flash Sale
                     </span>
+                    @endif
                 </div>
-                @endif
 
                 <div class="block relative w-full h-full">
                     {{-- Main image --}}
