@@ -20,14 +20,14 @@
 
         <!-- Hero Content (bottom-left aligned) -->
         <div class="absolute inset-0 z-10">
-            <div class="absolute bottom-8 left-0 text-left text-white pl-4 md:pl-12 pr-4">
-                <h1 class="sm:text-center md:text-left text-4xl md:text-6xl font-bold mb-4 slide-in">WORKFIT</h1>
-                <p class="text-left text-xl md:text-2xl pr-8 md:pr-0 mb-8 max-w-xl fade-in">Premium activewear designed for performance </p>
-                <div class="flex flex-col sm:flex-row justify-start gap-4 fade-in">
-                    <a href="{{ route('categories.index', 'women') }}" class="bg-white hover:bg-red-600 text-gray-950 hover:text-white font-bold py-3 px-6 transition-colors uppercase text-center">
+            <div class="absolute  top-1/2 -translate-y-1/2 lg:bottom-8 lg:top-auto left-0 text-left  text-white pl-4 md:pl-12 pr-4">
+                <h1 class="text-center md:text-left text-4xl md:text-6xl font-bold mb-4 slide-in">WORKFIT</h1>
+                <p class="text-center lg:text-left  text-xl md:text-2xl pr-8 md:pr-0 mb-8 max-w-xl fade-in">Premium activewear designed for performance </p>
+                <div class="flex flex-col sm:flex-row justify-center lg:mx-0 lg:justify-start gap-4 fade-in">
+                    <a href="{{ route('categories.index', 'women') }}" class="bg-white hover:bg-red-600 text-gray-950 hover:text-white font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
                         SHOP WOMEN
                     </a>
-                    <a href="{{ route('categories.index', 'men') }}" class="bg-white hover:bg-gray-400 text-black font-bold py-3 px-6 transition-colors text-center">
+                    <a href="{{ route('categories.index', 'men') }}" class="bg-white hover:bg-gray-400 text-black font-bold py-3 px-6 transition-colors text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
                         SHOP MEN
                     </a>
                 </div>
