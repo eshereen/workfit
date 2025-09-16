@@ -65,7 +65,8 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-<!--Favicons--><link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<!--Favicons-->
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

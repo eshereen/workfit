@@ -122,8 +122,14 @@ class FrontendController extends Controller
             ->take(8)
             ->get();
         });
+        // Sale Collection
+        $sale = cache()->remember('home_sale_collection', 1800, function () {
+            return Collection::where('collections.slug', 'sale')
+                ->where('collections.active', true)
+                ->first();
+        });
 
-        return view('home', compact('title', 'categories', 'recent', 'collections', 'featured', 'men', 'women'));
+        return view('home', compact('title', 'categories', 'recent', 'collections', 'featured', 'men', 'women', 'sale'));
     }
 
 
