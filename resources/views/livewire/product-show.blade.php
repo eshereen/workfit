@@ -53,18 +53,14 @@
                    zoomH = $event.target.clientHeight"
        @mouseleave="zoom = false">
 
-      <!-- Base product image (always visible) -->
-      <picture class="w-full h-auto cursor-zoom-in select-none block">
-        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
-        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
-        <img src="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}"
-             alt="{{ $product->name }}"
-             class="w-full h-auto block"
-             width="800"
-             height="800"
-             decoding="async"
-             fetchpriority="high">
-    </picture>
+      <!-- Base product image (changes based on thumbnail selection) -->
+      <img :src="currentImage"
+           alt="{{ $product->name }}"
+           class="w-full h-auto block cursor-zoom-in select-none object-cover object-center"
+           width="800"
+           height="800"
+           decoding="async"
+           fetchpriority="high">
 
 
       <!-- Zoom overlay (on top, transparent by default) -->
@@ -84,23 +80,19 @@
 
 
        <!-- Thumbnails -->
-       <div class="grid grid-cols-4 gap-2">
+       <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
            <template x-for="(image, index) in images" :key="index">
                <div class="border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors"
                     :class="currentImage === image.large ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'"
                     @click="currentImage = image.large">
 
-                   <picture class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
-                       <source :srcset="image.avif" type="image/avif">
-                       <source :srcset="image.medium" type="image/webp">
-                       <img :src="image.thumb"
-                            alt="{{ $product->name }}"
-                            class="w-full h-24 object-cover"
-                            width="150"
-                            height="150"
-                            loading="lazy"
-                            decoding="async">
-                   </picture>
+                   <img :src="image.thumb"
+                        alt="{{ $product->name }}"
+                        class="w-full h-20 sm:h-24 object-cover object-center hover:opacity-80 transition-opacity"
+                        width="150"
+                        height="150"
+                        loading="lazy"
+                        decoding="async">
                </div>
            </template>
        </div>
