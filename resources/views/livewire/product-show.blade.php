@@ -18,27 +18,28 @@
         <!-- Product Images -->
         <div class="lg:w-1/2"
         x-data="{
-           currentImage: '{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}',
+           currentImage: '{{ $product->getFirstMediaUrl('main_image', 'medium_webp') }}',
+           currentZoomImage: '{{ $product->getFirstMediaUrl('main_image', 'zoom_webp') }}',
            images: [
                {
-                   large: '{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}',
+                   large: '{{ $product->getFirstMediaUrl('main_image', 'medium_webp') }}',
                    medium: '{{ $product->getFirstMediaUrl('main_image', 'medium_webp') }}',
                    thumb: '{{ $product->getFirstMediaUrl('main_image', 'thumb_webp') }}',
-                   avif: '{{ $product->getFirstMediaUrl('main_image', 'medium_avif') }}',
+                   zoom: '{{ $product->getFirstMediaUrl('main_image', 'zoom_webp') }}',
                },
                @foreach($product->getMedia('product_images') as $image)
                {
-                   large: '{{ $image->getUrl('zoom_webp') }}',
+                   large: '{{ $image->getUrl('medium_webp') }}',
                    medium: '{{ $image->getUrl('medium_webp') }}',
                    thumb: '{{ $image->getUrl('thumb_webp') }}',
-                   avif: '{{ $image->getUrl('medium_avif') }}',
+                   zoom: '{{ $image->getUrl('zoom_webp') }}',
                },
                @endforeach
            ]
         }">
 
        <!-- Main image with zoom -->
-       <div class="mb-4 relative overflow-hidden rounded-lg shadow-md"
+       <div class="mb-4 relative rounded-lg shadow-md bg-white"
        x-data="{
           zoom: false,
           zoomX: 0,
@@ -54,25 +55,27 @@
        @mouseleave="zoom = false">
 
       <!-- Base product image (changes based on thumbnail selection) -->
-      <img :src="currentImage"
-           alt="{{ $product->name }}"
-           class="w-full h-auto block cursor-zoom-in select-none object-cover object-center"
-           width="800"
-           height="800"
-           decoding="async"
-           fetchpriority="high">
+      <div class="w-full aspect-square flex items-center justify-center bg-white overflow-hidden rounded-lg">
+        <img :src="currentImage"
+             alt="{{ $product->name }}"
+             class="max-w-full max-h-full object-contain cursor-zoom-in select-none"
+             width="800"
+             height="800"
+             decoding="async"
+             fetchpriority="high">
+      </div>
 
 
       <!-- Zoom overlay (on top, transparent by default) -->
       <div x-show="zoom"
-           class="absolute inset-0 pointer-events-none transition-opacity duration-200"
+           class="absolute inset-0 pointer-events-none transition-opacity duration-200 rounded-lg"
            style="opacity:0;"
            x-transition.opacity
            :style="`
               opacity:1;
-              background-image: url(${currentImage});
+              background-image: url(${currentZoomImage});
               background-repeat: no-repeat;
-              background-size: 200%; /* zoom level */
+              background-size: 250%; /* zoom level */
               background-position: ${(zoomX / zoomW) * 100}% ${(zoomY / zoomH) * 100}%;
            `">
       </div>
@@ -80,15 +83,15 @@
 
 
        <!-- Thumbnails -->
-       <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+       <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-4 gap-2">
            <template x-for="(image, index) in images" :key="index">
-               <div class="border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors"
+               <div class="aspect-square border-2 rounded-lg overflow-hidden cursor-pointer hover:border-red-500 transition-colors bg-white flex items-center justify-center"
                     :class="currentImage === image.large ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'"
-                    @click="currentImage = image.large">
+                    @click="currentImage = image.large; currentZoomImage = image.zoom || image.large">
 
                    <img :src="image.thumb"
                         alt="{{ $product->name }}"
-                        class="w-full h-20 sm:h-24 object-cover object-center hover:opacity-80 transition-opacity"
+                        class="max-w-full max-h-full object-contain hover:opacity-80 transition-opacity"
                         width="150"
                         height="150"
                         loading="lazy"
