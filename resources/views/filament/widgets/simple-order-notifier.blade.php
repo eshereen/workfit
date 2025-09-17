@@ -117,29 +117,33 @@
      wire:poll.8s="checkForNewOrders">
 
     @if($hasNewOrder && $newOrder)
-        <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="flex-shrink-0">
-                        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+        <div style="margin-bottom: 1rem; padding: 0.75rem; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.5rem; font-size: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="flex-shrink: 0;">
+                        <div style="width: 20px; height: 20px; background-color: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <svg style="width: 12px; height: 12px; color: white;" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                             </svg>
                         </div>
                     </div>
                     <div>
-                        <h3 class="text-sm font-medium text-green-800">New Order Received!</h3>
-                        <p class="text-sm text-green-700">Order #{{ $newOrder->id }} was just placed</p>
+                        <h3 style="font-weight: 500; color: #166534; margin: 0;">New Order Received!</h3>
+                        <p style="color: #15803d; margin: 0;">Order #{{ $newOrder->id }} was just placed</p>
                     </div>
                 </div>
-                <div class="flex space-x-2">
+                <div style="display: flex; gap: 0.5rem;">
                     <a href="/admin/orders/{{ $newOrder->id }}" target="_blank"
-                       class="text-sm bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">
+                       style="background-color: #16a34a; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; text-decoration: none; font-size: 14px;"
+                       onmouseover="this.style.backgroundColor='#15803d'"
+                       onmouseout="this.style.backgroundColor='#16a34a'">
                         View Order
                     </a>
                     <button wire:click="dismissNotification"
-                            class="text-green-400 hover:text-green-600">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            style="color: #4ade80; background: none; border: none; cursor: pointer; padding: 0.25rem;"
+                            onmouseover="this.style.color='#16a34a'"
+                            onmouseout="this.style.color='#4ade80'">
+                        <svg style="width: 16px; height: 16px;" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
                     </button>
