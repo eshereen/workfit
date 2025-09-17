@@ -45,13 +45,13 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Categories & Subcategories Details')
                     ->icon('heroicon-o-archive-box'),
-                    
+
                  NavigationGroup::make()
                     ->label('Collections Details')
                     ->icon('heroicon-o-building-storefront'),
 
                 NavigationGroup::make()
-                    ->label('Products')
+                    ->label('Products Details')
                     ->icon('heroicon-o-cube'),
 
                 NavigationGroup::make()
