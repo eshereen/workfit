@@ -6,19 +6,42 @@
             this.audio = new Audio('/sounds/new-order.mp3');
             this.audio.preload = 'auto';
             this.audio.volume = 0.8;
+            this.audioEnabled = false;
 
-            // Enable audio on first user interaction
-            const enableAudio = () => {
-                this.audio.play().then(() => {
+            // Enable audio on first user interaction with better error handling
+            const enableAudio = async () => {
+                try {
+                    // Create audio context if needed
+                    if (window.AudioContext || window.webkitAudioContext) {
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        if (!this.audioContext) {
+                            this.audioContext = new AudioContext();
+                        }
+                        if (this.audioContext.state === 'suspended') {
+                            await this.audioContext.resume();
+                        }
+                    }
+
+                    // Test play audio
+                    await this.audio.play();
                     this.audio.pause();
                     this.audio.currentTime = 0;
+                    this.audioEnabled = true;
                     console.log('Audio enabled for notifications');
-                }).catch(() => {});
-                document.removeEventListener('click', enableAudio);
-                document.removeEventListener('keydown', enableAudio);
+
+                    // Remove listeners
+                    document.removeEventListener('click', enableAudio);
+                    document.removeEventListener('keydown', enableAudio);
+                    document.removeEventListener('touchstart', enableAudio);
+                } catch (e) {
+                    console.log('Audio enable failed:', e);
+                }
             };
+
+            // Listen for multiple interaction types
             document.addEventListener('click', enableAudio);
             document.addEventListener('keydown', enableAudio);
+            document.addEventListener('touchstart', enableAudio);
 
             // Listen for new order events
             Livewire.on('new-order-created', (data) => {
@@ -47,19 +70,55 @@
         },
 
         playNotificationSound() {
+            console.log('Attempting to play notification sound, audioEnabled:', this.audioEnabled);
+
+            if (!this.audioEnabled) {
+                console.log('Audio not enabled yet, will play on next interaction');
+                return;
+            }
+
             try {
+                // Reset audio
                 this.audio.currentTime = 0;
-                this.audio.play()
-                    .then(() => console.log('Order notification sound played'))
-                    .catch(e => {
-                        console.log('Audio play failed (user interaction required):', e);
-                        // Try to play on next user interaction
-                        document.addEventListener('click', () => {
-                            this.audio.play().catch(() => {});
-                        }, { once: true });
-                    });
+
+                // Ensure volume is set
+                this.audio.volume = 0.8;
+
+                // Play with multiple fallbacks
+                const playPromise = this.audio.play();
+
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            console.log('✅ Order notification sound played successfully');
+                        })
+                        .catch(e => {
+                            console.log('❌ Audio play failed:', e);
+
+                            // Try to play a simple beep as fallback
+                            try {
+                                const audioContext = this.audioContext || new (window.AudioContext || window.webkitAudioContext)();
+                                const oscillator = audioContext.createOscillator();
+                                const gainNode = audioContext.createGain();
+
+                                oscillator.connect(gainNode);
+                                gainNode.connect(audioContext.destination);
+
+                                oscillator.frequency.value = 800;
+                                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+                                oscillator.start(audioContext.currentTime);
+                                oscillator.stop(audioContext.currentTime + 0.5);
+
+                                console.log('📢 Played fallback beep sound');
+                            } catch (beepError) {
+                                console.log('❌ Fallback sound also failed:', beepError);
+                            }
+                        });
+                }
             } catch (err) {
-                console.log('Audio initialization error:', err);
+                console.log('❌ Audio initialization error:', err);
             }
         },
 
