@@ -90,7 +90,13 @@
                     </div>
                     <div class="text-right">
                         <p class="text-gray-900">Qty: {{ $item->quantity }}</p>
-                        <p class="font-medium text-gray-900">{{ $orderSymbol }}{{ number_format($item->price, 2) }}</p>
+                        @php
+                            $itemPrice = $item->price;
+                            if ($orderCurrency !== 'USD') {
+                                $itemPrice = $currencyService->convertFromUSD($item->price, $orderCurrency);
+                            }
+                        @endphp
+                        <p class="font-medium text-gray-900">{{ $orderSymbol }}{{ number_format($itemPrice, 2) }}</p>
                     </div>
                 </div>
                 @endforeach
@@ -131,7 +137,7 @@
             <!-- Additional Info -->
             <div class="mt-8 text-sm text-gray-500">
                 <p>If you have any questions about your order, please contact our customer support.</p>
-                <p class="mt-2">Email: support@workfit.com | Phone: +1 (555) 123-4567</p>
+                <p class="mt-2">Email: support@workfit.com </p>
             </div>
         </div>
     </div>
