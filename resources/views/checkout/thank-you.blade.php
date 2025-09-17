@@ -4,6 +4,11 @@
 <div class="min-h-screen bg-gray-50 py-40">
     <div class="container mx-auto px-4">
         <div class="max-w-2xl mx-auto text-center">
+            @php
+                $currencyService = app(\App\Services\CountryCurrencyService::class);
+                $orderCurrencyCode = $order->currency ?? 'USD';
+                $orderCurrencySymbol = $currencyService->getCurrencySymbol($orderCurrencyCode);
+            @endphp
             <!-- Success Icon -->
             <div class="mb-8">
                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
@@ -37,7 +42,7 @@
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <span class="text-gray-600">Total Amount:</span>
-                        <span class="font-medium text-gray-900">{{ $currencyInfo['currency_symbol'] ?? '$' }}{{ number_format($order->total_amount, 2) }}</span>
+                        <span class="font-medium text-gray-900">{{ $orderCurrencySymbol }}{{ number_format($order->total_amount, 2) }}</span>
                     </div>
                     <div>
                         <span class="text-gray-600">Payment Method:</span>
@@ -84,7 +89,13 @@
                     </div>
                     <div class="text-right">
                         <p class="text-gray-900">Qty: {{ $item->quantity }}</p>
-                        <p class="font-medium text-gray-900">{{ $currencyInfo['currency_symbol'] ?? '$' }}{{ number_format($item->price, 2) }}</p>
+                        @php
+                            $linePrice = $item->price;
+                            if (($orderCurrencyCode ?? 'USD') !== 'USD') {
+                                $linePrice = $currencyService->convertFromUSD($item->price, $orderCurrencyCode);
+                            }
+                        @endphp
+                        <p class="font-medium text-gray-900">{{ $orderCurrencySymbol }}{{ number_format($linePrice, 2) }}</p>
                     </div>
                 </div>
                 @endforeach
