@@ -43,21 +43,26 @@
        <!-- Main image with zoom -->
        <div class="mb-4 relative overflow-hidden rounded-lg shadow-md h-[520px] md:h-[680px] flex items-center justify-center bg-white"
        x-data="{
-          zoom: false,
+          magnifierEnabled: false,
           zoomX: 0,
           zoomY: 0,
           zoomW: 0,
           zoomH: 0
        }"
-       @mousemove="zoom = true;
-                   zoomX = $event.offsetX;
-                   zoomY = $event.offsetY;
-                   zoomW = $event.target.clientWidth;
-                   zoomH = $event.target.clientHeight"
-       @mouseleave="zoom = false">
+       @mousemove="if (magnifierEnabled) { zoomX = $event.offsetX; zoomY = $event.offsetY; zoomW = $event.target.clientWidth; zoomH = $event.target.clientHeight }"
+       @mouseleave="magnifierEnabled = false">
+
+      <!-- Magnifier toggle -->
+      <button type="button"
+              class="absolute top-3 right-3 z-30 bg-white/90 border border-gray-200 text-gray-700 text-xs px-2 py-1 rounded hover:bg-gray-100"
+              @click.stop="magnifierEnabled = !magnifierEnabled"
+              :aria-pressed="magnifierEnabled.toString()">
+          <i class="fas" :class="magnifierEnabled ? 'fa-search-minus' : 'fa-search-plus'"></i>
+          <span class="sr-only" x-text="magnifierEnabled ? 'Disable magnifier' : 'Enable magnifier'"></span>
+      </button>
 
       <!-- Base product image (always visible) -->
-      <picture class="w-full h-full cursor-zoom-in select-none block">
+      <picture class="w-full h-full select-none block" :class="magnifierEnabled ? 'cursor-crosshair' : 'cursor-default'">
         <img :src="currentImage"
              alt="{{ $product->name }}"
              class="max-w-full max-h-full block object-contain object-center"
@@ -69,20 +74,13 @@
     </picture>
 
 
-      <!-- Zoom overlay (on top, transparent by default) -->
-      <div x-show="zoom"
-           class="absolute inset-0 pointer-events-none transition-opacity duration-200"
-           style="opacity:0;"
+      <!-- Magnifier lens -->
+      <div x-show="magnifierEnabled"
+           class="absolute pointer-events-none rounded-full ring-2 ring-gray-200 shadow-sm"
            x-transition.opacity
-           :style="`
-              opacity:1;
-              background-image: url(${currentZoomImage});
-              background-repeat: no-repeat;
-              background-size: 250%; /* zoom level */
-              background-position: ${(zoomX / zoomW) * 100}% ${(zoomY / zoomH) * 100}%;
-           `">
+           :style="(() => { const lens=180; const scale=2.5; const top=zoomY - lens/2; const left=zoomX - lens/2; const bgX = (zoomX*scale) - lens/2; const bgY = (zoomY*scale) - lens/2; return `width:${lens}px;height:${lens}px;top:${top}px;left:${left}px;background-image:url(${currentZoomImage});background-repeat:no-repeat;background-size:${zoomW*scale}px ${zoomH*scale}px;background-position:-${bgX}px -${bgY}px;`; })()">
       </div>
-  </div>
+   </div>
 
 
        <!-- Thumbnails -->
@@ -90,7 +88,7 @@
            <template x-for="(image, index) in images" :key="index">
                <div class="border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors"
                     :class="currentImage === image.large ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'"
-                    @click="currentImage = image.large; currentZoomImage = image.zoom">
+                    @click="magnifierEnabled = false; currentImage = image.large; currentZoomImage = image.zoom">
 
                    <picture class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
                        <source :srcset="image.avif" type="image/avif">
