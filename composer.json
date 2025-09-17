@@ -9,6 +9,7 @@
         "php": "^8.2",
         "amrshawky/laravel-currency": "^3.2",
         "ashallendesign/laravel-exchange-rates": "^7.9",
+        "bezhansalleh/filament-shield": "^4.0",
         "darryldecode/cart": "^4.2",
         "filament/filament": "^4.0",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
