@@ -2,29 +2,30 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\UserResource\Pages\ListUsers;
-use App\Filament\Resources\UserResource\Pages\CreateUser;
-use App\Filament\Resources\UserResource\Pages\ViewUser;
-use App\Filament\Resources\UserResource\Pages\EditUser;
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
 use Filament\Forms;
-use Filament\Resources\Resource;
+use App\Models\User;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\DateTimePicker;
+use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\UserResource\Pages\EditUser;
+use App\Filament\Resources\UserResource\Pages\ViewUser;
+use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Resources\UserResource\RelationManagers;
 
 class UserResource extends Resource
 {
@@ -48,8 +49,11 @@ class UserResource extends Resource
                     ->password()
                     ->required()
                     ->maxLength(255),
-                Toggle::make('is_admin')
-                    ->required(),
+                Select::make('roles')
+                    ->preload()
+                    ->multiple()
+                    ->relationship('roles', 'name')
+                    ->columnSpan('full'),
             ]);
     }
 
