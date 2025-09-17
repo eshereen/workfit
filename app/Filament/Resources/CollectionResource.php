@@ -29,12 +29,16 @@ use App\Filament\Resources\CollectionResource\Pages\ViewCollection;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionResource\Pages\CreateCollection;
 use App\Filament\Resources\CollectionResource\RelationManagers\ProductsRelationManager;
+use BackedEnum;
+use UnitEnum;
 
 class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-storefront';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-building-storefront';
+ 
+
 
     public static function form(Schema $schema): Schema
     {

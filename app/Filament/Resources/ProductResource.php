@@ -30,13 +30,16 @@ use App\Filament\Resources\ProductResource\Pages\ViewProduct;
 use App\Filament\Resources\ProductResource\Pages\ListProducts;
 use App\Filament\Resources\ProductResource\Pages\CreateProduct;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
+use BackedEnum;
+use UnitEnum;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string | UnitEnum   | null $navigationGroup = 'Products';
 
     public static function form(Schema $schema): Schema
     {

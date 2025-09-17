@@ -30,12 +30,14 @@ use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
-
+use UnitEnum;
+use BackedEnum;
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-gift';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-gift';
+    protected static string | UnitEnum   | null $navigationGroup = 'Orders Details';
 
     public static function form(Schema $schema): Schema
     {
@@ -85,7 +87,7 @@ class OrderResource extends Resource
                     ->placeholder('Building number (optional)')
                     ->default(fn ($record) => $record?->billing_building_number ?? ''),
                 ])->columns(3)->columnSpanFull(),
-                
+
                 Section::make('Shipping Address')
                 ->schema([
                 Toggle::make('use_billing_for_shipping')
@@ -107,7 +109,7 @@ class OrderResource extends Resource
                     ->visible(fn ($get) => !$get('use_billing_for_shipping'))
                     ->default(fn ($record) => $record?->shipping_building_number ?? ''),
                 ])->columns(3)->columnSpanFull(),
-                
+
                 Section::make('Order Summary')
                 ->schema([
                 TextInput::make('subtotal')

@@ -23,12 +23,15 @@ use App\Filament\Resources\ProductVariantResource\Pages\EditProductVariant;
 use App\Filament\Resources\ProductVariantResource\Pages\ViewProductVariant;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\ProductVariantResource\Pages\CreateProductVariant;
+use BackedEnum;
+use UnitEnum;
 
 class ProductVariantResource extends Resource
 {
     protected static ?string $model = ProductVariant::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-vertical';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-vertical';
+    protected static string | UnitEnum   | null $navigationGroup = 'Products';
 
     public static function form(Schema $schema): Schema
     {
@@ -41,7 +44,7 @@ class ProductVariantResource extends Resource
                     ->maxLength(255),
                 TextInput::make('size')
                     ->maxLength(255),
-             
+
                 TextInput::make('stock')
                     ->required()
                     ->numeric()

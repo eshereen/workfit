@@ -27,12 +27,14 @@ use App\Filament\Resources\CustomerResource\Pages\EditCustomer;
 use App\Filament\Resources\CustomerResource\Pages\ViewCustomer;
 use App\Filament\Resources\CustomerResource\Pages\ListCustomers;
 use App\Filament\Resources\CustomerResource\Pages\CreateCustomer;
-
+use UnitEnum;
+use BackedEnum;
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user';
+    protected static string | UnitEnum   | null $navigationGroup = 'Orders Details';
 
     public static function form(Schema $schema): Schema
     {

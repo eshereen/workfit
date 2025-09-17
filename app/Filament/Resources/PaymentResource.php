@@ -23,12 +23,14 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
+use UnitEnum;
+use BackedEnum;
 class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-currency-dollar';
+    protected static string | UnitEnum   | null $navigationGroup = 'Orders Details';
 
     public static function form(Schema $schema): Schema
     {
