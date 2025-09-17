@@ -16,7 +16,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
-use BackedEnum;
 class OrderItemResource extends Resource
 {
     protected static ?string $model = OrderItem::class;
