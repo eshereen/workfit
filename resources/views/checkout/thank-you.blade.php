@@ -4,11 +4,7 @@
 <div class="min-h-screen bg-gray-50 py-40">
     <div class="container mx-auto px-4">
         <div class="max-w-2xl mx-auto text-center">
-            @php
-                $currencyService = app(\App\Services\CountryCurrencyService::class);
-                $orderCurrencyCode = $order->currency ?? 'USD';
-                $orderCurrencySymbol = $currencyService->getCurrencySymbol($orderCurrencyCode);
-            @endphp
+
             <!-- Success Icon -->
             <div class="mb-8">
                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
