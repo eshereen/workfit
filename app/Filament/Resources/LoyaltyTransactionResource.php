@@ -29,7 +29,6 @@ class LoyaltyTransactionResource extends Resource
 {
     protected static ?string $model = LoyaltyTransaction::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-banknotes';
     protected static string | UnitEnum   | null $navigationGroup = 'Orders Details';
 
 
