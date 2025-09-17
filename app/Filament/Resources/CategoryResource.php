@@ -24,13 +24,14 @@ use App\Filament\Resources\CategoryResource\Pages\EditCategory;
 use App\Filament\Resources\CategoryResource\Pages\ViewCategory;
 use App\Filament\Resources\CategoryResource\Pages\CreateCategory;
 use App\Filament\Resources\CategoryResource\Pages\ListCategories;
-
+use UnitEnum;
+use BackedEnum;
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-archive-box';
-
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-archive-box';
+    protected static string | UnitEnum   | null $navigationGroup = 'Categories & Subcategories Details';
     public static function form(Schema $schema): Schema
     {
         return $schema

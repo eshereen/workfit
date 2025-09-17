@@ -37,7 +37,7 @@ class CollectionResource extends Resource
     protected static ?string $model = Collection::class;
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-building-storefront';
- 
+    protected static string | UnitEnum   | null $navigationGroup = 'Collections Details';
 
 
     public static function form(Schema $schema): Schema

@@ -15,13 +15,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
+use BackedEnum;
 
 class CollectionProductResource extends Resource
 {
     protected static ?string $model = CollectionProduct::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string | UnitEnum   | null $navigationGroup = 'Collections Details';
     public static function form(Schema $schema): Schema
     {
         return CollectionProductForm::configure($schema);

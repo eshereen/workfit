@@ -49,6 +49,9 @@ class WishlistResource extends Resource
                 TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
+                    TextColumn::make('user.name')
+                  
+                    ->sortable(),
                 TextColumn::make('product_id')
                     ->numeric()
                     ->sortable(),

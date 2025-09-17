@@ -29,13 +29,14 @@ use App\Filament\Resources\SubcategoryResource\Pages\EditSubcategory;
 use App\Filament\Resources\SubcategoryResource\Pages\ViewSubcategory;
 use App\Filament\Resources\SubcategoryResource\Pages\CreateSubcategory;
 use App\Filament\Resources\SubcategoryResource\Pages\ListSubcategories;
-
+use UnitEnum;
+use BackedEnum;
 class SubcategoryResource extends Resource
 {
     protected static ?string $model = Subcategory::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-inbox-stack';
-
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-inbox-stack';
+    protected static string | UnitEnum   | null $navigationGroup = 'Categories & Subcategories Details';
     public static function form(Schema $schema): Schema
     {
         return $schema
