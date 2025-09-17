@@ -18,11 +18,11 @@
         <!-- Product Images -->
         <div class="lg:w-1/2"
         x-data="{
-           currentImage: '{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}',
+           currentImage: '{{ $product->getFirstMediaUrl('main_image') }}',
            currentZoomImage: '{{ $product->getFirstMediaUrl('main_image', 'zoom_webp') }}',
            images: [
                {
-                   large: '{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}',
+                   large: '{{ $product->getFirstMediaUrl('main_image') }}',
                    zoom: '{{ $product->getFirstMediaUrl('main_image', 'zoom_webp') }}',
                    medium: '{{ $product->getFirstMediaUrl('main_image', 'medium_webp') }}',
                    thumb: '{{ $product->getFirstMediaUrl('main_image', 'thumb_webp') }}',
@@ -30,7 +30,7 @@
                },
                @foreach($product->getMedia('product_images') as $image)
                {
-                   large: '{{ $image->getUrl('large_webp') }}',
+                   large: '{{ $image->getUrl() }}',
                    zoom: '{{ $image->getUrl('zoom_webp') }}',
                    medium: '{{ $image->getUrl('medium_webp') }}',
                    thumb: '{{ $image->getUrl('thumb_webp') }}',
@@ -41,7 +41,7 @@
         }">
 
        <!-- Main image with zoom -->
-       <div class="mb-4 relative overflow-hidden rounded-lg shadow-md"
+       <div class="mb-4 relative overflow-hidden rounded-lg shadow-md h-[520px] md:h-[680px] flex items-center justify-center bg-white"
        x-data="{
           zoom: false,
           zoomX: 0,
@@ -57,10 +57,10 @@
        @mouseleave="zoom = false">
 
       <!-- Base product image (always visible) -->
-      <picture class="w-full h-auto cursor-zoom-in select-none block">
+      <picture class="w-full h-full cursor-zoom-in select-none block">
         <img :src="currentImage"
              alt="{{ $product->name }}"
-             class="w-full h-auto block object-cover object-center"
+             class="max-w-full max-h-full block object-contain object-center"
              style="object-position: center;"
              width="800"
              height="800"
