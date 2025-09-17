@@ -35,7 +35,6 @@ class SubcategoryResource extends Resource
 {
     protected static ?string $model = Subcategory::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-inbox-stack';
     protected static string | UnitEnum   | null $navigationGroup = 'Categories & Subcategories Details';
     public static function form(Schema $schema): Schema
     {

@@ -30,7 +30,6 @@ class ProductVariantResource extends Resource
 {
     protected static ?string $model = ProductVariant::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-vertical';
     protected static string | UnitEnum   | null $navigationGroup = 'Products Details';
 
     public static function form(Schema $schema): Schema

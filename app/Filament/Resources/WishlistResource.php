@@ -22,13 +22,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
+use UnitEnum;
 class WishlistResource extends Resource
 {
     protected static ?string $model = Wishlist::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-heart';
-
+    protected static string | UnitEnum   | null $navigationGroup = 'Orders Details';
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -50,7 +49,7 @@ class WishlistResource extends Resource
                     ->numeric()
                     ->sortable(),
                     TextColumn::make('user.name')
-                  
+
                     ->sortable(),
                 TextColumn::make('product_id')
                     ->numeric()

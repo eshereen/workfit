@@ -24,13 +24,13 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
+use UnitEnum;
 class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-flag';
-
+    protected static string | UnitEnum   | null $navigationGroup = 'Settings';
+    protected static ?int $navigationSort = 6;
     public static function form(Schema $schema): Schema
     {
         return $schema

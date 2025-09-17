@@ -27,13 +27,12 @@ use App\Filament\Resources\CouponResource\Pages\ViewCoupon;
 use App\Filament\Resources\CouponResource\RelationManagers;
 use App\Filament\Resources\CouponResource\Pages\ListCoupons;
 use App\Filament\Resources\CouponResource\Pages\CreateCoupon;
-
+use UnitEnum;
 class CouponResource extends Resource
 {
     protected static ?string $model = Coupon::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-ticket';
-
+    protected static string | UnitEnum   | null $navigationGroup = 'Settings';
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -56,7 +55,7 @@ class CouponResource extends Resource
                     ->numeric(),
                 TextInput::make('usage_limit')
                     ->numeric(),
-          
+
                 DateTimePicker::make('starts_at')
                     ->required(),
                 DateTimePicker::make('expires_at')

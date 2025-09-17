@@ -26,13 +26,13 @@ use App\Filament\Resources\UserResource\Pages\ViewUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\RelationManagers;
+use UnitEnum;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?int $navigationSort = 5;
+    protected static string | UnitEnum   | null $navigationGroup = 'Users & Roles';
     public static function form(Schema $schema): Schema
     {
         return $schema

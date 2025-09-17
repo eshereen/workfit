@@ -24,13 +24,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
+use UnitEnum;
 class NewsletterResource extends Resource
 {
     protected static ?string $model = Newsletter::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-newspaper';
-
+    protected static string | UnitEnum   | null $navigationGroup = 'Settings';
     public static function form(Schema $schema): Schema
     {
         return $schema

@@ -29,8 +29,8 @@ use BackedEnum;
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
-
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-archive-box';
+    
+    protected static ?int $navigationSort = 1;
     protected static string | UnitEnum   | null $navigationGroup = 'Categories & Subcategories Details';
     public static function form(Schema $schema): Schema
     {

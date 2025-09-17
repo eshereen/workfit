@@ -11,6 +11,7 @@ use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use App\Filament\Widgets\RevenueChart;
 use App\Filament\Widgets\StatsOverview;
+use Filament\Navigation\NavigationGroup;
 use Filament\Http\Middleware\Authenticate;
 use App\Filament\Widgets\SimpleOrderNotifier;
 use Illuminate\Session\Middleware\StartSession;
@@ -35,6 +36,31 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Amber,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Users & Roles')
+                    ->icon('heroicon-o-users')
+                    ->collapsible(),
+                NavigationGroup::make()
+                    ->label('Categories & Subcategories Details')
+                    ->icon('heroicon-o-archive-box'),
+                    
+                 NavigationGroup::make()
+                    ->label('Collections Details')
+                    ->icon('heroicon-o-building-storefront'),
+
+                NavigationGroup::make()
+                    ->label('Products')
+                    ->icon('heroicon-o-cube'),
+
+                NavigationGroup::make()
+                    ->label('Orders Details')
+                    ->icon('heroicon-o-shopping-cart'),
+
+                NavigationGroup::make()
+                    ->label('Settings')
+                    ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -62,7 +88,7 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentShieldPlugin::make(),
             ])
-          
+
             ->authMiddleware([
                 Authenticate::class,
             ]);
