@@ -21,7 +21,6 @@ class CollectionProductResource extends Resource
 {
     protected static ?string $model = CollectionProduct::class;
 
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string | UnitEnum   | null $navigationGroup = 'Collections Details';
     public static function form(Schema $schema): Schema
     {
