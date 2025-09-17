@@ -3,32 +3,40 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Order;
-use Illuminate\Support\Carbon;
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 class OrderPing extends Component
 {
     public ?int $latestOrderId = null;
+    public bool $hasNewOrder = false;
 
     public function mount(): void
     {
         $this->latestOrderId = Order::max('id');
     }
 
-    public function check(): void
+    public function checkForNewOrders(): void
     {
         $currentLatest = Order::max('id');
 
         if ($currentLatest && (!$this->latestOrderId || $currentLatest > $this->latestOrderId)) {
             $order = Order::find($currentLatest);
             $this->latestOrderId = $currentLatest;
+            $this->hasNewOrder = true;
 
-            $this->dispatchBrowserEvent('admin-new-order', [
-                'id' => $order?->id,
-                'number' => $order?->id,
-                'created_at' => optional($order?->created_at)->toDateTimeString(),
+            // Dispatch to browser
+            $this->dispatch('new-order-notification', [
+                'orderId' => $order?->id,
+                'orderNumber' => $order?->id,
+                'message' => "New order #" . $order?->id . " received!",
             ]);
         }
+    }
+
+    public function markAsRead(): void
+    {
+        $this->hasNewOrder = false;
     }
 
     public function render()

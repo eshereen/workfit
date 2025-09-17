@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\RevenueChart;
+use App\Filament\Widgets\SimpleOrderNotifier;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -41,10 +42,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
+                SimpleOrderNotifier::class,
                 AccountWidget::class,
                 StatsOverview::class,
                 RevenueChart::class,
-
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -59,7 +60,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-            ->renderHook('panels::body.end', fn () => view('livewire.admin.order-ping'));
+            ]);
     }
 }
