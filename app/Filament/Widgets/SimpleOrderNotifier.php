@@ -7,11 +7,15 @@ use Filament\Widgets\Widget;
 
 class SimpleOrderNotifier extends Widget
 {
-    protected string $view = 'filament.widgets.simple-order-notifier';
 
+    protected string $view = 'filament.widgets.simple-order-notifier';
+   protected static ?  int $sort = 4;
     protected static bool $isLazy = false;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = [
+        'md' => 2,
+        'xl' => 3,
+    ];
 
     public ?int $latestOrderId = null;
     public bool $hasNewOrder = false;
