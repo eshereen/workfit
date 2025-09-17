@@ -22,7 +22,13 @@
                 this.audio.currentTime = 0;
                 this.audio.play()
                     .then(() => console.log('Sound played successfully'))
-                    .catch(e => console.log('Audio play failed:', e));
+                    .catch(e => {
+                        console.log('Audio play failed:', e);
+                        // Try again on next user interaction
+                        document.addEventListener('click', () => {
+                            this.audio.play().catch(() => {});
+                        }, { once: true });
+                    });
             } catch (err) {
                 console.log('Audio error:', err);
             }
@@ -48,5 +54,4 @@
      class="hidden">
 
     <!-- Hidden widget that handles order notifications -->
-    <span class="sr-only">Order notification system active</span>
 </div>

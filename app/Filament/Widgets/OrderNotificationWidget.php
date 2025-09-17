@@ -43,7 +43,7 @@ class OrderNotificationWidget extends Widget
     protected function sendNotification(Order $order): void
     {
         Notification::make()
-            ->title('🎉 New Order Received!')
+            ->title('New Order Received!')
             ->body("Order #{$order->id} has been placed")
             ->success()
             ->persistent()
