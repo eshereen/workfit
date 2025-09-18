@@ -26,7 +26,7 @@
    'fixed top-0 left-0 right-0 bg-white text-gray-900 shadow-md': (isHome ? scrolled : true),
    'relative bg-transparent text-white': isHome && !scrolled
  }"
- class="z-[1100] transition-all duration-300 py-3 mb-10 font-semibold max-h-28"
+ class="z-[1100] transition-all duration-300 py-3 mb-10 font-semibold max-h-30"
 >
 <div class="container mx-auto px-4">
   <div class="flex items-center justify-between relative">
