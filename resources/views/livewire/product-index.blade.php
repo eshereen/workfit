@@ -52,10 +52,10 @@
     @endif
     @endif
 
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
         @if($products && $products->count() > 0)
             @foreach($products as $product)
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition my-10 h-auto">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
             <div class="relative overflow-hidden aspect-[4/5] product-image-container"
                  style="cursor: pointer;"
                  onmouseenter="this.querySelector('.main-image').style.opacity='0'; this.querySelector('.gallery-image').style.opacity='1';"
@@ -88,8 +88,8 @@
                          alt="{{ $product->name }}"
                          class="w-full h-full object-cover transition-opacity duration-500 main-image"
                          style="opacity: 1; transition: opacity 0.5s ease;"
-                         width="400"
-                         height="400"
+                         width="300"
+                         height="300"
                          loading="lazy">
 
                     {{-- Gallery image (if exists) --}}
@@ -108,8 +108,8 @@
                              alt="{{ $product->name }}"
                              class="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 gallery-image"
                              style="opacity: 0; z-index: 2; transition: opacity 0.5s ease;"
-                             width="400"
-                             height="400"
+                             width="300"
+                             height="300"
                              loading="lazy">
                     @endif
                 </div>
@@ -149,11 +149,11 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <a href="{{ route('product.show', $product->slug) }}"
-                           class="font-semibold text-lg hover:text-red-600">
+                           class="font-semibold text-base hover:text-red-600">
                             {{ $product->name }}
                         </a>
                         @if($product->category)
-                            <p class="text-gray-600 text-sm">{{ $product->category->name }}</p>
+                            <p class="text-gray-600 text-sm pt-3">{{ $product->category->name }}</p>
                         @endif
                     </div>
                     @if($product->compare_price > 0)
@@ -163,9 +163,9 @@
                     @endif
                 </div>
 
-                <div class="mt-3 flex items-center justify-between">
+                <div class="mt-2 flex items-center justify-between">
                     <div>
-                        <span class="font-bold text-lg">{{ $currencySymbol }}{{ number_format($product->converted_price ?? $product->price, 2) }}</span>
+                        <span class="font-bold text-base">{{ $currencySymbol }}{{ number_format($product->converted_price ?? $product->price, 2) }}</span>
                         @if($product->compare_price > 0)
                         <span class="text-sm text-gray-500 line-through ml-2">
                             {{ $currencySymbol }}{{ number_format($product->converted_compare_price ?? $product->compare_price, 2) }}
@@ -331,7 +331,7 @@
         @endif
 
         <!-- Action Buttons -->
-        <div class="mt-6 flex justify-end space-x-3">
+        <div class="mt-3 flex justify-end space-x-3">
             <button wire:click="$set('showVariantModal', false)"
                     class="px-4 py-2 border rounded hover:bg-gray-100 transition-colors">
                 Cancel
