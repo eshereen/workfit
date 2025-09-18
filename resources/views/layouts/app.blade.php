@@ -252,7 +252,7 @@ style="background: rgba(255,255,255,0.95);"
             const textSpan = document.createElement('span');
             textSpan.textContent = message;
             textSpan.style.color = 'white';
-            textSpan.style.fontSize = '18px';
+            textSpan.style.fontSize = '15px';
             textSpan.style.fontWeight = 'bold';
             textSpan.style.display = 'block';
             textSpan.style.textAlign = 'center';
@@ -261,7 +261,7 @@ style="background: rgba(255,255,255,0.95);"
 
             notification.style.zIndex = '9999';
             notification.style.minWidth = '300px';
-            notification.style.border = '3px solid black';
+          
             notification.style.backgroundColor = type === 'success' ? '#10B981' : '#EF4444';
             notification.style.padding = '16px';
             notification.style.marginBottom = '16px';
