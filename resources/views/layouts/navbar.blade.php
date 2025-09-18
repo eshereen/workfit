@@ -2,7 +2,7 @@
    @if(request()->routeIs('home'))
    @if($sale)
  <div class="relative z-[1100] bg-red-600 text-white py-3 px-4 h-auto w-full text-center transition-all duration-300 mb-4">
- <p> <span >{{ $sale->description }}</span> <a href="{{ route('collection.show', $sale->slug) }}" class="px-2 text-gray-800 font-bold underline hover:text-white">Shop Now</a></p>
+ <p> <span >{{ $sale->description }}</span> <a href="{{ route('collection.show', $sale->slug) }}" class="px-2 text-gray-500 font-bold underline hover:text-white">Shop Now</a></p>
     </div>
     @endif
     @endif
