@@ -206,9 +206,9 @@
           <!-- Logo (Perfectly Centered) -->
       <a href="{{ route('home') }}" class="absolute left-1/2 transform -translate-x-1/2 flex items-center">
           <!-- White logo (home page, not scrolled) -->
-          <img x-show="isHome && !scrolled" src="/imgs/workfit_logo_white.png" alt="logo" class="w-16">
+          <img x-show="isHome && !scrolled" src="/imgs/workfit_logo_white.png" alt="logo" class="w-18">
           <!-- Black logo (home page scrolled or non-home page) -->
-          <img x-show="!isHome || (isHome && scrolled)" src="/imgs/workfit_logo_black.png" alt="logo" class="w-16">
+          <img x-show="!isHome || (isHome && scrolled)" src="/imgs/workfit_logo_black.png" alt="logo" class="w-18">
       </a>
 
       <!-- Icons (Right) -->
