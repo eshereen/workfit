@@ -52,7 +52,7 @@
     @endif
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2  gap-x-16 gap-y-8">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         @if($products && $products->count() > 0)
             @foreach($products as $product)
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition my-10 h-auto">
@@ -70,7 +70,7 @@
                         Best Seller
                     </span>
                     @endif
-                    
+
                     <!-- Flash Sale Badge -->
                     @if($product->compare_price > 0)
                     <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">

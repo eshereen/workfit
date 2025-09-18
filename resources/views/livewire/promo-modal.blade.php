@@ -1,5 +1,29 @@
 {{-- Promotional Modal --}}
-<div x-data="{ open: @entangle('showModal') }"
+<div x-data="{
+        open: false,
+        init() {
+            // Check if user has seen modal in this session
+            if (!sessionStorage.getItem('promo_modal_seen')) {
+                // Show modal after 1 second delay
+                setTimeout(() => {
+                    this.open = true;
+                    document.body.style.overflow = 'hidden';
+                }, 2000);
+            }
+
+            this.$watch('open', value => {
+                if (value) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+        },
+        closeModal() {
+            this.open = false;
+            sessionStorage.setItem('promo_modal_seen', 'true');
+        }
+     }"
      x-show="open"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
@@ -9,12 +33,11 @@
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 z-[9999] overflow-y-auto"
      style="display: none;"
-     @keydown.escape.window="$wire.closeModal()"
-     @if($showModal) x-init="setTimeout(() => open && document.body.style.overflow = 'hidden', 100)" @endif>
+     @keydown.escape.window="closeModal()">
 
     <!-- Background overlay -->
     <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity"
-         @click="$wire.closeModal()"></div>
+         @click="closeModal()"></div>
 
     <!-- Modal container -->
     <div class="flex min-h-screen items-center justify-center p-4">
@@ -28,7 +51,7 @@
              @click.stop>
 
             <!-- Close button -->
-            <button wire:click="closeModal"
+            <button @click="closeModal()"
                     class="absolute top-4 right-4 z-10 text-gray-500 hover:text-gray-700 bg-white rounded-full p-2 shadow-lg transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -90,10 +113,11 @@
                         </div>
 
                         <!-- Register Button -->
-                        <button wire:click="redirectToRegister"
-                                class="w-full bg-red-600 text-white py-4 px-6 rounded-lg hover:bg-red-700 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                        <a href="{{ route('register') }}"
+                           @click="closeModal()"
+                           class="w-full bg-red-600 text-white py-4 px-6 rounded-lg hover:bg-red-700 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 inline-block text-center">
                            GET 10% OFF
-                        </button>
+                        </a>
 
                         <p class="text-xs text-gray-500 mt-6 text-center">
                             Join thousands of satisfied customers who love WorkFit's premium activewear.
@@ -107,11 +131,3 @@
     </div>
 </div>
 
-<script>
-// Reset body overflow when modal closes
-document.addEventListener('livewire:updated', () => {
-    if (!@this.showModal) {
-        document.body.style.overflow = '';
-    }
-});
-</script>
