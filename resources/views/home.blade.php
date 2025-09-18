@@ -6,15 +6,15 @@
     <!-- Hero Section with Video Background -->
     <section class="relative -top-28 h-screen overflow-hidden">
         <!-- Video Background -->
-        <video autoplay muted loop playsinline preload="metadata" poster="poster.jpg" class="w-full h-full object-cover hidden md:block">
+        <video autoplay muted loop playsinline preload="metadata" poster="/imgs/group.jpg" class="w-full h-full object-cover hidden md:block">
             <source src="videos/workfit-lg.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <!-- Mobile Video -->
-        <video autoplay muted loop playsinline preload="metadata" poster="poster.jpg" class="w-full h-full object-cover  md:hidden">
+        <video autoplay muted loop playsinline preload="metadata" poster="/imgs/group.jpg" class="w-full h-full object-cover md:hidden" id="mobile-video">
             <source src="videos/workfit-mobile.mp4" type="video/mp4">
             Your browser does not support the video tag.
-            </video>
+        </video>
         <!-- Overlay -->
         <div class="absolute inset-0 bg-black/50"></div>
 
@@ -212,3 +212,31 @@
 </section>
 
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure mobile video plays
+    const mobileVideo = document.getElementById('mobile-video');
+    if (mobileVideo && window.innerWidth < 768) {
+        // Try to play the video
+        const playPromise = mobileVideo.play();
+
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('Mobile video started playing');
+            }).catch(error => {
+                console.log('Mobile video autoplay failed:', error);
+                // If autoplay fails, try to play on first user interaction
+                document.addEventListener('touchstart', function() {
+                    mobileVideo.play().catch(e => console.log('Video play failed:', e));
+                }, { once: true });
+            });
+        }
+
+        // Also try to play when video is loaded
+        mobileVideo.addEventListener('loadeddata', function() {
+            mobileVideo.play().catch(e => console.log('Video play on load failed:', e));
+        });
+    }
+});
+</script>
