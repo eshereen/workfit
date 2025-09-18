@@ -1,7 +1,7 @@
    <!-- Header -->
    @if(request()->routeIs('home'))
    @if($sale)
- <div class="relative z-[1100] bg-red-600 text-white py-3 px-4 h-auto w-full text-center transition-all duration-300">
+ <div class="relative z-[1100] bg-red-600 text-white py-3 px-4 h-auto w-full text-center transition-all duration-300 mb-4">
  <p> <span >{{ $sale->description }}</span> <a href="{{ route('collection.show', $sale->slug) }}" class="px-2 text-gray-800 font-bold underline hover:text-white">Shop Now</a></p>
     </div>
     @endif
@@ -206,9 +206,9 @@
           <!-- Logo (Perfectly Centered) -->
       <a href="{{ route('home') }}" class="absolute left-1/2 transform -translate-x-1/2 flex items-center">
           <!-- White logo (home page, not scrolled) -->
-          <img x-show="isHome && !scrolled" src="/imgs/workfit_logo_white.png" alt="logo" class="w-20">
+          <img x-show="isHome && !scrolled" src="/imgs/workfit_logo_white.png" alt="logo" class="w-16">
           <!-- Black logo (home page scrolled or non-home page) -->
-          <img x-show="!isHome || (isHome && scrolled)" src="/imgs/workfit_logo_black.png" alt="logo" class="w-20">
+          <img x-show="!isHome || (isHome && scrolled)" src="/imgs/workfit_logo_black.png" alt="logo" class="w-16">
       </a>
 
       <!-- Icons (Right) -->
