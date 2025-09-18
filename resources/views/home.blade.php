@@ -150,7 +150,7 @@
 
     <!-- Product Grid - Men's Collection -->
 
-     <section class="py-16 px-4">
+     <section class="py-16 my-20 px-4">
         @if($categories->isNotEmpty())
         <div class="container mx-auto">
             @if($categories->count() > 1)
