@@ -18,7 +18,7 @@
   <!-- Content -->
   @if($category)
     <!-- Show products for specific category -->
-    <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 my-8">
+    <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 my-8">
       <!-- Sidebar Filters -->
       <aside class="space-y-6">
         @livewire('category-filters', ['categorySlug' => $categorySlug])
