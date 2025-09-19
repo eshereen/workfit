@@ -76,7 +76,7 @@
                                 Best Seller
                             </span>
                             @endif
-                            
+
                             <!-- Flash Sale Badge -->
                             @if($product->compare_price > 0)
                             <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">
@@ -84,7 +84,7 @@
                             </span>
                             @endif
                         </div>
-                        
+
                         <a href="{{ route('product.show', $product->slug) }}" class="block relative z-10 w-full h-64">
                             @if($product->media->count() > 0)
                                 {{-- Main image --}}
@@ -195,7 +195,7 @@
                             @if($product->variants->count() > 0)
                                 <button
                                     wire:click="openVariantModal({{ $product->id }})"
-                                    class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+                                    class="flex-1 bg-gray-950 text-white py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-gray-950 transition-colors cursor-pointer"
                                 >
                                     View Options
                                 </button>
@@ -203,7 +203,7 @@
                                 @if($product->quantity > 0)
                                     <button
                                         wire:click="addSimpleProductToCart({{ $product->id }})"
-                                        class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
+                                        class="flex-1 bg-gray-950 text-white py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-gray-950 transition-colors cursor-pointer"
                                     >
                                         Add to Cart
                                     </button>

@@ -7,7 +7,7 @@
             <div class="text-center text-white px-4">
                 <h1 class="text-4xl md:text-6xl font-bold mb-4 slide-in-left">ABOUT WORKFIT</h1>
                 <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto slide-in-right">Empowering your fitness journey with premium activewear</p>
-                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 transition-colors fade-in">
+                <button class="bg-gray-950 hover:bg-gray-100 hover:text-gray-950 text-white font-bold py-3 px-8 transition-colors fade-in">
                     OUR STORY
                 </button>
             </div>

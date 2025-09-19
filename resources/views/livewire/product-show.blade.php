@@ -288,7 +288,7 @@
                             wire:loading.attr="disabled"
                             wire:loading.class="opacity-75 cursor-not-allowed"
                             wire:target="addToCart"
-                            class="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="w-full bg-gray-950 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-100 hover:text-gray-950 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         <span wire:loading.remove wire:target="addToCart">Add to Cart</span>
                         <span wire:loading wire:target="addToCart">
                             <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

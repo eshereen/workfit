@@ -9,7 +9,7 @@
             </div>
             <h1 class="text-3xl font-semibold text-gray-900 mb-4">Subscription Confirmed!</h1>
             <p class="text-lg text-gray-600 mb-6">Thank you for subscribing to WorkFit updates. You'll start receiving our latest news and exclusive offers.</p>
-            <a href="{{ route('home') }}" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors inline-block">
+            <a href="{{ route('home') }}" class="bg-gray-950 text-white px-6 py-3 rounded-lg hover:bg-gray-100 hover:text-gray-950 transition-colors inline-block">
                 Return to Home
             </a>
         </div>

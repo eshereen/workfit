@@ -36,7 +36,7 @@
     </section>
 
     <!-- Men Products -->
-    <section class="container mx-auto h-full">
+    <section class="py-16 mt-20 px-4">
         <h1 class="text-center font-bold sm:text-3xl md:text-4xl lg:text-5xl mb-2 uppercase">Men's Collection</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
 
@@ -55,7 +55,7 @@
 
 
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-[1200px] bg-cover overflow-hidden animate-on-scroll">
+    <section class="relative h-[1200px] bg-cover overflow-hidden animate-on-scroll mt-20 mb-20">
         <img src="{{ asset('imgs/women.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
@@ -79,7 +79,7 @@
         @endif
     </section>
     <!-- Product Grid - First Category Collection -->
-    <section class="py-16 px-4">
+    <section class="py-16 mt-20 px-4">
         @if($women && $women->directProducts && $women->directProducts->isNotEmpty())
         <div class="container mx-auto">
             <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $women->name }}'S COLLECTION</h2>
@@ -97,7 +97,7 @@
     </section>
 
     <!-- Three Image Block Section -->
-    <section class="py-16 px-4 bg-gray-100">
+    <section class="py-16 mb-20 px-4 bg-gray-100">
         <div class="container mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 h-auto">
                 <!-- RUN Block -->
@@ -150,7 +150,7 @@
 
     <!-- Product Grid - Men's Collection -->
 
-     <section class="py-16 my-20 px-4">
+     <section class="py-16 mb-32 px-4">
         @if($categories->isNotEmpty())
         <div class="container mx-auto">
             @if($categories->count() > 1)
@@ -172,7 +172,7 @@
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
-    <section class="relative w-full h-[1200px] overflow-hidden animate-on-scroll my-20">
+    <section class="relative w-full h-[1200px] overflow-hidden animate-on-scroll mt-20 mb-40">
         <img src="{{ asset('imgs/group.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
@@ -190,7 +190,7 @@
 
 
     <!-- Just Arrived Products -->
-    <section class="px-4">
+    <section class="px-4 py-16 mt-20 mb-20">
         <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
         @if($recent && $recent->isNotEmpty())
@@ -198,7 +198,7 @@
        @endif
    </section>
 
-   <section class="relative h-[1200px] overflow-hidden animate-on-scroll bg-[url(/imgs/bg-footer.jpg)] bg-cover bg-top">
+   <section class="relative h-[1200px] overflow-hidden animate-on-scroll bg-[url(/imgs/bg-footer.jpg)] bg-cover bg-top mt-20">
 
     <div class="absolute inset-0 bg-black/50 w-full">
         <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">

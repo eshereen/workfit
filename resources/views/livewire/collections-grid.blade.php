@@ -68,7 +68,7 @@
                         <!-- Action Button -->
                         <a
                             href="{{ route('collection.show', $collection->slug) }}"
-                            class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-center block"
+                            class="w-full bg-gray-950 text-white py-2 px-4 rounded-lg hover:bg-gray-100 hover:text-gray-950 transition-colors text-center block"
                         >
                             Browse Collection
                         </a>
