@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Coupon;
@@ -11,6 +12,7 @@ use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -27,7 +29,6 @@ use App\Filament\Resources\CouponResource\Pages\ViewCoupon;
 use App\Filament\Resources\CouponResource\RelationManagers;
 use App\Filament\Resources\CouponResource\Pages\ListCoupons;
 use App\Filament\Resources\CouponResource\Pages\CreateCoupon;
-use UnitEnum;
 class CouponResource extends Resource
 {
     protected static ?string $model = Coupon::class;

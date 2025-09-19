@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -10,6 +12,7 @@ use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -29,8 +32,7 @@ use App\Filament\Resources\SubcategoryResource\Pages\EditSubcategory;
 use App\Filament\Resources\SubcategoryResource\Pages\ViewSubcategory;
 use App\Filament\Resources\SubcategoryResource\Pages\CreateSubcategory;
 use App\Filament\Resources\SubcategoryResource\Pages\ListSubcategories;
-use UnitEnum;
-use BackedEnum;
+
 class SubcategoryResource extends Resource
 {
     protected static ?string $model = Subcategory::class;

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Collection;
@@ -10,6 +12,7 @@ use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Toggle;
 use Filament\Actions\DeleteBulkAction;
@@ -29,8 +32,6 @@ use App\Filament\Resources\CollectionResource\Pages\ViewCollection;
 use App\Filament\Resources\CollectionResource\Pages\ListCollections;
 use App\Filament\Resources\CollectionResource\Pages\CreateCollection;
 use App\Filament\Resources\CollectionResource\RelationManagers\ProductsRelationManager;
-use BackedEnum;
-use UnitEnum;
 
 class CollectionResource extends Resource
 {

@@ -2,16 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Order;
-use App\Enums\PaymentStatus;
 use App\Enums\OrderStatus;
 use Filament\Tables\Table;
+use App\Enums\PaymentStatus;
 use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -30,8 +33,7 @@ use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
-use UnitEnum;
-use BackedEnum;
+
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
