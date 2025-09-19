@@ -68,7 +68,6 @@ class OrderResource extends Resource
                     ->email()
                     ->maxLength(255),
                 TextInput::make('phone_number')
-                    ->tel()
                     ->maxLength(255),
                 ])->columns(3)->columnSpanFull(),
                 Section::make('Billing Address')
@@ -115,22 +114,22 @@ class OrderResource extends Resource
                     ->required()
                     ->numeric(),
                 TextInput::make('tax_amount')
-                    ->required()
+
                     ->numeric()
                     ->default(0),
                 TextInput::make('shipping_amount')
-                    ->required()
+
                     ->numeric()
                     ->default(0),
                 TextInput::make('discount_amount')
-                    ->required()
+
                     ->numeric()
                     ->default(0),
                 TextInput::make('total_amount')
                     ->required()
                     ->numeric(),
                 TextInput::make('currency')
-                    ->required()
+
                     ->maxLength(3)
                     ->default('USD'),
                 Textarea::make('notes')
@@ -142,7 +141,8 @@ class OrderResource extends Resource
                 TextInput::make('coupon_id')
                     ->numeric(),
                 Toggle::make('is_guest')
-                    ->required(),
+
+                    ->default(true),
                 TextInput::make('payment_method')
                     ->required()
                     ->maxLength(255),
@@ -150,8 +150,7 @@ class OrderResource extends Resource
                     ->options(PaymentStatus::options())
                     ->required(),
                 Select::make('status')
-                    ->options(OrderStatus::options())
-                    ->required(),
+                    ->options(OrderStatus::options()),
                 ])->columns(3)->columnSpanFull(),
             ]);
     }
