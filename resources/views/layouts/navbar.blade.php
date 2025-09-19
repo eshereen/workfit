@@ -206,9 +206,9 @@
           <!-- Logo (Perfectly Centered) -->
       <a href="{{ route('home') }}" class="absolute left-1/2 transform -translate-x-1/2 flex items-center">
           <!-- White logo (home page, not scrolled) -->
-          <img x-show="isHome && !scrolled" src="/imgs/workfit_logo_white.png" alt="logo" class="w-20">
+          <img x-show="isHome && !scrolled" src="/imgs/workfit_logo_white.png" alt="logo" class="w-16">
           <!-- Black logo (home page scrolled or non-home page) -->
-          <img x-show="!isHome || (isHome && scrolled)" src="/imgs/workfit_logo_black.png" alt="logo" class="w-20">
+          <img x-show="!isHome || (isHome && scrolled)" src="/imgs/workfit_logo_black.png" alt="logo" class="w-16">
       </a>
 
       <!-- Icons (Right) -->
@@ -217,6 +217,7 @@
 
           <!-- Currency Selector -->
           <!-- (your currency selector code here) -->
+
 
           <a href="{{ route('login') }}" class="hidden lg:block font-xs hover:text-red-600 uppercase transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">Account</a>
 
@@ -337,6 +338,7 @@
       <div class="border-t border-gray-200 pt-2 space-y-2">
         <a href="{{ route('location') }}" class="block text-gray-900 hover:text-red-600 transition-colors font-semibold py-2" @click="mobileMenuOpen = false">LOCATION</a>
         <a href="{{ route('login') }}" class="block text-gray-900 hover:text-red-600 transition-colors font-semibold py-2" @click="mobileMenuOpen = false">ACCOUNT</a>
+
       </div>
     </nav>
   </div>
