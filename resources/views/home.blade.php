@@ -36,7 +36,7 @@
     </section>
 
     <!-- Men Products -->
-    <section class="py-8 px-4">
+    <section class="py-16  px-4">
         <h1 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">Men's Collection</h1>
         <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
 
@@ -101,7 +101,7 @@
     </section>
 
     <!-- Three Image Block Section -->
-    <section class="py-8 px-4 bg-gray-100">
+    <section class="py-16  px-4 bg-gray-100">
         <div class="container mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 h-auto">
                 <!-- RUN Block -->
@@ -199,7 +199,7 @@
 
 
     <!-- Just Arrived Products -->
-    <section class="py-8 px-4">
+    <section class="py-16  px-4">
         <h1 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">Just Arrived</h1>
         <p class="text-center text-gray-600 mb-4 max-w-2xl mx-auto animate-on-scroll px-8">Discover our latest collection of products</p>
         @if($recent && $recent->isNotEmpty())
