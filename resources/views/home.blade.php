@@ -36,8 +36,8 @@
     </section>
 
     <!-- Men Products -->
-    <section class="py-16 mt-20 px-4">
-        <h1 class="text-center font-bold sm:text-3xl md:text-4xl lg:text-5xl mb-2 uppercase">Men's Collection</h1>
+    <section class="py-8 px-4">
+        <h1 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">Men's Collection</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
 
         @if($men && $men->directProducts && $men->directProducts->isNotEmpty())
@@ -55,7 +55,7 @@
 
 
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-[1200px] bg-cover overflow-hidden animate-on-scroll mt-20 mb-20">
+    <section class="relative h-[1200px] bg-cover overflow-hidden animate-on-scroll mt-8 mb-8">
         <img src="{{ asset('imgs/women.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
@@ -150,7 +150,7 @@
 
     <!-- Product Grid - Men's Collection -->
 
-     <section class="py-16 mb-32 px-4">
+     <section class="py-8 mb-12 px-4">
         @if($categories->isNotEmpty())
         <div class="container mx-auto">
             @if($categories->count() > 1)
@@ -172,7 +172,7 @@
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
-    <section class="relative w-full h-[1200px] overflow-hidden animate-on-scroll mt-20 mb-40">
+    <section class="relative w-full h-[1200px] overflow-hidden animate-on-scroll mt-8 mb-8">
         <img src="{{ asset('imgs/group.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
@@ -190,23 +190,26 @@
 
 
     <!-- Just Arrived Products -->
-    <section class="px-4 py-16 mt-20 mb-20">
+    <section class="px-4 py-16 my-8">
         <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
         @if($recent && $recent->isNotEmpty())
        @livewire('product-index',['products'=>$recent])
        @endif
+       <div class="text-center mt-12 animate-on-scroll">
+        <a href="{{ route('categories.index', $categories->get(0)->slug) }}" class="border-2 border-gray-900 hover:bg-gray-800 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
+          shop now
+        </a>
+    </div>
    </section>
 
-   <section class="relative h-[1200px] overflow-hidden animate-on-scroll bg-[url(/imgs/bg-footer.jpg)] bg-cover bg-top mt-20">
+   <section class="relative h-[1200px] overflow-hidden animate-on-scroll bg-[url(/imgs/bg-footer.jpg)] bg-cover bg-top mt-20 mb-0">
 
     <div class="absolute inset-0 bg-black/50 w-full">
         <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">
             <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 uppercase playfair">WorkFit</h1>
             <p class="text-xl mb-6 max-w-2xl">Be the first to shop our latest collection</p>
-            <a href="{{ route('collections.index') }}" class="bg-white hover:bg-gray-900  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
-                SHOP NOW
-            </a>
+
         </div>
     </div>
 </section>

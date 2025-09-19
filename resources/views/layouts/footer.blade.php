@@ -52,7 +52,7 @@
             <!-- Newsletter -->
             <div class="animate-on-scroll">
                 <h4 class="font-bold mb-4">JOIN OUR NEWSLETTER</h4>
-                <p class="text-gray-200 mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
+              
                 <livewire:newsletter.subscribe-form />
             </div>
         </div>
