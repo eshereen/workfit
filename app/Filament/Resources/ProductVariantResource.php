@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -10,6 +12,7 @@ use App\Models\ProductVariant;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Actions\DeleteBulkAction;
@@ -23,8 +26,6 @@ use App\Filament\Resources\ProductVariantResource\Pages\EditProductVariant;
 use App\Filament\Resources\ProductVariantResource\Pages\ViewProductVariant;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\ProductVariantResource\Pages\CreateProductVariant;
-use BackedEnum;
-use UnitEnum;
 
 class ProductVariantResource extends Resource
 {
@@ -108,6 +109,7 @@ class ProductVariantResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                 DeleteAction::make(), 
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

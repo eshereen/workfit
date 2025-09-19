@@ -2,29 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\PaymentResource\Pages\ListPayments;
-use App\Filament\Resources\PaymentResource\Pages\CreatePayment;
-use App\Filament\Resources\PaymentResource\Pages\ViewPayment;
-use App\Filament\Resources\PaymentResource\Pages\EditPayment;
-use App\Filament\Resources\PaymentResource\Pages;
-use App\Filament\Resources\PaymentResource\RelationManagers;
-use App\Models\Payment;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 use BackedEnum;
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Payment;
+use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\PaymentResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PaymentResource\RelationManagers;
+use App\Filament\Resources\PaymentResource\Pages\EditPayment;
+use App\Filament\Resources\PaymentResource\Pages\ViewPayment;
+use App\Filament\Resources\PaymentResource\Pages\ListPayments;
+use App\Filament\Resources\PaymentResource\Pages\CreatePayment;
+
 class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
@@ -44,7 +46,7 @@ class PaymentResource extends Resource
                 TextInput::make('provider_reference')
                     ->maxLength(255),
                 TextInput::make('status')
-                    ->required()
+                   
                     ->maxLength(255)
                     ->default('initiated'),
                 TextInput::make('currency')
@@ -105,6 +107,7 @@ class PaymentResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(), 
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

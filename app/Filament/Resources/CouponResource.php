@@ -55,7 +55,6 @@ class CouponResource extends Resource
                     ->numeric(),
                 TextInput::make('usage_limit')
                     ->numeric(),
-
                 DateTimePicker::make('starts_at')
                     ->required(),
                 DateTimePicker::make('expires_at')
@@ -107,6 +106,8 @@ class CouponResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(), 
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

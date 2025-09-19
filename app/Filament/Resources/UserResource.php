@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
@@ -10,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -26,7 +28,6 @@ use App\Filament\Resources\UserResource\Pages\ViewUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\RelationManagers;
-use UnitEnum;
 
 class UserResource extends Resource
 {
@@ -85,6 +86,7 @@ class UserResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                 DeleteAction::make(), 
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

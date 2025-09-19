@@ -23,6 +23,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
+use Filament\Actions\DeleteAction;
+
 class WishlistResource extends Resource
 {
     protected static ?string $model = Wishlist::class;

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Customer;
@@ -10,6 +12,7 @@ use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -27,8 +30,7 @@ use App\Filament\Resources\CustomerResource\Pages\EditCustomer;
 use App\Filament\Resources\CustomerResource\Pages\ViewCustomer;
 use App\Filament\Resources\CustomerResource\Pages\ListCustomers;
 use App\Filament\Resources\CustomerResource\Pages\CreateCustomer;
-use UnitEnum;
-use BackedEnum;
+
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
@@ -57,7 +59,6 @@ class CustomerResource extends Resource
                     ->maxLength(255),
 
                 TextInput::make('phone_number')
-                    ->tel()
                     ->maxLength(255),
                 ])->columns(2)->columnSpanFull(),
 
@@ -161,6 +162,7 @@ class CustomerResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(), 
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -2,29 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\CountryResource\Pages\ListCountries;
-use App\Filament\Resources\CountryResource\Pages\CreateCountry;
-use App\Filament\Resources\CountryResource\Pages\ViewCountry;
-use App\Filament\Resources\CountryResource\Pages\EditCountry;
-use App\Filament\Resources\CountryResource\Pages;
-use App\Filament\Resources\CountryResource\RelationManagers;
-use App\Models\Country;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Country;
+use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\CountryResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CountryResource\RelationManagers;
+use App\Filament\Resources\CountryResource\Pages\EditCountry;
+use App\Filament\Resources\CountryResource\Pages\ViewCountry;
+use App\Filament\Resources\CountryResource\Pages\CreateCountry;
+use App\Filament\Resources\CountryResource\Pages\ListCountries;
+
 class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
@@ -51,7 +53,6 @@ class CountryResource extends Resource
                 TextInput::make('currency_sympol')
                     ->maxLength(255),
                 TextInput::make('tax_rate')
-                    ->required()
                     ->numeric()
                     ->default(0.00),
                 Toggle::make('active')
@@ -93,6 +94,8 @@ class CountryResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(), 
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

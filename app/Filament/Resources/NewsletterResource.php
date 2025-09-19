@@ -2,29 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\NewsletterResource\Pages\ListNewsletters;
-use App\Filament\Resources\NewsletterResource\Pages\CreateNewsletter;
-use App\Filament\Resources\NewsletterResource\Pages\ViewNewsletter;
-use App\Filament\Resources\NewsletterResource\Pages\EditNewsletter;
-use App\Filament\Resources\NewsletterResource\Pages;
-use App\Filament\Resources\NewsletterResource\RelationManagers;
-use App\Models\Newsletter;
+use UnitEnum;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Newsletter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Toggle;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use UnitEnum;
+use App\Filament\Resources\NewsletterResource\Pages;
+use App\Filament\Resources\NewsletterResource\RelationManagers;
+use App\Filament\Resources\NewsletterResource\Pages\EditNewsletter;
+use App\Filament\Resources\NewsletterResource\Pages\ViewNewsletter;
+use App\Filament\Resources\NewsletterResource\Pages\ListNewsletters;
+use App\Filament\Resources\NewsletterResource\Pages\CreateNewsletter;
+
 class NewsletterResource extends Resource
 {
     protected static ?string $model = Newsletter::class;
@@ -75,6 +77,7 @@ class NewsletterResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(), 
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

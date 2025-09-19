@@ -34,6 +34,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->resourceCreatePageRedirect('index')
+            ->resourceEditPageRedirect('index')
             ->colors([
                 'primary' => Color::Amber,
             ])
