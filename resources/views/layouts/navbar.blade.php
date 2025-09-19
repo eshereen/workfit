@@ -1,8 +1,8 @@
    <!-- Header -->
    @if(request()->routeIs('home'))
    @if($sale)
- <div class="relative z-[1100] bg-red-600 text-white py-3 px-4 h-auto w-full text-center transition-all duration-300 mb-4">
- <p> <span >{{ $sale->description }}</span> <a href="{{ route('collection.show', $sale->slug) }}" class="px-2 text-blue-600 font-semibold underline hover:text-white">Shop Now</a></p>
+ <div class="relative z-[1100] bg-red-600 text-white py-3 px-4 h-auto w-full text-center transition-all duration-300">
+ <p> <span >{{ $sale->description }}</span> <a href="{{ route('collection.show', $sale->slug) }}" class="px-2 text-gray-800 font-bold underline hover:text-white">Shop Now</a></p>
     </div>
     @endif
     @endif
@@ -28,7 +28,7 @@
  }"
  class="z-[1100] transition-all duration-300 py-3 mb-10 font-semibold max-h-30"
 >
-<div class="container mx-auto px-4">
+<div class="container mx-auto px-8">
   <div class="flex items-center justify-between relative">
 
       <!-- Mobile Menu Button (Left) -->
@@ -37,15 +37,15 @@
       </button>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex space-x-8 flex-1 relative">
-          <a href="{{route('categories.index', 'women')}}" class="font-xs hover:text-red-600 transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">WOMEN</a>
-          <a href="{{route('categories.index', 'men')}}" class="font-xs hover:text-red-600 transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">MEN</a>
+      <nav class="hidden md:flex space-x-4 flex-1 relative">
+          <a href="{{route('categories.index', 'women')}}" class="font-xs hover:text-red-600 text-sm transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900' ">WOMEN</a>
+          <a href="{{route('categories.index', 'men')}}" class="font-xs hover:text-red-600 text-sm transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">MEN</a>
 
           <!-- Categories Dropdown -->
           <div class="relative"
                @mouseenter="categoriesDropdownOpen = true"
                @mouseleave="categoriesDropdownOpen = false">
-              <button class="font-xs hover:text-red-600 transition-colors flex items-center font-light"
+              <button class="font-xs hover:text-red-600 transition-colors flex items-center font-light text-sm"
                       :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">
                   CATEGORIES
                   <svg class="ml-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
@@ -132,7 +132,7 @@
           <div class="relative"
                @mouseenter="collectionsDropdownOpen = true"
                @mouseleave="collectionsDropdownOpen = false">
-              <button class="font-xs hover:text-red-600 transition-colors flex items-center"
+              <button class="font-xs hover:text-red-600 transition-colors flex items-center text-sm"
                       :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">
                   COLLECTIONS
                   <svg class="ml-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
@@ -213,13 +213,14 @@
 
       <!-- Icons (Right) -->
       <div class="flex items-center space-x-4 justify-end relative z-[1001] flex-shrink-0">
-          <a href="{{ route('location') }}" class="hidden lg:block font-xs uppercase hover:text-red-600 transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">Location</a>
+          <a href="{{ route('location') }}" class="hidden lg:block font-xs uppercase hover:text-red-600 text-sm  transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">Location</a>
 
           <!-- Currency Selector -->
+          @livewire('currency-selector')
           <!-- (your currency selector code here) -->
 
 
-          <a href="{{ route('login') }}" class="hidden lg:block font-xs hover:text-red-600 uppercase transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">Account</a>
+          <a href="{{ route('login') }}" class="hidden lg:block font-xs hover:text-red-600 uppercase transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'"><i class="fas fa-user"></i></a>
 
            <!-- Cart and Wishlist Counts -->
            @livewire('cart-wishlist-counts')

@@ -126,6 +126,7 @@ class FrontendController extends Controller
         $sale = cache()->remember('home_sale_collection', 1800, function () {
             return Collection::where('collections.slug', 'sale')
                 ->where('collections.active', true)
+                ->orderBy('collections.created_at', 'desc')
                 ->first();
         });
 

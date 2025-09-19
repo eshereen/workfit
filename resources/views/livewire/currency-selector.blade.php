@@ -1,23 +1,31 @@
 <div class="relative currency-selector x-cloak"
-     x-data="{ open: false }"
-     x-init="$watch('open', value => $wire?.set('showDropdown', value))"
+     x-data="{
+       open: false,
+       scrolled: false,
+       isHome: {{ request()->routeIs('home') ? 'true' : 'false' }},
+       init() {
+         this.$watch('open', value => $wire?.set('showDropdown', value));
+         // Listen to scroll events from parent navbar
+         window.addEventListener('scroll', () => {
+           this.scrolled = window.scrollY > 10;
+         });
+       }
+     }"
      @currency-changed.window="open = false"
      wire:key="{{ $this->getId() }}"
      data-component-id="{{ $this->getId() }}"
      data-component-name="currency-selector">
 
-    @if(request()->routeIs('home'))
-        <button @click="open = !open" type="button"
-                class="flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-white group-hover:text-gray-900 hover:text-red-600 rounded-md transition-colors">
-    @else
-        <button @click="open = !open" type="button"
-                class="flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-gray-900 hover:text-red-600 rounded-md transition-colors">
-    @endif
-        <span class="text-lg">{{ $currentSymbol }}</span>
-        <span class="hidden sm:inline">{{ $currentCurrency }}</span>
-        <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button @click="open = !open" type="button"
+            class="flex items-center space-x-2 px-1 md:px-3 py-2 text-sm font-semibold hover:text-red-600 rounded-md transition-colors"
+            :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">
+            <span class="text-lg" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">{{ $currentSymbol }}</span>
+            <span class="hidden sm:inline" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">{{ $currentCurrency }}</span>
+
+
+     {{-- <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
+        </svg> --}}
     </button>
 
     <!-- Dropdown -->
