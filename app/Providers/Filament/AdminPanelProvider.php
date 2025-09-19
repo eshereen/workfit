@@ -37,8 +37,12 @@ class AdminPanelProvider extends PanelProvider
             ->resourceCreatePageRedirect('index')
             ->resourceEditPageRedirect('index')
             ->colors([
-                'primary' => Color::Amber,
-            ])
+                'primary' => Color::Red,
+                'gray' => Color::Zinc,
+                'info' => Color::Blue,
+                'success' => Color::Green,
+                'warning' => Color::Amber,
+                    ])
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Users & Roles')
