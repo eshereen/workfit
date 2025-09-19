@@ -55,7 +55,7 @@
 
 
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-[1200px] bg-cover overflow-hidden animate-on-scroll my-4">
+    <section class="relative h-[1100px] bg-cover overflow-hidden animate-on-scroll my-4">
         <img src="{{ asset('imgs/women.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
@@ -65,15 +65,19 @@
              @if($collections->isNotEmpty())
         <!-- Overlay with only background dark -->
         <div class="absolute inset-0 bg-black/50 z-0">
-            <div class="absolute bottom-8 left-0 z-40 text-left text-white pl-8 md:pl-12">
-                <h2 class="font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">{{ $collections->first()->name }} 'S COLLECTIONS</h2>
-                <p class="text-xl mb-6 max-w-2xl">
+            <div class="absolute  top-1/2 -translate-y-1/2 lg:bottom-8 lg:top-auto left-0 text-left  text-white pl-4 md:pl-12 pr-4">
+                <h2 class="text-center md:text-left text-4xl md:text-6xl font-bold mb-4 slide-in">{{ $collections->first()->name }} 'S COLLECTIONS</h2>
+                <p class="text-center lg:text-left  text-xl md:text-2xl pr-8 md:pr-0 mb-8 max-w-xl fade-in">
                     {{ $collections->first()->description }}
                 </p>
-                <a href="{{ route('collections.index') }}"
-                   class="bg-white hover:bg-gray-900 text-gray-950 hover:text-white font-bold py-3 px-8 transition-colors">
-                    SHOP NOW
-                </a>
+                <div class="flex flex-col sm:flex-row justify-center lg:mx-0 lg:justify-start gap-4 fade-in">
+                    <a href="{{ route('categories.index', 'women') }}" class="bg-white hover:bg-gray-700 text-gray-950 hover:text-white font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
+                        SHOP WOMEN
+                    </a>
+                    <a href="{{ route('categories.index', 'men') }}" class="bg-white hover:bg-gray-400 text-black font-bold py-3 px-6 transition-colors text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
+                        SHOP MEN
+                    </a>
+                </div>
             </div>
         </div>
         @endif
@@ -172,18 +176,23 @@
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
-    <section class="relative w-full h-[1200px] overflow-hidden animate-on-scroll mt-8 mb-8">
+    <section class="relative w-full h-[1100px] overflow-hidden animate-on-scroll mt-8 mb-8">
         <img src="{{ asset('imgs/group.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
              class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black/50">
-            <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">
-                <h1 class="text-3xl  lg:text-4xl font-bold my-4 uppercase playfair">WorkFit</h1>
-                <p class="text-xl mb-6 max-w-2xl">Be the first to shop our latest collection</p>
-                <a href="{{ route('collections.index') }}" class="bg-white hover:bg-gray-900  text-gray-950 hover:text-white playfair font-bold py-3 px-8 transition-colors">
-                    SHOP NOW
-                </a>
+            <div class="absolute  top-1/2 -translate-y-1/2 lg:bottom-8 lg:top-auto left-0 text-left  text-white pl-4 md:pl-12 pr-4">
+                <h1 class="text-center md:text-left text-4xl md:text-6xl font-bold mb-4 slide-in">WorkFit</h1>
+                <p class="text-center lg:text-left  text-xl md:text-2xl pr-8 md:pr-0 mb-8 max-w-xl fade-in">Be the first to shop our latest collection</p>
+                <div class="flex flex-col sm:flex-row justify-center lg:mx-0 lg:justify-start gap-4 fade-in">
+                    <a href="{{ route('categories.index', 'women') }}" class="bg-white hover:bg-gray-700 text-gray-950 hover:text-white font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
+                        SHOP WOMEN
+                    </a>
+                    <a href="{{ route('categories.index', 'men') }}" class="bg-white hover:bg-gray-400 text-black font-bold py-3 px-6 transition-colors text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
+                        SHOP MEN
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -203,12 +212,12 @@
     </div>
    </section>
 
-   <section class="relative h-[1200px] overflow-hidden animate-on-scroll bg-[url(/imgs/bg-footer.jpg)] bg-cover bg-top mt-20 mb-0">
+   <section class="relative h-[1100px] overflow-hidden animate-on-scroll bg-[url(/imgs/bg-footer.jpg)] bg-cover bg-top mt-20 mb-0">
 
     <div class="absolute inset-0 bg-black/50 w-full">
-        <div class="absolute bottom-8 left-0 text-left text-white pl-8 md:pl-12">
-            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 uppercase playfair">WorkFit</h1>
-            <p class="text-xl mb-6 max-w-2xl">Be the first to shop our latest collection</p>
+        <div class="absolute  top-1/2 -translate-y-1/2 lg:bottom-8 lg:top-auto left-0 text-left  text-white pl-4 md:pl-12 pr-4">
+            <h1 class="text-center md:text-left text-4xl md:text-6xl font-bold mb-4 slide-in">WorkFit</h1>
+            <p class="text-center lg:text-left  text-xl md:text-2xl pr-8 md:pr-0 mb-8 max-w-xl fade-in">Be the first to shop our latest collection</p>
 
         </div>
     </div>
