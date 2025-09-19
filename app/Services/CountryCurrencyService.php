@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Http;
+use Mgcodeur\CurrencyConverter\Facades\CurrencyConverter;
+use Carbon\Carbon;
 
 class CountryCurrencyService
 {
@@ -26,7 +28,7 @@ class CountryCurrencyService
         }
 
         // Cache detection per IP to avoid repeated slow lookups
-        return Cache::remember("detected_country_{$ip}", now()->addDay(), function () use ($ip) {
+        return Cache::remember("detected_country_{$ip}", Carbon::now()->addDays(1), function () use ($ip) {
             Log::info("CountryCurrencyService: Detecting country for IP: {$ip}");
 
             try {
@@ -79,7 +81,6 @@ class CountryCurrencyService
             Session::put('detected_currency', $detected['currency_code']);
             return $detected['currency_code'];
         }
-
         // Default to USD
         return 'USD';
     }
@@ -149,67 +150,46 @@ class CountryCurrencyService
         }
 
         try {
-            // Cache exchange rate for 1 hour
-            $rate = Cache::remember("usd_to_{$currencyCode}", now()->addHour(), function () use ($currencyCode) {
-                return $this->fetchExchangeRate($currencyCode);
+            // Cache conversion result for 1 hour
+            $cacheKey = "usd_to_{$currencyCode}_{$amount}";
+            $converted = Cache::remember($cacheKey, Carbon::now()->addHours(1), function () use ($amount, $currencyCode) {
+                try {
+                    // Use the new currency converter package
+                    $result = CurrencyConverter::convert($amount)
+                        ->from('USD')
+                        ->to($currencyCode)
+                        ->get();
+
+                    return round($result, 2);
+                } catch (Exception $e) {
+                    Log::error("CurrencyConverter package error: " . $e->getMessage());
+                    // Fallback to manual rate calculation
+                    return $this->convertWithFallbackRate($amount, $currencyCode);
+                }
             });
 
-            if ($rate && is_numeric($rate)) {
-                $converted = round($amount * $rate, 2);
-                Log::info("Currency conversion: {$amount} USD to {$currencyCode} = {$converted} (rate: {$rate})");
-                return $converted;
-            }
+            Log::info("Currency conversion: {$amount} USD to {$currencyCode} = {$converted}");
+            return $converted;
         } catch (Exception $e) {
             Log::error("Currency conversion error: " . $e->getMessage());
-        }
-
-        Log::warning("Currency conversion failed for {$currencyCode}, returning original amount: {$amount}");
-        return $amount;
-    }
-
-    protected function fetchExchangeRate($currencyCode)
-    {
-        try {
-            // Try multiple free exchange rate APIs for reliability
-            $rate = $this->fetchFromExchangeRateAPI($currencyCode);
-
-            if ($rate) {
-                return $rate;
-            }
-
-            // Fallback to hardcoded rates for common currencies
-            return $this->getFallbackRate($currencyCode);
-
-        } catch (Exception $e) {
-            Log::error("Failed to fetch exchange rate for {$currencyCode}: " . $e->getMessage());
-            return $this->getFallbackRate($currencyCode);
+            // Use fallback conversion
+            return $this->convertWithFallbackRate($amount, $currencyCode);
         }
     }
 
-    protected function fetchFromExchangeRateAPI($currencyCode)
+    protected function convertWithFallbackRate($amount, $currencyCode)
     {
-        try {
-            // Using a free exchange rate API
-            $response = Http::timeout(5)->get("https://api.exchangerate-api.com/v4/latest/USD");
-
-            if ($response->successful()) {
-                $data = $response->json();
-                if (isset($data['rates'][$currencyCode])) {
-                    return $data['rates'][$currencyCode];
-                }
-            }
-        } catch (Exception $e) {
-            Log::warning("Exchange rate API failed: " . $e->getMessage());
-        }
-
-        return null;
+        $rate = $this->getFallbackRate($currencyCode);
+        $converted = round($amount * $rate, 2);
+        Log::warning("Using fallback rate for {$currencyCode}: {$amount} USD = {$converted} {$currencyCode} (rate: {$rate})");
+        return $converted;
     }
 
     protected function getFallbackRate($currencyCode)
     {
         // Fallback rates (updated periodically) - these are approximate
         $fallbackRates = [
-            'EGP' => 48.60,    // Egyptian Pound
+            'EGP' => 48.20,    // Egyptian Pound
             'GBP' => 0.79,    // British Pound
             'EUR' => 0.92,    // Euro
             'AED' => 3.67,    // UAE Dirham

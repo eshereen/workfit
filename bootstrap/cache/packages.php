@@ -1,15 +1,4 @@
 <?php return array (
-  'amrshawky/laravel-currency' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'AmrShawky\\Currency\\CurrencyServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Currency' => 'AmrShawky\\Currency\\Facade\\Currency',
-    ),
-  ),
   'anourvalar/eloquent-serialize' => 
   array (
     'aliases' => 
@@ -152,6 +141,13 @@
       0 => 'Filament\\Widgets\\WidgetsServiceProvider',
     ),
   ),
+  'genericmilk/docudoodle' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Docudoodle\\DocudoodleServiceProvider',
+    ),
+  ),
   'kirschbaum-development/eloquent-power-joins' => 
   array (
     'providers' => 
@@ -209,6 +205,17 @@
       0 => 'Livewire\\Volt\\VoltServiceProvider',
     ),
   ),
+  'mgcodeur/laravel-currency-converter' => 
+  array (
+    'aliases' => 
+    array (
+      'CurrencyConverter' => 'Mgcodeur\\CurrencyConverter\\Facades\\CurrencyConverter',
+    ),
+    'providers' => 
+    array (
+      0 => 'Mgcodeur\\CurrencyConverter\\CurrencyConverterServiceProvider',
+    ),
+  ),
   'nesbot/carbon' => 
   array (
     'providers' => 
@@ -235,6 +242,13 @@
     'providers' => 
     array (
       0 => 'Pest\\Laravel\\PestServiceProvider',
+    ),
+  ),
+  'phiki/phiki' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Phiki\\Adapters\\Laravel\\PhikiServiceProvider',
     ),
   ),
   'ryangjchandler/blade-capture-directive' => 
