@@ -28,7 +28,7 @@
  }"
  class="z-[1100] transition-all duration-300 py-3 mb-10 font-semibold max-h-30"
 >
-<div class="container mx-auto px-8">
+<div class="container mx-auto px-6">
   <div class="flex items-center justify-between relative">
 
       <!-- Mobile Menu Button (Left) -->
