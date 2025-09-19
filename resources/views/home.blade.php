@@ -38,7 +38,7 @@
     <!-- Men Products -->
     <section class="py-8 px-4">
         <h1 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">Men's Collection</h1>
-        <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
+        <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
 
         @if($men && $men->directProducts && $men->directProducts->isNotEmpty())
        @livewire('product-index',['products'=>$men->directProducts->take(4), 'useBestSellerLogic' => true, 'category' => $men->id])

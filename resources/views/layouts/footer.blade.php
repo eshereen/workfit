@@ -27,10 +27,10 @@
 
             <!-- Shop -->
             <div class="animate-on-scroll">
-                <h4 class="font-bold mb-4">SHOP</h4>
+                <h4 class="font-bold mb-4 uppercase">STORE</h4>
                 <ul class="space-y-2">
                     @foreach ($categories as $category)
-                    <li><a href="{{ route('categories.index', $category->slug) }}" class="text-gray-200hover:text-red-600 transition-colors capitalize">{{ $category->name }}</a></li>
+                    <li><a href="{{ route('categories.index', $category->slug) }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">{{ $category->name }}</a></li>
                     @endforeach
 
                 </ul>
@@ -52,7 +52,7 @@
             <!-- Newsletter -->
             <div class="animate-on-scroll">
                 <h4 class="font-bold mb-4">JOIN OUR NEWSLETTER</h4>
-              
+
                 <livewire:newsletter.subscribe-form />
             </div>
         </div>
