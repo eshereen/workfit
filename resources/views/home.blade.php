@@ -52,10 +52,8 @@
     @endif
 
    </section>
-
-
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-[1100px] bg-cover overflow-hidden animate-on-scroll my-4">
+    <section class="relative h-[1100px] bg-cover overflow-hidden animate-on-scroll my-8">
         <img src="{{ asset('imgs/women.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
@@ -176,7 +174,7 @@
     </section>
 
     <!-- Full-width Lifestyle Banner 2 -->
-    <section class="relative w-full h-[1100px] overflow-hidden animate-on-scroll mt-8 mb-8">
+    <section class="relative w-full h-[1100px] overflow-hidden animate-on-scroll my-8">
         <img src="{{ asset('imgs/group.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
