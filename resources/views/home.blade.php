@@ -37,7 +37,7 @@
 
     <!-- Men Products -->
     <section class="py-8 px-4">
-        <h1 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">Men's Collection</h1>
+        <h1 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">Men's Collection</h1>
         <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
 
         @if($men && $men->directProducts && $men->directProducts->isNotEmpty())
@@ -55,7 +55,7 @@
 
 
     <!-- Full-width Lifestyle Banner -->
-    <section class="relative h-[1200px] bg-cover overflow-hidden animate-on-scroll mt-8 mb-8">
+    <section class="relative h-[1200px] bg-cover overflow-hidden animate-on-scroll my-4">
         <img src="{{ asset('imgs/women.jpg')}}"
              loading="lazy"
              alt="Lifestyle Banner"
@@ -66,7 +66,7 @@
         <!-- Overlay with only background dark -->
         <div class="absolute inset-0 bg-black/50 z-0">
             <div class="absolute bottom-8 left-0 z-40 text-left text-white pl-8 md:pl-12">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4 uppercase">{{ $collections->first()->name }} 'S COLLECTIONS</h2>
+                <h2 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">{{ $collections->first()->name }} 'S COLLECTIONS</h2>
                 <p class="text-xl mb-6 max-w-2xl">
                     {{ $collections->first()->description }}
                 </p>
@@ -79,10 +79,10 @@
         @endif
     </section>
     <!-- Product Grid - First Category Collection -->
-    <section class="py-16 mt-20 px-4">
+    <section class="py-8  px-4">
         @if($women && $women->directProducts && $women->directProducts->isNotEmpty())
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $women->name }}'S COLLECTION</h2>
+            <h2 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">{{ $women->name }}'S COLLECTION</h2>
 
             <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $women->description }}</p>
 
@@ -97,7 +97,7 @@
     </section>
 
     <!-- Three Image Block Section -->
-    <section class="py-16 mb-20 px-4 bg-gray-100">
+    <section class="py-8 px-4 bg-gray-100">
         <div class="container mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 h-auto">
                 <!-- RUN Block -->
@@ -150,13 +150,13 @@
 
     <!-- Product Grid - Men's Collection -->
 
-     <section class="py-8 mb-12 px-4">
+     <section class="py-8  px-4">
         @if($categories->isNotEmpty())
         <div class="container mx-auto">
             @if($categories->count() > 1)
-            <h2 class="text-3xl font-bold text-center mb-4 animate-on-scroll uppercase">{{ $categories->get(0)->name }}'S COLLECTION</h2>
+            <h2 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">{{ $categories->get(0)->name }}'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $categories->get(0)->description }}</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll px-8">{{ $categories->get(0)->description }}</p>
 
 
            @livewire('product-index',['products'=>$categories->get(0)->directProducts->take(4)])
@@ -190,13 +190,13 @@
 
 
     <!-- Just Arrived Products -->
-    <section class="px-4 py-16 my-8">
-        <h1 class="text-center font-bold text-5xl mb-2">Just Arrived</h1>
-        <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
+    <section class="py-8 px-4">
+        <h1 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">Just Arrived</h1>
+        <p class="text-center text-gray-600 mb-4 max-w-2xl mx-auto animate-on-scroll px-8">Discover our latest collection of products</p>
         @if($recent && $recent->isNotEmpty())
        @livewire('product-index',['products'=>$recent])
        @endif
-       <div class="text-center mt-12 animate-on-scroll">
+       <div class="text-center mt-4 animate-on-scroll">
         <a href="{{ route('categories.index', $categories->get(0)->slug) }}" class="border-2 border-gray-900 hover:bg-gray-800 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
           shop now
         </a>
