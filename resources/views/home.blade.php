@@ -66,7 +66,7 @@
         <!-- Overlay with only background dark -->
         <div class="absolute inset-0 bg-black/50 z-0">
             <div class="absolute bottom-8 left-0 z-40 text-left text-white pl-8 md:pl-12">
-                <h2 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">{{ $collections->first()->name }} 'S COLLECTIONS</h2>
+                <h2 class="font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">{{ $collections->first()->name }} 'S COLLECTIONS</h2>
                 <p class="text-xl mb-6 max-w-2xl">
                     {{ $collections->first()->description }}
                 </p>
