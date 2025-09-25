@@ -2,7 +2,7 @@
    @if(request()->routeIs('home'))
    @if($sale)
  <div class="relative z-[1100] bg-red-600 text-white py-3 px-4 h-auto w-full text-center transition-all duration-300">
- <p> <span >{{ $sale->description }}</span> <a href="{{ route('collection.show', $sale->slug) }}" class="px-2 text-gray-800 font-bold underline hover:text-white">Shop Now</a></p>
+ <p> <span >{{ $sale->description }}</span> <a href="{{ route('collection.show', $sale->slug) }}" class="px-2 font-bold text-gray-800 underline hover:text-white">Shop Now</a></p>
     </div>
     @endif
     @endif
@@ -28,27 +28,31 @@
  }"
  class="z-[1100] transition-all duration-300 py-3 mb-10 font-semibold max-h-30"
 >
-<div class="container mx-auto px-8">
-  <div class="flex items-center justify-between relative">
+<div class="container px-8 mx-auto">
+  <div class="flex relative justify-between items-center">
 
-      <!-- Mobile Menu Button (Left) -->
-      <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden hover:cursor-pointer flex-shrink-0" type="button" aria-controls="mobileMenu">
-          <i class="fas fa-bars text-xl" :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"></i>
-      </button>
+      <!-- Mobile Left Side: Cart and Currency -->
+      <div class="flex flex-shrink-0 items-center space-x-2 md:hidden">
+          <!-- Currency Selector -->
+          @livewire('currency-selector')
+
+          <!-- Cart and Wishlist Counts -->
+          @livewire('cart-wishlist-counts')
+      </div>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex space-x-4 flex-1 relative">
-          <a href="{{route('categories.index', 'women')}}" class="font-xs hover:text-red-600 text-sm transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900' ">WOMEN</a>
-          <a href="{{route('categories.index', 'men')}}" class="font-xs hover:text-red-600 text-sm transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">MEN</a>
+      <nav class="hidden relative flex-1 space-x-4 md:flex">
+          <a href="{{route('categories.index', 'women')}}" class="text-sm transition-colors font-xs hover:text-red-600" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900' ">WOMEN</a>
+          <a href="{{route('categories.index', 'men')}}" class="text-sm transition-colors font-xs hover:text-red-600" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">MEN</a>
 
           <!-- Categories Dropdown -->
           <div class="relative"
                @mouseenter="categoriesDropdownOpen = true"
                @mouseleave="categoriesDropdownOpen = false">
-              <button class="font-xs hover:text-red-600 transition-colors flex items-center font-light text-sm"
+              <button class="flex items-center text-sm font-light transition-colors font-xs hover:text-red-600"
                       :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">
                   CATEGORIES
-                  <svg class="ml-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="ml-1 w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                   </svg>
               </button>
@@ -66,12 +70,12 @@
                    @click.away="categoriesDropdownOpen = false">
 
                   <!-- Header -->
-                  <div class="border-b border-gray-100 py-4">
-                      <div class="container mx-auto px-4">
-                          <div class="flex items-center justify-between">
+                  <div class="py-4 border-b border-gray-100">
+                      <div class="container px-4 mx-auto">
+                          <div class="flex justify-between items-center">
                               <h2 class="text-2xl font-bold text-gray-900">Browse Categories</h2>
                               <button @click="categoriesDropdownOpen = false"
-                                      class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                      class="p-2 rounded-full transition-colors hover:bg-gray-100">
                                   <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                   </svg>
@@ -81,18 +85,18 @@
                   </div>
 
                   <!-- Categories Content -->
-                  <div class="container mx-auto px-4 py-6">
-                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  <div class="container px-4 py-6 mx-auto">
+                      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                           @foreach($categories as $category)
                           <div class="space-y-3">
                               <!-- Category Header -->
-                              <div class="border-b border-gray-200 pb-2">
+                              <div class="pb-2 border-b border-gray-200">
                                   <a href="{{ route('categories.index', $category->slug) }}"
-                                     class="block font-bold text-lg text-gray-900 hover:text-red-600 transition-colors uppercase"
+                                     class="block text-lg font-bold text-gray-900 uppercase transition-colors hover:text-red-600"
                                      @click="categoriesDropdownOpen = false">
                                       {{ $category->name }}
                                   </a>
-                                  <div class="text-xs text-gray-500 mt-1">
+                                  <div class="mt-1 text-xs text-gray-500">
                                       {{ $category->products_count ?? 0 }} products
                                   </div>
                               </div>
@@ -102,7 +106,7 @@
                               <div class="space-y-1">
                                   @foreach($category->subcategories as $subcategory)
                                   <a href="{{ route('categories.subcategory', [$category->slug, $subcategory->slug]) }}"
-                                     class="block text-sm text-gray-700 hover:text-red-600 hover:bg-gray-50 py-1 px-2 rounded transition-colors capitalize"
+                                     class="block px-2 py-1 text-sm text-gray-700 capitalize rounded transition-colors hover:text-red-600 hover:bg-gray-50"
                                      @click="categoriesDropdownOpen = false">
                                       {{ $subcategory->name }}
                                   </a>
@@ -114,12 +118,12 @@
                       </div>
 
                       <!-- Footer -->
-                      <div class="mt-12 pt-8 border-t border-gray-200 text-center">
+                      <div class="pt-8 mt-12 text-center border-t border-gray-200">
                           <a href="{{ route('categories.all') }}"
-                             class="inline-flex items-center bg-gray-950 hover:bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+                             class="inline-flex items-center px-6 py-3 font-semibold text-white rounded-lg transition-colors bg-gray-950 hover:bg-gray-700"
                              @click="categoriesDropdownOpen = false">
                               View All Categories
-                              <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                               </svg>
                           </a>
@@ -132,10 +136,10 @@
           <div class="relative"
                @mouseenter="collectionsDropdownOpen = true"
                @mouseleave="collectionsDropdownOpen = false">
-              <button class="font-xs hover:text-red-600 transition-colors flex items-center text-sm"
+              <button class="flex items-center text-sm transition-colors font-xs hover:text-red-600"
                       :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">
                   COLLECTIONS
-                  <svg class="ml-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="ml-1 w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                   </svg>
               </button>
@@ -153,12 +157,12 @@
                    @click.away="collectionsDropdownOpen = false">
 
                   <!-- Header -->
-                  <div class="border-b border-gray-100 py-4">
-                      <div class="container mx-auto px-4">
-                          <div class="flex items-center justify-between">
+                  <div class="py-4 border-b border-gray-100">
+                      <div class="container px-4 mx-auto">
+                          <div class="flex justify-between items-center">
                               <h2 class="text-2xl font-bold text-gray-900">Browse Collections</h2>
                               <button @click="collectionsDropdownOpen = false"
-                                      class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                      class="p-2 rounded-full transition-colors hover:bg-gray-100">
                                   <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                   </svg>
@@ -168,19 +172,19 @@
                   </div>
 
                   <!-- Collections Content -->
-                  <div class="container mx-auto px-4 py-6">
-                      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  <div class="container px-4 py-6 mx-auto">
+                      <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                           @foreach($collections as $collection)
                           <a href="{{ route('collection.show', $collection->slug) }}"
-                             class="block p-4 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-gray-50 transition-colors group"
+                             class="block p-4 rounded-lg border border-gray-200 transition-colors hover:border-red-300 hover:bg-gray-50 group"
                              @click="collectionsDropdownOpen = false">
-                              <div class="font-bold text-base text-gray-900 group-hover:text-red-600 transition-colors uppercase mb-1">
+                              <div class="mb-1 text-base font-bold text-gray-900 uppercase transition-colors group-hover:text-red-600">
                                   {{ $collection->name }}
                               </div>
                               <div class="text-xs text-gray-500">
                                   {{ $collection->products_count }} products
                               </div>
-                              <div class="mt-2 text-xs text-red-600 group-hover:text-red-700 font-medium">
+                              <div class="mt-2 text-xs font-medium text-red-600 group-hover:text-red-700">
                                   Shop Now →
                               </div>
                           </a>
@@ -188,12 +192,12 @@
                       </div>
 
                       <!-- Footer -->
-                      <div class="mt-12 pt-8 border-t border-gray-200 text-center">
+                      <div class="pt-8 mt-12 text-center border-t border-gray-200">
                           <a href="{{ route('collections.index') }}"
-                             class="inline-flex items-center bg-gray-950 hover:bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+                             class="inline-flex items-center px-6 py-3 font-semibold text-white rounded-lg transition-colors bg-gray-950 hover:bg-gray-700"
                              @click="collectionsDropdownOpen = false">
                               View All Collections
-                              <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                               </svg>
                           </a>
@@ -204,28 +208,37 @@
       </nav>
 
           <!-- Logo (Perfectly Centered) -->
-      <a href="{{ route('home') }}" class="absolute left-1/2 transform -translate-x-1/2 flex items-center">
+      <a href="{{ route('home') }}" class="flex absolute left-1/2 items-center transform -translate-x-1/2">
           <!-- White logo (home page, not scrolled) -->
           <img x-show="isHome && !scrolled" src="/imgs/workfit_logo_white.png" alt="logo" class="w-16">
           <!-- Black logo (home page scrolled or non-home page) -->
           <img x-show="!isHome || (isHome && scrolled)" src="/imgs/workfit_logo_black.png" alt="logo" class="w-16">
       </a>
 
-      <!-- Icons (Right) -->
-      <div class="flex items-center space-x-4 justify-end relative z-[1001] flex-shrink-0">
-          <a href="{{ route('location') }}" class="hidden lg:block font-xs uppercase hover:text-red-600 text-sm  transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">Location</a>
+      <!-- Desktop Right Side Icons -->
+      <div class="hidden md:flex items-center space-x-4 justify-end relative z-[1001] flex-shrink-0">
+          <a href="{{ route('location') }}" class="hidden text-sm uppercase transition-colors lg:block font-xs hover:text-red-600" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">Location</a>
 
           <!-- Currency Selector -->
           @livewire('currency-selector')
-          <!-- (your currency selector code here) -->
 
-
-          <a href="{{ route('login') }}" class="hidden lg:block font-xs hover:text-red-600 uppercase transition-colors" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'"><i class="fas fa-user"></i></a>
+          <a href="{{ route('login') }}" class="hidden uppercase transition-colors lg:block font-xs hover:text-red-600" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'"><i class="fas fa-user"></i></a>
 
            <!-- Cart and Wishlist Counts -->
            @livewire('cart-wishlist-counts')
+      </div>
 
+      <!-- Mobile Right Side: Search and Menu -->
+      <div class="flex flex-shrink-0 items-center space-x-3 md:hidden">
+          <!-- Search Icon -->
+          <a href="{{ route('products.search') }}" class="hover:cursor-pointer">
+              <i class="text-xl fas fa-search" :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"></i>
+          </a>
 
+          <!-- Mobile Menu Button -->
+          <button @click="mobileMenuOpen = !mobileMenuOpen" class="hover:cursor-pointer" type="button" aria-controls="mobileMenu">
+              <i class="text-xl fas fa-bars" :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"></i>
+          </button>
       </div>
   </div>
 
@@ -254,9 +267,9 @@
        style="display: none;">
 
     <!-- Mobile Menu Header -->
-    <div class="flex items-center justify-between p-4 border-b border-gray-200">
+    <div class="flex justify-between items-center p-4 border-b border-gray-200">
         <h2 class="text-lg font-semibold text-gray-900">Menu</h2>
-        <button @click="mobileMenuOpen = false" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+        <button @click="mobileMenuOpen = false" class="p-2 rounded-full transition-colors hover:bg-gray-100">
             <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -264,13 +277,13 @@
     </div>
 
     <nav class="px-4 py-4 space-y-2">
-      <a href="{{route('categories.index', 'women')}}" class="block text-gray-900 hover:text-red-600 transition-colors font-semibold py-2" @click="mobileMenuOpen = false">WOMEN</a>
-      <a href="{{route('categories.index', 'men')}}" class="block text-gray-900 hover:text-red-600 transition-colors font-semibold py-2" @click="mobileMenuOpen = false">MEN</a>
+      <a href="{{route('categories.index', 'women')}}" class="block py-2 font-semibold text-gray-900 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">WOMEN</a>
+      <a href="{{route('categories.index', 'men')}}" class="block py-2 font-semibold text-gray-900 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">MEN</a>
 
       <!-- Categories Section -->
-      <div class="border-t border-gray-200 pt-2">
+      <div class="pt-2 border-t border-gray-200">
         <button @click="mobileCategoriesOpen = !mobileCategoriesOpen"
-                class="flex items-center justify-between w-full text-left text-gray-900 hover:text-red-600 transition-colors font-semibold py-2">
+                class="flex justify-between items-center py-2 w-full font-semibold text-left text-gray-900 transition-colors hover:text-red-600">
           <span>CATEGORIES</span>
           <svg class="w-4 h-4 transition-transform duration-200"
                :class="mobileCategoriesOpen ? 'rotate-45' : ''"
@@ -288,15 +301,15 @@
              x-transition:leave-end="opacity-0 max-h-0"
              class="overflow-hidden"
              style="display: none;">
-          <div class="pl-4 pt-2 space-y-1">
-            <a href="{{ route('categories.all') }}" class="block text-sm text-gray-700 hover:text-red-600 transition-colors py-1" @click="mobileMenuOpen = false">All Categories</a>
+          <div class="pt-2 pl-4 space-y-1">
+            <a href="{{ route('categories.all') }}" class="block py-1 text-sm text-gray-700 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">All Categories</a>
             @foreach($categories as $category)
             <div class="space-y-1">
-              <a href="{{ route('categories.index', $category->slug) }}" class="block text-sm font-medium text-gray-800 hover:text-red-600 transition-colors py-1" @click="mobileMenuOpen = false">{{ $category->name }}</a>
+              <a href="{{ route('categories.index', $category->slug) }}" class="block py-1 text-sm font-medium text-gray-800 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">{{ $category->name }}</a>
               @if($category->subcategories && $category->subcategories->count() > 0)
               <div class="pl-3 space-y-1">
                 @foreach($category->subcategories as $subcategory)
-                <a href="{{ route('categories.subcategory', [$category->slug, $subcategory->slug]) }}" class="block text-xs text-gray-600 hover:text-red-600 transition-colors py-1" @click="mobileMenuOpen = false">{{ $subcategory->name }}</a>
+                <a href="{{ route('categories.subcategory', [$category->slug, $subcategory->slug]) }}" class="block py-1 text-xs text-gray-600 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">{{ $subcategory->name }}</a>
                 @endforeach
               </div>
               @endif
@@ -307,9 +320,9 @@
       </div>
 
       <!-- Collections Section -->
-      <div class="border-t border-gray-200 pt-2">
+      <div class="pt-2 border-t border-gray-200">
         <button @click="mobileCollectionsOpen = !mobileCollectionsOpen"
-                class="flex items-center justify-between w-full text-left text-gray-900 hover:text-red-600 transition-colors font-semibold py-2">
+                class="flex justify-between items-center py-2 w-full font-semibold text-left text-gray-900 transition-colors hover:text-red-600">
           <span>COLLECTIONS</span>
           <svg class="w-4 h-4 transition-transform duration-200"
                :class="mobileCollectionsOpen ? 'rotate-45' : ''"
@@ -327,18 +340,18 @@
              x-transition:leave-end="opacity-0 max-h-0"
              class="overflow-hidden"
              style="display: none;">
-          <div class="pl-4 pt-2 space-y-1">
-            <a href="{{ route('collections.index') }}" class="block text-sm text-gray-700 hover:text-red-600 transition-colors py-1" @click="mobileMenuOpen = false">All Collections</a>
+          <div class="pt-2 pl-4 space-y-1">
+            <a href="{{ route('collections.index') }}" class="block py-1 text-sm text-gray-700 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">All Collections</a>
             @foreach($collections as $collection)
-            <a href="{{ route('collection.show', $collection->slug) }}" class="block text-sm text-gray-700 hover:text-red-600 transition-colors py-1" @click="mobileMenuOpen = false">{{ $collection->name }}</a>
+            <a href="{{ route('collection.show', $collection->slug) }}" class="block py-1 text-sm text-gray-700 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">{{ $collection->name }}</a>
             @endforeach
           </div>
         </div>
       </div>
 
-      <div class="border-t border-gray-200 pt-2 space-y-2">
-        <a href="{{ route('location') }}" class="block text-gray-900 hover:text-red-600 transition-colors font-semibold py-2" @click="mobileMenuOpen = false">LOCATION</a>
-        <a href="{{ route('login') }}" class="block text-gray-900 hover:text-red-600 transition-colors font-semibold py-2" @click="mobileMenuOpen = false">ACCOUNT</a>
+      <div class="pt-2 space-y-2 border-t border-gray-200">
+        <a href="{{ route('location') }}" class="block py-2 font-semibold text-gray-900 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">LOCATION</a>
+        <a href="{{ route('login') }}" class="block py-2 font-semibold text-gray-900 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">ACCOUNT</a>
 
       </div>
     </nav>
