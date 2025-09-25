@@ -33,11 +33,11 @@
 
       <!-- Mobile Left Side: Cart and Currency -->
       <div class="flex flex-shrink-0 items-center space-x-2 md:hidden">
+          <!-- Cart Count Only (wishlist/search hidden on mobile inside component) -->
+          @livewire('cart-wishlist-counts')
+
           <!-- Currency Selector -->
           @livewire('currency-selector')
-
-          <!-- Cart and Wishlist Counts -->
-          @livewire('cart-wishlist-counts')
       </div>
 
       <!-- Desktop Navigation -->
@@ -228,17 +228,17 @@
            @livewire('cart-wishlist-counts')
       </div>
 
-      <!-- Mobile Right Side: Search and Menu -->
+      <!-- Mobile Right Side: Menu and Search -->
       <div class="flex flex-shrink-0 items-center space-x-3 md:hidden">
+          <!-- Mobile Menu Button (bars) -->
+          <button @click="mobileMenuOpen = !mobileMenuOpen" class="hover:cursor-pointer" type="button" aria-controls="mobileMenu">
+              <i class="text-xl fas fa-bars" :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"></i>
+          </button>
+
           <!-- Search Icon -->
           <a href="{{ route('products.search') }}" class="hover:cursor-pointer">
               <i class="text-xl fas fa-search" :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"></i>
           </a>
-
-          <!-- Mobile Menu Button -->
-          <button @click="mobileMenuOpen = !mobileMenuOpen" class="hover:cursor-pointer" type="button" aria-controls="mobileMenu">
-              <i class="text-xl fas fa-bars" :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"></i>
-          </button>
       </div>
   </div>
 
