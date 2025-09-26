@@ -7,7 +7,7 @@
 
 <div class="py-40 min-h-screen bg-gray-50">
     <div class="container px-4 mx-auto">
-        <div class="mx-auto mx-w-5xl lg:max-w-7xl">
+        <div class="mx-auto mx-w-5xl lg:max-w-6xl">
             <!-- Header -->
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
