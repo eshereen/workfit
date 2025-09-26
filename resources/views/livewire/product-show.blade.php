@@ -1,20 +1,20 @@
-<div class="container mx-auto px-4 py-8 my-20">
+<div class="container px-4 py-8 mx-auto my-20">
     <!-- Flash Messages -->
     @if (session()->has('success'))
-        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+        <div class="p-4 mb-4 text-green-700 bg-green-100 rounded-lg border border-green-400">
             {{ session('success') }}
         </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+        <div class="p-4 mb-4 text-red-700 bg-red-100 rounded-lg border border-red-400">
             {{ session('error') }}
         </div>
     @endif
 
 
 
-    <div class="flex flex-col lg:flex-row gap-8">
+    <div class="flex flex-col gap-8 lg:flex-row">
         <!-- Product Images -->
         <div class="lg:w-1/2"
         x-data="{
@@ -54,7 +54,7 @@
 
       <!-- Magnifier toggle -->
       <button type="button"
-              class="absolute top-3 right-3 z-30 bg-white/90 border border-gray-200 text-gray-700 text-xs px-2 py-1 rounded hover:bg-gray-100"
+              class="absolute top-3 right-3 z-30 px-2 py-1 text-xs text-gray-700 rounded border border-gray-200 bg-white/90 hover:bg-gray-100"
               @click.stop="magnifierEnabled = !magnifierEnabled"
               :aria-pressed="magnifierEnabled.toString()">
           <i class="fas" :class="magnifierEnabled ? 'fa-search-minus' : 'fa-search-plus'"></i>
@@ -62,10 +62,10 @@
       </button>
 
       <!-- Base product image (always visible) -->
-      <picture class="w-full h-full select-none block" :class="magnifierEnabled ? 'cursor-crosshair' : 'cursor-default'">
+      <picture class="block w-full h-full select-none" :class="magnifierEnabled ? 'cursor-crosshair' : 'cursor-default'">
         <img :src="currentImage"
              alt="{{ $product->name }}"
-             class="max-w-full max-h-full block object-contain object-center"
+             class="block object-contain object-center max-w-full max-h-full"
              style="object-position: center;"
              width="800"
              height="800"
@@ -76,7 +76,7 @@
 
       <!-- Magnifier lens -->
       <div x-show="magnifierEnabled"
-           class="absolute pointer-events-none rounded-full ring-2 ring-gray-200 shadow-sm"
+           class="absolute rounded-full ring-2 ring-gray-200 shadow-sm pointer-events-none"
            x-transition.opacity
            :style="(() => { const lens=180; const scale=2.5; const top=zoomY - lens/2; const left=zoomX - lens/2; const bgX = (zoomX*scale) - lens/2; const bgY = (zoomY*scale) - lens/2; return `width:${lens}px;height:${lens}px;top:${top}px;left:${left}px;background-image:url(${currentZoomImage});background-repeat:no-repeat;background-size:${zoomW*scale}px ${zoomH*scale}px;background-position:-${bgX}px -${bgY}px;`; })()">
       </div>
@@ -86,16 +86,16 @@
        <!-- Thumbnails -->
        <div class="grid grid-cols-4 gap-2">
            <template x-for="(image, index) in images" :key="index">
-               <div class="border rounded overflow-hidden cursor-pointer hover:border-red-500 transition-colors"
-                    :class="currentImage === image.large ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-200'"
+               <div class="overflow-hidden rounded border transition-colors cursor-pointer hover:border-gray-500"
+                    :class="currentImage === image.large ? 'border-gray-500 ring-2 ring-gray-200' : 'border-gray-200'"
                     @click="magnifierEnabled = false; currentImage = image.large; currentZoomImage = image.zoom">
 
-                   <picture class="w-full h-24 object-cover hover:opacity-80 transition-opacity">
+                   <picture class="object-cover w-full h-24 transition-opacity hover:opacity-80">
                        <source :srcset="image.avif" type="image/avif">
                        <source :srcset="image.medium" type="image/webp">
                        <img :src="image.thumb"
                             alt="{{ $product->name }}"
-                            class="w-full h-24 object-cover object-center"
+                            class="object-cover object-center w-full h-24"
                             style="object-position: center;"
                             width="150"
                             height="150"
@@ -111,8 +111,8 @@
         <!-- Product Info -->
         <div class="lg:w-1/2">
             @if($currencyCode !== 'USD')
-            <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <div class="text-sm text-green-800 text-center">
+            <div class="p-3 mb-4 bg-green-50 rounded-lg border border-green-200">
+                <div class="text-sm text-center text-green-800">
                     @if($isAutoDetected)
                         Prices automatically converted to {{ $currencyCode }} ({{ $currencySymbol }}) based on your location
                     @else
@@ -122,7 +122,7 @@
             </div>
             @endif
 
-            <div class="flex items-start justify-between mb-4">
+            <div class="flex justify-between items-start mb-4">
                 <h1 class="text-3xl font-bold">{{ $product->name }}</h1>
                 @auth
                 <button wire:click="toggleWishlist"
@@ -133,8 +133,8 @@
                     <svg class="w-8 h-8" fill="{{ $isInWishlist ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                     </svg>
-                    <span wire:loading wire:target="toggleWishlist" class="absolute inset-0 flex items-center justify-center">
-                        <svg class="animate-spin h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <span wire:loading wire:target="toggleWishlist" class="flex absolute inset-0 justify-center items-center">
+                        <svg class="w-5 h-5 text-red-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -145,13 +145,13 @@
 
             <div class="flex items-center mb-4">
                 @if($product->compare_price > 0)
-                <span class="text-2xl font-bold text-red-600 mr-3">
+                <span class="mr-3 text-2xl font-bold text-red-600">
                     {{ $currencySymbol }}{{ number_format($product->converted_price ?? $product->price, 2) }}
                 </span>
                 <span class="text-lg text-gray-500 line-through">
                     {{ $currencySymbol }}{{ number_format($product->converted_compare_price ?? $product->compare_price, 2) }}
                 </span>
-                <span class="ml-3 bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                <span class="px-2 py-1 ml-3 text-sm text-red-800 bg-red-100 rounded">
                     Save {{ $product->discount_percentage }}%
                 </span>
                 @else
@@ -163,13 +163,13 @@
 
             <div class="mb-6">
            {{--  <div class="flex items-center mb-2">
-                    <span class="text-gray-700 mr-2">Availability:</span>
+                    <span class="mr-2 text-gray-700">Availability:</span>
                     @if($selectedVariant && $selectedVariant->stock > 0)
-                    <span class="text-green-600 font-medium">In Stock ({{ $selectedVariant->stock }} available) - {{ $selectedVariant->color }}, {{ $selectedVariant->size }}</span>
+                    <span class="font-medium text-green-600">In Stock ({{ $selectedVariant->stock }} available) - {{ $selectedVariant->color }}, {{ $selectedVariant->size }}</span>
                     @elseif($product->variants->isEmpty() && $product->quantity > 0)
-                    <span class="text-green-600 font-medium">In Stock</span>
+                    <span class="font-medium text-green-600">In Stock</span>
                     @else
-                    <span class="text-red-600 font-medium">Out of Stock</span>
+                    <span class="font-medium text-red-600">Out of Stock</span>
                     @endif
                 </div> --}}
 
@@ -184,7 +184,7 @@
                     @endphp
                     @if($colors->count() > 1)
                     <div class="mb-4">
-                        <h4 class="text-sm font-medium text-gray-700 mb-2">Color</h4>
+                        <h4 class="mb-2 text-sm font-medium text-gray-700">Color</h4>
                         <div class="flex flex-wrap gap-2">
                             @foreach($colors as $color)
                             @php
@@ -205,7 +205,7 @@
                     <!-- Size Selection -->
                     @if($selectedVariant)
                     <div class="mb-4">
-                        <h4 class="text-sm font-medium text-gray-700 mb-2">Size</h4>
+                        <h4 class="mb-2 text-sm font-medium text-gray-700">Size</h4>
                         <div class="flex flex-wrap gap-2">
                             @foreach($product->variants->where('color', $selectedVariant->color) as $variant)
                             <button type="button"
@@ -224,8 +224,8 @@
                 <!-- Quantity Selector -->
                 @if(($selectedVariant && $selectedVariant->stock > 0) || ($product->variants->isEmpty() && $product->quantity > 0))
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Quantity:</label>
-                        <div class="flex items-center border rounded-md overflow-hidden">
+                        <label class="block mb-2 text-sm font-medium text-gray-700">Quantity:</label>
+                        <div class="flex overflow-hidden items-center rounded-md border">
                             <button type="button"
                                     wire:click="decrementQty"
                                     wire:loading.attr="disabled"
@@ -259,23 +259,23 @@
                 @endif
                      <!--Description-->
                      <div class="py-6">
-                        <h3 class="font-semibold text-lg mb-3">Description</h3>
-                        <div class="prose max-w-none">
+                        <h3 class="mb-3 text-lg font-semibold">Description</h3>
+                        <div class="max-w-none prose">
                             {!! $product->description !!}
                         </div>
                     </div>
 
                 <!-- Selected Variant Info -->
                 @if($selectedVariant)
-                <div class="mb-4 p-3 bg-gray-50 rounded-lg">
-                    <div class="flex items-center justify-between">
+                <div class="p-3 mb-4 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between items-center">
                         <div>
                             <span class="text-sm text-gray-600">Selected:</span>
                             <span class="ml-2 font-medium">{{ $selectedVariant->color }} - {{ $selectedVariant->size }}</span>
                         </div>
-                        <span class="font-bold text-lg">{{ $currencySymbol }}{{ number_format($selectedVariant->converted_price ?? $selectedVariant->price ?? $product->converted_price ?? $product->price, 2) }}</span>
+                        <span class="text-lg font-bold">{{ $currencySymbol }}{{ number_format($selectedVariant->converted_price ?? $selectedVariant->price ?? $product->converted_price ?? $product->price, 2) }}</span>
                     </div>
-                    <div class="text-sm text-gray-600 mt-1">
+                    <div class="mt-1 text-sm text-gray-600">
                         Stock: {{ $selectedVariant->stock }} available
                     </div>
                 </div>
@@ -288,10 +288,10 @@
                             wire:loading.attr="disabled"
                             wire:loading.class="opacity-75 cursor-not-allowed"
                             wire:target="addToCart"
-                            class="w-full bg-gray-950 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-100 hover:text-gray-950 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="px-6 py-3 w-full font-semibold text-white rounded-lg transition-colors bg-gray-950 hover:bg-gray-100 hover:text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed">
                         <span wire:loading.remove wire:target="addToCart">Add to Cart</span>
                         <span wire:loading wire:target="addToCart">
-                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <svg class="inline-block mr-2 -ml-1 w-4 h-4 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
@@ -299,7 +299,7 @@
                         </span>
                     </button>
                 @else
-                    <button disabled class="w-full bg-gray-400 text-white py-3 px-6 rounded-lg font-semibold cursor-not-allowed">
+                    <button disabled class="px-6 py-3 w-full font-semibold text-white bg-gray-400 rounded-lg cursor-not-allowed">
                         Out of Stock
                     </button>
                 @endif
@@ -310,19 +310,19 @@
     <!-- Related Products -->
     @if($relatedProducts->isNotEmpty())
     <div class="mt-16">
-        <h2 class="text-2xl font-bold mb-6">You May Also Like</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <h2 class="mb-6 text-2xl font-bold">You May Also Like</h2>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             @foreach($relatedProducts as $relatedProduct)
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+            <div class="overflow-hidden bg-white rounded-lg shadow-md transition hover:shadow-lg">
                 <a href="{{ route('product.show', $relatedProduct->slug) }}">
-                    <picture class="w-full h-64">
+                    <picture class="w-full h-80">
                         {{-- Modern formats first --}}
                         <source srcset="{{ $relatedProduct->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
                         <source srcset="{{ $relatedProduct->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
                         {{-- Fallback for older browsers --}}
                         <img src="{{ $relatedProduct->getFirstMediaUrl('main_image') }}"
                              alt="{{ $relatedProduct->name }}"
-                             class="w-full h-64 object-cover"
+                             class="object-cover w-full h-80"
                              width="400"
                              height="400"
                              loading="lazy"
@@ -331,7 +331,7 @@
                 </a>
                 <div class="p-4">
                     <a href="{{ route('product.show', $relatedProduct->slug) }}"
-                       class="font-semibold text-lg hover:text-red-600 block mb-1">
+                       class="block mb-1 text-lg font-semibold hover:text-red-600">
                         {{ $relatedProduct->name }}
                     </a>
                     <span class="font-bold">{{ $currencySymbol }}{{ number_format($relatedProduct->converted_price ?? $relatedProduct->price, 2) }}</span>
