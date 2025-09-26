@@ -41,7 +41,7 @@
         }">
 
        <!-- Main image with zoom -->
-       <div class="mb-4 relative overflow-hidden rounded-lg shadow-md h-[520px] md:h-[680px] flex items-center justify-center bg-white"
+       <div class="mb-4 relative overflow-hidden rounded-lg  h-[520px] md:h-[680px] flex items-center justify-center bg-white"
        x-data="{
           magnifierEnabled: false,
           zoomX: 0,
@@ -313,7 +313,7 @@
         <h2 class="mb-6 text-2xl font-bold">You May Also Like</h2>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             @foreach($relatedProducts as $relatedProduct)
-            <div class="overflow-hidden bg-white rounded-lg shadow-md transition hover:shadow-lg">
+            <div class="overflow-hidden bg-white transition">
                 <a href="{{ route('product.show', $relatedProduct->slug) }}">
                     <picture class="w-full h-80">
                         {{-- Modern formats first --}}
@@ -322,14 +322,14 @@
                         {{-- Fallback for older browsers --}}
                         <img src="{{ $relatedProduct->getFirstMediaUrl('main_image') }}"
                              alt="{{ $relatedProduct->name }}"
-                             class="object-cover w-full h-80"
+                             class="object-contain w-full h-80"
                              width="400"
                              height="400"
                              loading="lazy"
                              decoding="async">
                     </picture>
                 </a>
-                <div class="p-4">
+                <div class="p-4 text-center">
                     <a href="{{ route('product.show', $relatedProduct->slug) }}"
                        class="block mb-1 text-lg font-semibold hover:text-red-600">
                         {{ $relatedProduct->name }}
