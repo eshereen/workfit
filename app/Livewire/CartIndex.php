@@ -6,6 +6,7 @@ use Exception;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
 use App\Models\Coupon;
+use App\Enums\CouponType;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Log;
@@ -152,23 +153,43 @@ class CartIndex extends Component
                 return;
             }
 
-            // Calculate discount against USD subtotal, then convert to current currency
-            $cartService = app(CartService::class);
-            $subtotalUSD = $cartService->getSubtotal();
-            $discountUSD = $coupon->calculateDiscount($subtotalUSD);
+            $currencyService = app(CountryCurrencyService::class);
 
-            if ($discountUSD <= 0) {
+            $cartService = app(CartService::class);
+            $subtotalUSD = (float) $cartService->getSubtotal();
+            $shippingUSD = (float) $cartService->getShippingCost();
+            $taxUSD = (float) $cartService->getTaxAmount();
+            $baseUSDTotal = $subtotalUSD + $shippingUSD + $taxUSD;
+
+            // Local base total is already converted in $this->subtotal/shipping/tax
+            $baseLocalTotal = (float) ($this->subtotal + $this->shipping + $this->tax);
+
+            if ($coupon->type === CouponType::Percentage) {
+                // Enforce min order in USD if set
+                if (!is_null($coupon->min_order_amount) && $baseUSDTotal < (float) $coupon->min_order_amount) {
+                    $this->dispatch('showNotification', [
+                        'message' => 'Coupon does not meet the minimum order amount.',
+                        'type' => 'warning',
+                    ]);
+                    return;
+                }
+
+                $discountLocal = $baseLocalTotal * ((float) $coupon->value / 100);
+            } else {
+                // Fixed coupons are stored/value in USD; use subtotal basis per calculateDiscount then convert
+                $discountUSD = (float) $coupon->calculateDiscount($subtotalUSD);
+                $discountLocal = $this->currencyCode === 'USD'
+                    ? $discountUSD
+                    : (float) $currencyService->convertFromUSD($discountUSD, $this->currencyCode);
+            }
+
+            if ($discountLocal <= 0) {
                 $this->dispatch('showNotification', [
-                    'message' => 'Coupon does not apply to the current subtotal.',
+                    'message' => 'Coupon does not apply to the current total.',
                     'type' => 'warning',
                 ]);
                 return;
             }
-
-            $currencyService = app(CountryCurrencyService::class);
-            $discountLocal = $this->currencyCode === 'USD'
-                ? $discountUSD
-                : $currencyService->convertFromUSD($discountUSD, $this->currencyCode);
 
             $this->appliedCouponId = $coupon->id;
             $this->appliedCouponCode = $coupon->code;
@@ -238,15 +259,32 @@ class CartIndex extends Component
         }
 
         try {
-            // Calculate discount on USD subtotal
-            $cartService = app(CartService::class);
-            $subtotalUSD = $cartService->getSubtotal();
-            $discountUSD = $coupon->calculateDiscount($subtotalUSD);
-
             $currencyService = app(CountryCurrencyService::class);
-            $discountLocal = $this->currencyCode === 'USD'
-                ? $discountUSD
-                : $currencyService->convertFromUSD($discountUSD, $this->currencyCode);
+
+            $cartService = app(CartService::class);
+            $subtotalUSD = (float) $cartService->getSubtotal();
+            $shippingUSD = (float) $cartService->getShippingCost();
+            $taxUSD = (float) $cartService->getTaxAmount();
+            $baseUSDTotal = $subtotalUSD + $shippingUSD + $taxUSD;
+
+            $baseLocalTotal = (float) ($this->subtotal + $this->shipping + $this->tax);
+
+            if ($coupon->type === CouponType::Percentage) {
+                // Check min order requirement in USD
+                if (!is_null($coupon->min_order_amount) && $baseUSDTotal < (float) $coupon->min_order_amount) {
+                    $this->couponDiscount = 0.0;
+                    $this->appliedCouponId = null;
+                    $this->appliedCouponCode = null;
+                    return;
+                }
+
+                $discountLocal = $baseLocalTotal * ((float) $coupon->value / 100);
+            } else {
+                $discountUSD = (float) $coupon->calculateDiscount($subtotalUSD);
+                $discountLocal = $this->currencyCode === 'USD'
+                    ? $discountUSD
+                    : (float) $currencyService->convertFromUSD($discountUSD, $this->currencyCode);
+            }
 
             $this->appliedCouponId = $coupon->id;
             $this->appliedCouponCode = $coupon->code;

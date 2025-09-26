@@ -184,7 +184,7 @@
                         </span>
                     </div>
 
-                    <div class="flex justify-between">
+              {{--     <div class="flex justify-between">
                         <span class="text-gray-600">Shipping</span>
                         <span>
                             @if($currencyCode !== 'USD')
@@ -204,7 +204,7 @@
                                 <span class="block text-xs text-gray-500">Original: ${{ number_format(app(\App\Services\CartService::class)->getTaxAmount(), 2) }}</span>
                             @endif
                         </span>
-                    </div>
+                    </div> --}}
 
                     @if($couponDiscount > 0)
                     <div class="flex justify-between text-red-700">

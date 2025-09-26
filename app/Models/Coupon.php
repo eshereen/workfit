@@ -48,16 +48,17 @@ class Coupon extends Model
             return 0;
         }
 
-        if ($this->type === 'fixed') {
-            return min($this->value, $subtotal);
+        if ($this->type === CouponType::Fixed) {
+            return min((float) $this->value, (float) $subtotal);
         }
 
-        return $subtotal * ($this->value / 100);
+        // Percentage
+        return (float) $subtotal * ((float) $this->value / 100);
     }
 
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
-    
+
 }
