@@ -15,11 +15,13 @@
     <!-- Resource hints for critical resources -->
     <link rel="preload" href="/videos/workfit-lg.mp4" as="video" type="video/mp4" media="(min-width: 768px)">
     <link rel="preload" href="/videos/workfit-mobile.mp4" as="video" type="video/mp4" media="(max-width: 767px)">
+    <!-- Preload hero image variants (safeguard for FCP/LCP on image heroes) -->
+    <link rel="preload" as="image" href="/imgs/workfit.png" imagesrcset="/imgs/workfit.png" imagesizes="100vw">
 
     <!-- Livewire Styles -->
     @livewireStyles
    </link>
-   <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" defer></script>
 
 <style>
     <!-- Minimal critical CSS for performance -->
@@ -125,7 +127,7 @@ p,a,span,li,ul,ol,button{
     </style>
 
 </head>
-<body class="bg-white text-gray-950 antialiased overflow-x-hidden">
+<body class="overflow-x-hidden antialiased bg-white text-gray-950">
         <!-- Loader Overlay -->
 <div
 x-data="{ show: true }"
@@ -134,10 +136,10 @@ x-show="show"
 x-transition:leave="transition-opacity duration-700"
 x-transition:leave-start="opacity-100"
 x-transition:leave-end="opacity-0"
-class="fixed inset-0 z-50 flex items-center justify-center bg-white"
+class="flex fixed inset-0 z-50 justify-center items-center bg-white"
 style="background: rgba(255,255,255,0.95);"
 >
-<img src="/imgs/workfit_logo_black.png" alt="Loading..." class="w-32  animate-pulse">
+<img src="/imgs/workfit_logo_black.png" alt="Loading..." class="w-32 animate-pulse">
 </div>
 
     @include('layouts.navbar')
