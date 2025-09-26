@@ -288,9 +288,9 @@
                                             </div>
                                             <div class="mt-1 text-sm text-gray-600">
                                                 @if($variant->price && $variant->price > 0)
-                                                    {{ $currencySymbol }}{{ number_format($this->convertPrice($variant->price), 2) }}
+                                                       {{ number_format($this->convertPrice($variant->price), 2) }}  {{ $currencySymbol }}
                                                 @else
-                                                    {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedProduct->price), 2) }}
+                                                    {{ number_format($this->convertPrice($selectedProduct->price), 2) }} {{ $currencySymbol }}
                                                 @endif
                                             </div>
                                             <div class="mt-1 text-xs text-gray-500">

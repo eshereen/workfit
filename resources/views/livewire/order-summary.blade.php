@@ -78,16 +78,16 @@
             <div class="flex justify-between pt-3 text-lg font-bold border-t border-gray-200">
                 @if($loyaltyDiscount > 0 || $couponDiscount > 0)
                     <span class="text-gray-900">Final Total:</span>
-                    <span class="text-gray-900">{{ $currencySymbol }}{{ number_format($finalTotal, 2) }}</span>
+                    <span class="text-gray-900">{{ number_format($finalTotal, 2) }} {{ $currencySymbol }}</span>
                 @else
                     <span class="text-gray-900">Total:</span>
-                    <span class="text-gray-900">{{ $currencySymbol }}{{ number_format($total, 2) }}</span>
+                    <span class="text-gray-900">{{ number_format($total, 2) }} {{ $currencySymbol }}</span>
                 @endif
             </div>
 
             @if($loyaltyDiscount > 0)
             <div class="text-sm text-center text-gray-500">
-                <p>You saved {{ $currencySymbol }}{{ number_format($loyaltyDiscount, 2) }} with loyalty points!</p>
+                <p>You saved {{ number_format($loyaltyDiscount, 2) }} {{ $currencySymbol }} with loyalty points!</p>
             </div>
             @endif
         </div>

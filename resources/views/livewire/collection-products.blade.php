@@ -181,10 +181,10 @@
 
                         <!-- Price -->
                         <div class="flex gap-2 items-center mb-3">
-                            <span class="text-lg font-bold text-gray-900">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->price), 2) }}</span>
+                            <span class="text-lg font-bold text-gray-900">{{ number_format($this->convertPrice($product->price), 2) }} {{ $currencySymbol }}</span>
 
                             @if($product->compare_price && $product->compare_price > $product->price)
-                                <span class="text-sm text-gray-500 line-through">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->compare_price), 2) }}</span>
+                                <span class="text-sm text-gray-500 line-through">{{ number_format($this->convertPrice($product->compare_price), 2) }} {{ $currencySymbol }}</span>
                             @endif
                         </div>
 
@@ -336,9 +336,9 @@
                         @if($selectedVariant)
                             Add to Cart -
                             @if($selectedVariant->price && $selectedVariant->price > 0)
-                                {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedVariant->price), 2) }}
+                                {{ number_format($this->convertPrice($selectedVariant->price), 2) }} {{ $currencySymbol }}
                             @else
-                                {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedProduct->price), 2) }}
+                                {{ number_format($this->convertPrice($selectedProduct->price), 2) }} {{ $currencySymbol }}
                             @endif
                         @else
                             Select a variant first
