@@ -5,9 +5,11 @@ namespace App\Livewire;
 use Exception;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
+use App\Models\Coupon;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class CartIndex extends Component
 {
@@ -21,6 +23,12 @@ class CartIndex extends Component
     public $currencySymbol = '$';
     public $isAutoDetected = false;
 
+    // Coupon state
+    public $couponCode = '';
+    public $couponDiscount = 0.0; // in current currency
+    public $appliedCouponId = null;
+    public $appliedCouponCode = null;
+
     public function mount()
     {
         Log::info('CartIndex component mounted - Starting');
@@ -28,6 +36,7 @@ class CartIndex extends Component
         try {
             $this->loadCurrencyInfo();
             $this->loadCart();
+            $this->recalculateCoupon();
             Log::info('CartIndex component mounted - Cart and currency loaded successfully');
         } catch (Exception $e) {
             Log::error('CartIndex component mounted - Error loading cart or currency', [
@@ -94,6 +103,9 @@ class CartIndex extends Component
             // Convert prices to current currency
             $this->convertPricesToCurrency();
 
+            // If a coupon is applied, recalculate its discount with the latest totals
+            $this->recalculateCoupon();
+
             Log::info('Cart loaded successfully', [
                 'cartItems' => $this->cartItems,
                 'cartCount' => $this->cartCount,
@@ -107,6 +119,146 @@ class CartIndex extends Component
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+        }
+    }
+
+    /**
+     * Apply coupon based on the entered coupon code.
+     */
+    public function applyCoupon()
+    {
+        $this->validate([
+            'couponCode' => 'required|string',
+        ]);
+
+        $code = strtoupper(trim($this->couponCode));
+
+        try {
+            $coupon = Coupon::where('code', $code)->first();
+
+            if (!$coupon) {
+                $this->dispatch('showNotification', [
+                    'message' => 'Coupon not found.',
+                    'type' => 'error',
+                ]);
+                return;
+            }
+
+            if (!$coupon->isValid()) {
+                $this->dispatch('showNotification', [
+                    'message' => 'Coupon is not valid or expired.',
+                    'type' => 'error',
+                ]);
+                return;
+            }
+
+            // Calculate discount against USD subtotal, then convert to current currency
+            $cartService = app(CartService::class);
+            $subtotalUSD = $cartService->getSubtotal();
+            $discountUSD = $coupon->calculateDiscount($subtotalUSD);
+
+            if ($discountUSD <= 0) {
+                $this->dispatch('showNotification', [
+                    'message' => 'Coupon does not apply to the current subtotal.',
+                    'type' => 'warning',
+                ]);
+                return;
+            }
+
+            $currencyService = app(CountryCurrencyService::class);
+            $discountLocal = $this->currencyCode === 'USD'
+                ? $discountUSD
+                : $currencyService->convertFromUSD($discountUSD, $this->currencyCode);
+
+            $this->appliedCouponId = $coupon->id;
+            $this->appliedCouponCode = $coupon->code;
+            $this->couponDiscount = round($discountLocal, 2);
+
+            // Persist selection in session (so checkout can pick it up)
+            Session::put('applied_coupon_code', $this->appliedCouponCode);
+            Session::put('applied_coupon_id', $this->appliedCouponId);
+
+            // Update total on the fly (subtotal, shipping, tax already in current currency)
+            $this->total = max(0, ($this->subtotal + $this->shipping + $this->tax) - $this->couponDiscount);
+
+            $this->dispatch('showNotification', [
+                'message' => 'Coupon applied successfully!',
+                'type' => 'success',
+            ]);
+        } catch (Exception $e) {
+            Log::error('Error applying coupon', ['error' => $e->getMessage()]);
+            $this->dispatch('showNotification', [
+                'message' => 'Failed to apply coupon.',
+                'type' => 'error',
+            ]);
+        }
+    }
+
+    /**
+     * Remove any applied coupon.
+     */
+    public function removeCoupon()
+    {
+        $this->appliedCouponId = null;
+        $this->appliedCouponCode = null;
+        $this->couponDiscount = 0.0;
+        Session::forget(['applied_coupon_code', 'applied_coupon_id']);
+
+        // Reload to restore total without discount
+        $this->loadCart();
+
+        $this->dispatch('showNotification', [
+            'message' => 'Coupon removed.',
+            'type' => 'info',
+        ]);
+    }
+
+    /**
+     * Recalculate coupon discount from session against current subtotals.
+     */
+    protected function recalculateCoupon(): void
+    {
+        $savedCode = Session::get('applied_coupon_code');
+        if (!$savedCode) {
+            $this->couponDiscount = 0.0;
+            $this->appliedCouponId = null;
+            $this->appliedCouponCode = null;
+            // Keep total as provided by service
+            return;
+        }
+
+        $coupon = Coupon::where('code', $savedCode)->first();
+        if (!$coupon || !$coupon->isValid()) {
+            // Clear invalid/expired coupon from session
+            Session::forget(['applied_coupon_code', 'applied_coupon_id']);
+            $this->couponDiscount = 0.0;
+            $this->appliedCouponId = null;
+            $this->appliedCouponCode = null;
+            return;
+        }
+
+        try {
+            // Calculate discount on USD subtotal
+            $cartService = app(CartService::class);
+            $subtotalUSD = $cartService->getSubtotal();
+            $discountUSD = $coupon->calculateDiscount($subtotalUSD);
+
+            $currencyService = app(CountryCurrencyService::class);
+            $discountLocal = $this->currencyCode === 'USD'
+                ? $discountUSD
+                : $currencyService->convertFromUSD($discountUSD, $this->currencyCode);
+
+            $this->appliedCouponId = $coupon->id;
+            $this->appliedCouponCode = $coupon->code;
+            $this->couponDiscount = round(max(0, $discountLocal), 2);
+
+            // Recompute total with discount
+            $this->total = max(0, ($this->subtotal + $this->shipping + $this->tax) - $this->couponDiscount);
+        } catch (Exception $e) {
+            Log::error('Error recalculating coupon', ['error' => $e->getMessage()]);
+            $this->couponDiscount = 0.0;
+            $this->appliedCouponId = null;
+            $this->appliedCouponCode = null;
         }
     }
 
