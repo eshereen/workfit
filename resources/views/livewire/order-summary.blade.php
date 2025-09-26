@@ -59,7 +59,14 @@
                 <span class="text-gray-900">{{ $currencySymbol }}{{ number_format($shippingAmount, 2) }}</span>
             </div>
             @endif
-            --}} 
+            --}}
+
+            @if($couponDiscount > 0)
+            <div class="flex justify-between text-red-600">
+                <span>Coupon Discount:</span>
+                <span>-{{ $currencySymbol }}{{ number_format($couponDiscount, 2) }}</span>
+            </div>
+            @endif
 
             @if($loyaltyDiscount > 0)
             <div class="flex justify-between text-green-600">
@@ -69,7 +76,7 @@
             @endif
 
             <div class="flex justify-between pt-3 text-lg font-bold border-t border-gray-200">
-                @if($loyaltyDiscount > 0)
+                @if($loyaltyDiscount > 0 || $couponDiscount > 0)
                     <span class="text-gray-900">Final Total:</span>
                     <span class="text-gray-900">{{ $currencySymbol }}{{ number_format($finalTotal, 2) }}</span>
                 @else

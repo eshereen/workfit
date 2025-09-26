@@ -6,7 +6,10 @@ use Exception;
 use Livewire\Component;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
+use App\Models\Coupon;
+use App\Enums\CouponType;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
 
 class OrderSummary extends Component
@@ -23,6 +26,8 @@ class OrderSummary extends Component
     public $loyaltyDiscount = 0;
     public $loyaltyPointsApplied = 0;
     public $finalTotal = 0;
+    public $couponDiscount = 0;
+    public $appliedCouponCode = null;
 
     protected $cartService;
     protected $currencyService;
@@ -112,7 +117,7 @@ class OrderSummary extends Component
 
     protected function calculateFinalTotal()
     {
-        $this->finalTotal = max(0, $this->total - $this->loyaltyDiscount);
+        $this->finalTotal = max(0, $this->total - $this->loyaltyDiscount - $this->couponDiscount);
 
         Log::info('OrderSummary: Final total calculated', [
             'original_total' => $this->total,
@@ -162,7 +167,10 @@ class OrderSummary extends Component
                 ]);
             }
 
-            // Calculate final total with any existing loyalty discount
+            // Apply coupon from session if present
+            $this->applyCouponFromSession();
+
+            // Calculate final total with any existing loyalty/coupon discount
             $this->calculateFinalTotal();
 
             Log::info('OrderSummary: Data loaded', [
@@ -180,6 +188,41 @@ class OrderSummary extends Component
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    protected function applyCouponFromSession(): void
+    {
+        $this->couponDiscount = 0;
+        $this->appliedCouponCode = null;
+
+        $savedCode = Session::get('applied_coupon_code');
+        if (!$savedCode) {
+            return;
+        }
+
+        $coupon = Coupon::where('code', $savedCode)->first();
+        if (!$coupon || !$coupon->isValid()) {
+            Session::forget(['applied_coupon_code', 'applied_coupon_id']);
+            return;
+        }
+
+        // Base prices in USD
+        $baseSubtotal = $this->cartService->getSubtotal();
+        $baseShipping = $this->cartService->getShippingCost();
+        $baseTax = $this->cartService->getTaxAmount();
+        $baseTotal = $baseSubtotal + $baseShipping + $baseTax;
+
+        if ($coupon->type === CouponType::Percentage) {
+            // Percentage on local total
+            $this->couponDiscount = $this->total * ((float) $coupon->value / 100);
+        } else {
+            // Fixed in USD -> convert to local
+            $discountUSD = (float) $coupon->calculateDiscount($baseSubtotal);
+            $this->couponDiscount = $this->currencyService->convertFromUSD($discountUSD, $this->currencyCode);
+        }
+
+        $this->couponDiscount = round(max(0, $this->couponDiscount), 2);
+        $this->appliedCouponCode = $coupon->code;
     }
 
     public function render()
