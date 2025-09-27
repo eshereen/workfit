@@ -63,7 +63,7 @@
 
     <!-- Products Grid -->
     @if($products->count() > 0)
-        <div class="grid grid-cols-2 gap-6 md:grid-cols-3">
+        <div class="grid grid-cols-2 gap-4 md:gap-6 md:grid-cols-3">
             @foreach($products as $product)
                 <div class="overflow-hidden bg-white rounded-lg shadow-md transition-shadow duration-300 hover:shadow-lg">
                     <!-- Product Image -->
