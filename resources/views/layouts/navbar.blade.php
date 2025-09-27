@@ -15,11 +15,28 @@
   collectionsDropdownOpen: false,
   mobileCategoriesOpen: false,
   mobileCollectionsOpen: false,
+  searchModalOpen: false,
+  searchQuery: '',
    isHome: {{ request()->routeIs('home') ? 'true' : 'false' }},
    init() {
      window.addEventListener('scroll', () => {
        this.scrolled = window.scrollY > 10;
      });
+   },
+   openSearchModal() {
+     this.searchModalOpen = true;
+     this.$nextTick(() => {
+       this.$refs.searchInput.focus();
+     });
+   },
+   closeSearchModal() {
+     this.searchModalOpen = false;
+     this.searchQuery = '';
+   },
+   performSearch() {
+     if (this.searchQuery.trim()) {
+       window.location.href = '{{ route('products.search') }}?q=' + encodeURIComponent(this.searchQuery.trim());
+     }
    }
  }"
  :class="{
@@ -39,9 +56,9 @@
           </button>
 
           <!-- Search Icon -->
-          <a href="{{ route('products.search') }}" class="hover:cursor-pointer">
+          <button @click="openSearchModal()" class="hover:cursor-pointer">
               <i class="text-xl fas fa-search" :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"></i>
-          </a>
+          </button>
       </div>
 
       <!-- Desktop Navigation -->
@@ -355,6 +372,44 @@
 
       </div>
     </nav>
+  </div>
+
+  <!-- Search Modal -->
+  <div x-show="searchModalOpen"
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0 transform -translate-y-2"
+       x-transition:enter-end="opacity-100 transform translate-y-0"
+       x-transition:leave="transition ease-in duration-200"
+       x-transition:leave-start="opacity-100 transform translate-y-0"
+       x-transition:leave-end="opacity-0 transform -translate-y-2"
+       class="fixed top-16 left-0 right-0 h-32 bg-white border-b border-gray-200 shadow-lg z-[1400]"
+       style="display: none;">
+
+    <!-- Search Modal Content -->
+    <div class="container flex items-center px-8 mx-auto h-full">
+      <div class="flex flex-1 items-center space-x-4">
+        <div class="relative flex-1">
+          <input
+            x-ref="searchInput"
+            x-model="searchQuery"
+            @keydown.enter="performSearch()"
+            @keydown.escape="closeSearchModal()"
+            type="text"
+            placeholder="Search products..."
+            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500"
+          >
+        </div>
+        <button @click="performSearch()"
+                :disabled="!searchQuery.trim()"
+                class="p-3 text-gray-600 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="text-xl fas fa-search"></i>
+        </button>
+        <button @click="closeSearchModal()"
+                class="p-3 text-gray-400 transition-colors hover:text-gray-600">
+          <i class="text-xl fas fa-times"></i>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 </header>
