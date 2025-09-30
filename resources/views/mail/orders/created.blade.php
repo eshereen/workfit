@@ -1,5 +1,5 @@
 <x-mail::message>
-    <x-logo email width="200" height="60" />
+
     @php
         $customerName = optional($order->customer)->full_name
             ?? trim(($order->first_name ?? '') . ' ' . ($order->last_name ?? ''))
