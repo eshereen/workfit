@@ -1,4 +1,6 @@
 <x-mail::message>
+    <x-logo class="h-12" />
+
 Hello {{ $order->customer->full_name }}
 
 Your order has been shipped successfully.

@@ -342,17 +342,9 @@
                     <a href="{{ route('checkout') }}" class="block py-3 w-full font-medium text-center text-white bg-red-500 rounded-md transition hover:bg-red-600">
                         Proceed to Checkout
                     </a>
-                    <a href="{{ route('products.index') }}" class="block py-3 w-full font-medium text-center text-white rounded-md border transition bg-gray-950 hover:bg-gray-50">
+                    <a href="{{ route('products.index') }}" class="block py-3 w-full font-medium text-center text-white rounded-md border transition border-gray-950 hover:bg-gray-50">
                         Continue Shopping
                     </a>
-                    @if($cartCount > 0)
-                        <button
-                            wire:click="clearCart"
-                            class="py-3 w-full font-medium border border-gray-900 transition rounded-m-d text-gray-950 hover:bg-gray-950"
-                        >
-                            Clear Cart
-                        </button>
-                    @endif
                 </div>
             </div>
         </div>
