@@ -1,5 +1,5 @@
 <div>
-    <h2 class="my-20 text-xl font-semibold text-gray-900">Order Summary</h2>
+    <h2 class="my-5 text-xl font-semibold text-gray-900">Order Summary</h2>
 
     @if(config('app.debug'))
         <div class="mb-2 text-xs text-gray-500">
