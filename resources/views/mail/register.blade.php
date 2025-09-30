@@ -1,5 +1,5 @@
 <x-mail::message>
- <x-logo class="h-12" />
+    <x-logo email width="200" height="60" />
 Welcome to {{ config('app.name') }}
 we want to welcome you to our platform and we hope you enjoy your stay.
 

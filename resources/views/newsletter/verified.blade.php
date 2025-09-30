@@ -1,6 +1,6 @@
 {{-- resources/views/newsletter/verified.blade.php --}}
 @extends('layouts.app')
-<x-logo class="h-12" />
+<x-logo email width="200" height="60" />
 @section('content')
     <div class="px-4 mx-auto my-40 max-w-xl">
         <div class="text-center">
