@@ -342,7 +342,7 @@
                     <a href="{{ route('checkout') }}" class="block py-3 w-full font-medium text-center text-white bg-red-500 rounded-md transition hover:bg-red-600">
                         Proceed to Checkout
                     </a>
-                    <a href="{{ route('products.index') }}" class="block py-3 w-full font-medium text-center text-white rounded-md border transition border-gray-950 hover:bg-gray-50">
+                    <a href="{{ route('products.index') }}" class="block py-3 w-full font-medium text-center text-white rounded-md border transition border-gray-950 bg-accent hover:bg-gray-50 hover:text-gray-950">
                         Continue Shopping
                     </a>
                 </div>
