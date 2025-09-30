@@ -41,7 +41,7 @@
         }">
 
        <!-- Main image with zoom -->
-       <div class="mb-4 relative overflow-hidden rounded-lg  h-[520px] md:h-[680px] flex items-center justify-center bg-white"
+       <div class="relative overflow-hidden rounded-lg  h-[520px] md:h-[680px] flex items-center justify-center bg-white"
        x-data="{
           magnifierEnabled: false,
           zoomX: 0,
@@ -84,7 +84,7 @@
 
 
        <!-- Thumbnails -->
-       <div class="grid grid-cols-4 gap-2">
+       <div class="grid grid-cols-4 gap-1 mt-2">
            <template x-for="(image, index) in images" :key="index">
                <div class="overflow-hidden rounded border transition-colors cursor-pointer hover:border-gray-500"
                     :class="currentImage === image.large ? 'border-gray-500 ring-2 ring-gray-200' : 'border-gray-200'"
@@ -162,17 +162,6 @@
             </div>
 
             <div class="mb-6">
-           {{--  <div class="flex items-center mb-2">
-                    <span class="mr-2 text-gray-700">Availability:</span>
-                    @if($selectedVariant && $selectedVariant->stock > 0)
-                    <span class="font-medium text-green-600">In Stock ({{ $selectedVariant->stock }} available) - {{ $selectedVariant->color }}, {{ $selectedVariant->size }}</span>
-                    @elseif($product->variants->isEmpty() && $product->quantity > 0)
-                    <span class="font-medium text-green-600">In Stock</span>
-                    @else
-                    <span class="font-medium text-red-600">Out of Stock</span>
-                    @endif
-                </div> --}}
-
 
                 @if($product->variants->isNotEmpty())
                 <div class="mb-6">
@@ -264,7 +253,6 @@
                             {!! $product->description !!}
                         </div>
                     </div>
-
                 <!-- Selected Variant Info -->
                 @if($selectedVariant)
                 <div class="p-3 mb-4 bg-gray-50 rounded-lg">
@@ -310,7 +298,7 @@
     <!-- Related Products -->
     @if($relatedProducts->isNotEmpty())
     <div class="mt-16">
-        <h2 class="mb-6 text-2xl font-bold">You May Also Like</h2>
+        <h2 class="mb-6 text-2xl font-bold text-center">You May Also Like</h2>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             @foreach($relatedProducts as $relatedProduct)
             <div class="overflow-hidden bg-white transition">
