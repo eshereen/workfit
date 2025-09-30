@@ -13,7 +13,7 @@
     <div class="flex flex-col gap-8 lg:flex-row">
         <!-- Cart Items -->
         <div class="lg:w-2/3">
-            <div class="overflow-x-auto">
+            <div class="hidden overflow-x-auto md:block">
                 @if($cartCount > 0)
                     <table class="w-full">
                         <thead class="border-b border-gray-200">
@@ -134,6 +134,108 @@
                     </div>
                 @endif
             </div>
+
+            @if($cartCount > 0)
+                <div class="space-y-4 md:hidden">
+                    @foreach($cartItems as $item)
+                        <div class="p-4 bg-white rounded-lg border">
+                            <div class="flex gap-4">
+                                <div class="overflow-hidden flex-shrink-0 w-24 h-24 bg-gray-50 rounded-md">
+                                    @if(isset($item['attributes']['image']))
+                                        <img src="{{ $item['attributes']['image'] }}" class="object-cover w-full h-full">
+                                    @else
+                                        <div class="flex justify-center items-center w-full h-full bg-gray-200">
+                                            <span class="text-gray-400">No Image</span>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-medium truncate">{{ $item['name'] }}</h3>
+                                    @if(isset($item['attributes']['color']) || isset($item['attributes']['size']))
+                                        <div class="flex gap-2 items-center mt-1 text-sm text-gray-500">
+                                            @if(isset($item['attributes']['color']))
+                                                @php
+                                                    $colorCode = $this->getColorCode($item['attributes']['color']);
+                                                @endphp
+                                                <span class="flex gap-1 items-center">
+                                                    <span class="inline-block w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color: {{ $colorCode }};" title="{{ $item['attributes']['color'] }}"></span>
+                                                    <span>{{ $item['attributes']['color'] }}</span>
+                                                </span>
+                                            @endif
+                                            @if(isset($item['attributes']['size']))
+                                                <span>/ {{ $item['attributes']['size'] }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
+
+                                    <div class="flex justify-between items-center mt-3">
+                                        <div class="text-sm text-gray-600">
+                                            @if(isset($item['converted_price']))
+                                                <span>{{ $currencySymbol }}{{ number_format($item['converted_price'], 2) }}</span>
+                                                <span class="block text-xs text-gray-400">Original: ${{ number_format($item['price'], 2) }}</span>
+                                            @else
+                                                <span>{{ $currencySymbol }}{{ number_format($item['price'], 2) }}</span>
+                                            @endif
+                                        </div>
+                                        <button
+                                            wire:click="removeItem('{{ $item['rowId'] }}')"
+                                            wire:loading.attr="disabled"
+                                            wire:loading.class="opacity-50 cursor-not-allowed"
+                                            class="text-gray-400 transition-colors hover:text-pink-500"
+                                            title="Remove {{ $item['name'] }} from cart"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="flex justify-between items-center mt-3">
+                                        <div class="flex w-28 rounded-md border">
+                                            <button
+                                                wire:click="decreaseQuantity('{{ $item['rowId'] }}')"
+                                                wire:loading.attr="disabled"
+                                                wire:loading.class="opacity-50 cursor-not-allowed"
+                                                class="px-2 py-1 text-gray-600 hover:bg-gray-100 {{ $item['quantity'] <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                {{ $item['quantity'] <= 1 ? 'disabled' : '' }}
+                                                title="Decrease quantity"
+                                            >-</button>
+                                            <span class="flex-1 px-2 py-1 text-center border-x">
+                                                <span wire:loading.remove>{{ $item['quantity'] }}</span>
+                                                <span wire:loading class="text-gray-400">...</span>
+                                            </span>
+                                            <button
+                                                wire:click="increaseQuantity('{{ $item['rowId'] }}')"
+                                                wire:loading.attr="disabled"
+                                                wire:loading.class="opacity-50 cursor-not-allowed"
+                                                class="px-2 py-1 text-gray-600 hover:bg-gray-100"
+                                                title="Increase quantity"
+                                            >+</button>
+                                        </div>
+                                        <div class="font-medium text-right">
+                                            @if(isset($item['converted_price']))
+                                                <span class="text-green-600">{{ $currencySymbol }}{{ number_format($item['converted_price'] * $item['quantity'], 2) }}</span>
+                                                <span class="block text-xs text-gray-500">Original: ${{ number_format($item['price'] * $item['quantity'], 2) }}</span>
+                                            @else
+                                                <span>{{ $currencySymbol }}{{ number_format($item['price'] * $item['quantity'], 2) }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="p-8 text-center bg-white rounded-lg shadow-md md:hidden">
+                    <h2 class="mb-4 text-2xl font-semibold">Your cart is empty</h2>
+                    <p class="mb-6">Looks like you haven't added any items to your cart yet.</p>
+                    <a href="{{ route('products.index') }}"
+                       class="inline-block px-6 py-2 text-white bg-red-600 rounded-lg transition hover:bg-red-700">
+                        Start Shopping
+                    </a>
+                </div>
+            @endif
         </div>
 
         <!-- Order Summary -->

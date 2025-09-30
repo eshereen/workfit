@@ -71,7 +71,7 @@
 
                     <!-- Flash Sale Badge -->
                     @if($product->compare_price > 0)
-                    <span class="px-4 py-1 text-xs font-bold text-white uppercase bg-red-600 rounded opacity-60 transform -rotate-14">
+                    <span class="px-2 py-1 font-bold text-white uppercase bg-red-600 rounded opacity-80">
                          Sale
                     </span>
                     @endif
@@ -80,7 +80,7 @@
                 <div class="block relative w-full h-full">
                     {{-- Main image --}}
                     @php
-                        $mainImage = $product->getFirstMediaUrl('main_image') ?: '/imgs/workfit.png';
+                        $mainImage = $product->getFirstMediaUrl('main_image') ;
                     @endphp
                     <img src="{{ $mainImage }}"
                          alt="{{ $product->name }}"

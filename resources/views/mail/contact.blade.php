@@ -1,4 +1,5 @@
 <x-mail::message>
+    <x-logo class="h-12" />
 Contact Message
 
 Name: {{ $contact->name }}

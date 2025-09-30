@@ -231,7 +231,7 @@
           <!-- Logo (Perfectly Centered) -->
       <a href="{{ route('home') }}" class="flex absolute left-1/2 items-center transform -translate-x-1/2">
           <!-- White logo (home page, not scrolled) -->
-          <img x-show="isHome && !scrolled" src="/imgs/workfit_logo_white.png" alt="logo" class="w-16" width="64" height="64" fetchpriority="high" decoding="async">
+          <img x-show="isHome && !scrolled" src="/imgs/workfit_logo_white.svg" alt="logo" class="w-16" width="64" height="64" fetchpriority="high" decoding="async">
           <!-- Black logo (home page scrolled or non-home page) -->
           <img x-show="!isHome || (isHome && scrolled)" src="/imgs/workfit_logo_black.png" alt="logo" class="w-16" width="64" height="64" fetchpriority="high" decoding="async">
       </a>
