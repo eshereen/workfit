@@ -4,7 +4,6 @@ namespace App\Livewire\Newsletter;
 
 use Throwable;
 use App\Mail\NewsletterVerificationMail;
-use App\Models\Country;
 use App\Models\Newsletter;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -108,8 +107,6 @@ class SubscribeForm extends Component
 
     public function render()
     {
-        return view('livewire.newsletter.subscribe-form', [
-            'countries' => Country::select('id', 'name')->orderBy('name')->get(),
-        ]);
+        return view('livewire.newsletter.subscribe-form');
     }
 }
