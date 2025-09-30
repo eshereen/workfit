@@ -214,7 +214,7 @@
                 @if(($selectedVariant && $selectedVariant->stock > 0) || ($product->variants->isEmpty() && $product->quantity > 0))
                     <div class="mb-4">
                         <label class="block mb-2 text-sm font-medium text-gray-700">Quantity:</label>
-                        <div class="flex overflow-hidden items-center rounded-md border">
+                        <div class="flex overflow-hidden items-center">
                             <button type="button"
                                     wire:click="decrementQty"
                                     wire:loading.attr="disabled"
