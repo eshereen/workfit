@@ -1,5 +1,5 @@
 <x-mail::message>
-    <x-logo class="h-12" />
+    <x-logo email width="200" height="60" />
 
 Hello {{ $order->customer->full_name }}
 
