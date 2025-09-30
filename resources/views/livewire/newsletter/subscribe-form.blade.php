@@ -1,6 +1,6 @@
 {{-- resources/views/livewire/newsletter/subscribe-form.blade.php --}}
 <div class="max-w-md">
-    <x-logo class="my-5" email width="200" height="60" />
+  
     @if($submitted)
         <div id="newsletter-success" class="p-3 text-sm text-green-700 bg-green-50 rounded-md animate-fade-in">
             Thanks! Please check your email to confirm your subscription.
