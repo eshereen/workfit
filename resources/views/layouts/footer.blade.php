@@ -26,7 +26,7 @@
             </div>
 
             <!-- Shop -->
-            <div class="animate-on-scroll">
+            {{--  <div class="animate-on-scroll">
                 <h4 class="font-bold mb-4 uppercase">STORE</h4>
                 <ul class="space-y-2">
                     @foreach ($categories as $category)
@@ -35,12 +35,13 @@
 
                 </ul>
             </div>
+--}}
 
             <!-- Support -->
             <div class="animate-on-scroll">
                 <h4 class="font-bold mb-4">SUPPORT</h4>
                 <ul class="space-y-2">
-                     <li><a href="{{ route('about') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">About Us</a></li>
+                    {{-- <li><a href="{{ route('about') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">About Us</a></li> --}}
                     <li><a href="{{ route('contact.index') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Contact Us</a></li>
                     <li><a href="{{ route('terms') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Terms & Conditions</a></li>
                     <li><a href="{{ route('return') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Shipping & Returns</a></li>
@@ -48,11 +49,14 @@
 
                 </ul>
             </div>
+            <div class="animate-on-scroll">
+                <h4 class="font-bold mb-4 uppercase">Check Our Branches</h4>
+                <a href="{{ route('location') }}" class="text-gray-200 hover:text-red-600 transition-colors capitalize">Location</a>
+            </div>
 
             <!-- Newsletter -->
-            <div class="animate-on-scroll">
+            <div class="animate-on-scroll text-center lg:text-left flex flex-col items-center lg:items-start justify-center lg:justify-start">
                 <h4 class="font-bold mb-4">JOIN OUR NEWSLETTER</h4>
-
                 <livewire:newsletter.subscribe-form />
             </div>
         </div>

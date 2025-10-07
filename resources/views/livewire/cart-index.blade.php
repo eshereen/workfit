@@ -267,7 +267,7 @@
                                     placeholder="Enter coupon code"
                                     class="flex-1 px-3 py-2 text-sm rounded-md border focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                 >
-                                <button type="submit" class="px-3 py-2 text-sm text-white bg-red-500 rounded-md hover:bg-red-600">Apply</button>
+                                <button type="submit" class="px-3 py-2 text-sm text-white bg-gray-900 rounded-md hover:bg-gray-700">Apply</button>
                             </form>
                             @error('couponCode')
                                 <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
