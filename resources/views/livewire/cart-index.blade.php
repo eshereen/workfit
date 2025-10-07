@@ -19,7 +19,7 @@
                         <thead class="border-b border-gray-200">
                             <tr class="text-sm text-left text-gray-500">
                                 <th class="pb-4 font-medium">Product</th>
-                                <th class="pb-4 font-medium">Price</th>
+
                                 <th class="pb-4 font-medium">Quantity</th>
                                 <th class="pb-4 font-medium">Total</th>
                                 <th class="pb-4 font-medium"></th>
@@ -62,9 +62,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="py-6">
 
-                                    </td>
                                     <td class="py-6">
                                         <div class="flex w-24 rounded-md border">
                                             <button
@@ -245,14 +243,14 @@
 
                 <div class="mb-6 space-y-4">
                     <!-- Coupon Form -->
-                    <div class="p-3 bg-white rounded-md border">
+                    <div class="p-3 bg-white">
                         @if($appliedCouponCode)
                             <div class="flex justify-between items-center">
                                 <div>
                                     <span class="text-sm text-gray-600">Applied coupon:</span>
                                     <span class="ml-2 font-semibold">{{ $appliedCouponCode }}</span>
                                 </div>
-                                <button wire:click="removeCoupon" class="text-sm text-red-600 hover:underline">Remove</button>
+                                <button wire:click="removeCoupon" class="text-sm text-red-600 hover:underline ">Remove</button>
                             </div>
                             @if($couponDiscount > 0)
                                 <div class="mt-2 text-sm text-green-700">
@@ -267,7 +265,7 @@
                                     placeholder="Enter coupon code"
                                     class="flex-1 px-3 py-2 text-sm rounded-md border focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                 >
-                                <button type="submit" class="px-3 py-2 text-sm text-white bg-gray-900 rounded-md hover:bg-gray-700">Apply</button>
+                                <button type="submit" class="px-3 py-2 text-sm text-white bg-gray-900 rounded-md hover:bg-gray-700 cursor-pointer">Apply</button>
                             </form>
                             @error('couponCode')
                                 <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
