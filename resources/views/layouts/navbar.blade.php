@@ -41,7 +41,7 @@
  }"
  :class="{
    'fixed top-0 left-0 right-0 bg-white text-gray-900 shadow-md': (isHome ? scrolled : true),
-   'relative bg-transparent text-gray-900': isHome && !scrolled
+   'relative bg-transparent text-gray-900 caret-gray-100' : isHome && !scrolled
  }"
  class="z-[1100] transition-all duration-300 py-3 mb-10 font-semibold max-h-30"
 >
@@ -402,13 +402,13 @@
         <button @click="performSearch()"
                 :disabled="!searchQuery.trim()"
                 class="p-3 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                style="color: #4b5563 !important;">
+                style="color: #4b5563 !important; caret-color: #fcfcfc !important;">
           <i class="text-xl fas fa-search" style="color: #4b5563 !important;"></i>
         </button>
         <button @click="closeSearchModal()"
                 class="p-3 transition-colors hover:text-gray-600"
                 style="color: #111827 !important;">
-          <i class="text-xl fas fa-times" style="color: #111827 !important;"></i>
+          <i class="text-xl fas fa-times" style="color: #111827 !important; care"></i>
         </button>
       </div>
     </div>
