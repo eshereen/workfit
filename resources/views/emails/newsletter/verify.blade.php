@@ -1,15 +1,15 @@
 {{-- resources/views/emails/newsletter/verify.blade.php --}}
-@component('mail::message')
+<x-mail::message>
 # Confirm your subscription
 
 Please confirm your subscription to WorkFit updates.
 
-@component('mail::button', ['url' => $url])
+<x-mail::button :url="$url">
 Confirm Subscription
-@endcomponent
+</x-mail::button>
 
 If you did not request this, you can ignore this email.
 
 Thanks,<br>
 {{ config('app.name') }}
-@endcomponent
+</x-mail::message>
