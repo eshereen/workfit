@@ -2,88 +2,147 @@
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
-use Filament\Forms;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use BackedEnum;
 use UnitEnum;
 
-class Profile extends Page implements Forms\Contracts\HasForms
+class Profile extends Page implements HasForms
 {
-    use Forms\Concerns\InteractsWithForms;
+    use InteractsWithForms;
 
     protected static BackedEnum | string | null $navigationIcon = 'heroicon-o-user-circle';
-    protected string $view = 'filament.pages.profile';
     protected static string | UnitEnum | null $navigationGroup = 'Account';
     protected static ?int $navigationSort = 50;
+    protected string $view = 'filament.pages.profile';
 
     public ?array $data = [];
 
     public function mount(): void
     {
-        $this->form->fill(auth()->user()->only(['name', 'email']));
+        $user = auth()->user();
+        $this->form->fill([
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
     }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->label('Full Name')
-                    ->required()
-                    ->maxLength(255),
+                Section::make('Profile Information')
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Full Name')
+                            ->required()
+                            ->maxLength(255),
 
-                Forms\Components\TextInput::make('email')
-                    ->label('Email')
-                    ->email()
-                    ->required()
-                    ->unique('users', 'email', ignoreRecord: true),
+                        TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->required()
+                            ->unique('users', 'email', auth()->id()),
+                    ]),
 
-                Forms\Components\TextInput::make('current_password')
-                    ->label('Current Password')
-                    ->password()
-                    ->dehydrated(false)
-                    ->rule('required_with:password,password_confirmation')
-                    ->rule(function () {
-                        return function (string $attribute, $value, $fail) {
-                            if ($value && ! Hash::check($value, auth()->user()->password)) {
-                                $fail('The current password is incorrect.');
-                            }
-                        };
-                    }),
+                Section::make('Update Password')
+                    ->schema([
+                        TextInput::make('current_password')
+                            ->label('Current Password')
+                            ->password()
+                            ->revealable()
+                            ->requiredWith('password,password_confirmation')
+                            ->rules([
+                                function () {
+                                    return function (string $attribute, $value, $fail) {
+                                        if ($value && ! Hash::check($value, auth()->user()->password)) {
+                                            $fail('The current password is incorrect.');
+                                        }
+                                    };
+                                }
+                            ]),
 
-                Forms\Components\TextInput::make('password')
-                    ->label('New Password')
-                    ->password()
-                    ->dehydrated(fn ($state) => filled($state))
-                    ->rule(Password::defaults())
-                    ->confirmed(),
+                        TextInput::make('password')
+                            ->label('New Password')
+                            ->password()
+                            ->revealable()
+                            ->rules([Password::defaults()])
+                            ->same('password_confirmation')
+                            ->dehydrated(fn ($state) => filled($state)),
 
-                Forms\Components\TextInput::make('password_confirmation')
-                    ->label('Confirm New Password')
-                    ->password()
-                    ->dehydrated(false),
+                        TextInput::make('password_confirmation')
+                            ->label('Confirm New Password')
+                            ->password()
+                            ->revealable()
+                            ->dehydrated(false),
+                    ])
+                    ->description('Leave blank to keep current password.'),
             ])
             ->statePath('data');
     }
 
+    protected function getFormActions(): array
+    {
+        return [
+            Action::make('save')
+                ->label('Save Changes')
+                ->submit('save'),
+        ];
+    }
+
     public function save(): void
     {
+        $data = $this->form->getState();
+
         $user = auth()->user();
 
-        $validated = $this->form->getState();
+        if (! empty($data['password'])) {
+            if (empty($data['current_password'])) {
+                Notification::make()
+                    ->danger()
+                    ->title('Error')
+                    ->body('Current password is required to set a new password.')
+                    ->send();
+                return;
+            }
 
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
+            if (! Hash::check($data['current_password'], $user->password)) {
+                Notification::make()
+                    ->danger()
+                    ->title('Error')
+                    ->body('The current password is incorrect.')
+                    ->send();
+                return;
+            }
 
-        if (! empty($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
+            $user->password = Hash::make($data['password']);
         }
 
+        $user->name = $data['name'];
+        $user->email = $data['email'];
         $user->save();
 
-        $this->notify('success', 'Profile updated successfully.');
+        // Clear password fields
+        $this->form->fill([
+            'name' => $user->name,
+            'email' => $user->email,
+            'current_password' => '',
+            'password' => '',
+            'password_confirmation' => '',
+        ]);
+
+        Notification::make()
+            ->success()
+            ->title('Success')
+            ->body('Profile updated successfully.')
+            ->send();
     }
 }
