@@ -382,7 +382,7 @@
        x-transition:leave="transition ease-in duration-200"
        x-transition:leave-start="opacity-100 transform translate-y-0"
        x-transition:leave-end="opacity-0 transform -translate-y-2"
-       class="fixed top-16 left-0 right-0 h-32 bg-white border-b border-gray-200 shadow-lg z-[1400]"
+       class="fixed top-16 left-0 right-0 h-32 bg-white text-gray-900 border-b border-gray-200 shadow-lg z-[1400]"
        style="display: none;">
 
     <!-- Search Modal Content -->
@@ -396,7 +396,7 @@
             @keydown.escape="closeSearchModal()"
             type="text"
             placeholder="Search products..."
-            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500"
+            class="px-4 py-3 w-full text-lg text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500"
           >
         </div>
         <button @click="performSearch()"

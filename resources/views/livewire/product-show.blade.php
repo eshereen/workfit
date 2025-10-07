@@ -1,4 +1,4 @@
-<div class="container px-4 py-8 mx-auto my-20">
+<div class="container px-6 py-8 mx-auto my-20">
     <!-- Flash Messages -->
     @if (session()->has('success'))
         <div class="p-4 mb-4 text-green-700 bg-green-100 rounded-lg border border-green-400">
@@ -65,8 +65,8 @@
       <picture class="block w-full h-full select-none" :class="magnifierEnabled ? 'cursor-crosshair' : 'cursor-default'">
         <img :src="currentImage"
              alt="{{ $product->name }}"
-             class="block object-contain object-center max-w-full max-h-full"
-             style="object-position: center;"
+             class="block object-cover object-center max-w-full max-h-full"
+             style="object-position: top;"
              width="800"
              height="800"
              decoding="async"
@@ -181,7 +181,7 @@
                                 $colorCode = $this->getColorCode($color);
                             @endphp
                             <button wire:click="selectVariant('{{ $variantForColor->id }}')"
-                                    class="px-3 py-3 mx-px border rounded-full text-sm transition-all duration-200 {{ $selectedVariant && $selectedVariant->color === $color ? 'ring-2 ring-gray-900 ring-offset-2' : 'hover:scale-105' }}"
+                                    class="px-2 py-2 mx-2 border rounded-xs text-sm transition-all duration-200 {{ $selectedVariant && $selectedVariant->color === $color ? 'ring-2 ring-gray-700 ring-offset-2' : 'hover:scale-105' }}"
                                     @if($selectedVariant && $selectedVariant->color === $color) aria-pressed="true" @endif
                                     style="background-color: {{ $colorCode }}; color: {{ $this->getContrastColor($colorCode) }}; border-color: {{ $colorCode }};">
 
@@ -193,13 +193,13 @@
 
                     <!-- Size Selection -->
                     @if($selectedVariant)
-                    <div class="mb-4">
+                    <div class="mb-6">
                         <h4 class="mb-2 text-sm font-medium text-gray-700">Size</h4>
-                        <div class="flex flex-wrap gap-2">
+                        <div class="flex flex-wrap gap-2 my-2">
                             @foreach($product->variants->where('color', $selectedVariant->color) as $variant)
                             <button type="button"
                                     wire:click="selectVariant('{{ $variant->id }}')"
-                                    class="w-12 h-10 flex items-center justify-center border rounded-md text-sm {{ $selectedVariantId == $variant->id ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}"
+                                    class="px-2  flex items-center justify-center border rounded-xs text-sm {{ $selectedVariantId == $variant->id ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}"
                                     @if($selectedVariantId == $variant->id) aria-pressed="true" @endif>
                                 {{ $variant->size }}
                             </button>
@@ -213,7 +213,7 @@
                 <!-- Quantity Selector -->
                 @if(($selectedVariant && $selectedVariant->stock > 0) || ($product->variants->isEmpty() && $product->quantity > 0))
                     <div class="mb-4">
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Quantity:</label>
+                        <h4 class="block mb-2 text-sm font-medium text-gray-700">Quantity:</h4>
                         <div class="flex overflow-hidden items-center">
                             <button type="button"
                                     wire:click="decrementQty"
@@ -263,9 +263,9 @@
                         </div>
                         <span class="text-lg font-bold">{{ $currencySymbol }}{{ number_format($selectedVariant->converted_price ?? $selectedVariant->price ?? $product->converted_price ?? $product->price, 2) }}</span>
                     </div>
-                    <div class="mt-1 text-sm text-gray-600">
+                  {{--    <div class="mt-1 text-sm text-gray-600">
                         Stock: {{ $selectedVariant->stock }} available
-                    </div>
+                    </div>--}}
                 </div>
                 @endif
 
@@ -276,7 +276,7 @@
                             wire:loading.attr="disabled"
                             wire:loading.class="opacity-75 cursor-not-allowed"
                             wire:target="addToCart"
-                            class="px-6 py-3 w-full font-semibold text-white rounded-lg transition-colors bg-gray-950 hover:bg-gray-100 hover:text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="px-6 py-3 w-full font-semibold text-white rounded-lg transition-colors bg-gray-950 hover:bg-gray-100 hover:text-gray-950 border-2 border-gray-950 disabled:opacity-50 disabled:cursor-not-allowed hover:border-2 hover:border-gray-900 cursor-pointer">
                         <span wire:loading.remove wire:target="addToCart">Add to Cart</span>
                         <span wire:loading wire:target="addToCart">
                             <svg class="inline-block mr-2 -ml-1 w-4 h-4 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -301,7 +301,7 @@
         <h2 class="mb-6 text-2xl font-bold text-center lg:text-left">You May Also Like</h2>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             @foreach($relatedProducts as $relatedProduct)
-            <div class="overflow-hidden bg-white transition">
+            <div class="overflow-hidden transition rounded-xs bg-white">
                 <a href="{{ route('product.show', $relatedProduct->slug) }}">
                     <picture class="w-full h-80">
                         {{-- Modern formats first --}}
@@ -310,14 +310,15 @@
                         {{-- Fallback for older browsers --}}
                         <img src="{{ $relatedProduct->getFirstMediaUrl('main_image') }}"
                              alt="{{ $relatedProduct->name }}"
-                             class="object-contain w-full h-80"
-                             width="400"
+                                class="object-cover w-full h-80"
+                                width="400"
+                                style="object-position: top;"
                              height="400"
                              loading="lazy"
                              decoding="async">
                     </picture>
                 </a>
-                <div class="p-4 text-center">
+                <div class="p-4 text-center lg:text-left">
                     <a href="{{ route('product.show', $relatedProduct->slug) }}"
                        class="block mb-1 text-lg font-semibold hover:text-red-600">
                         {{ $relatedProduct->name }}

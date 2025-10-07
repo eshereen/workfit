@@ -71,7 +71,7 @@
 
                     <!-- Flash Sale Badge -->
                     @if($product->compare_price > 0)
-                    <span class="px-2 py-1 font-bold text-white uppercase bg-red-600 rounded opacity-80">
+                    <span class="p-1 font-bold text-white uppercase bg-red-600 text-xs rounded opacity-80 mx-px">
                          Sale
                     </span>
                     @endif
@@ -85,7 +85,7 @@
                     <img src="{{ $mainImage }}"
                          alt="{{ $product->name }}"
                          class="object-cover w-full h-full transition-opacity duration-500 main-image"
-                         style="opacity: 1; transition: opacity 0.5s ease;"
+                         style="opacity: 1; transition: opacity 0.5s ease; object-position: top;"
                          width="400"
                          height="400"
                          loading="lazy">
@@ -118,10 +118,10 @@
                     <button wire:click="toggleWishlist({{ $product->id }})"
                             wire:loading.attr="disabled"
                             wire:target="toggleWishlist({{ $product->id }})"
-                            class="p-2 bg-white rounded-full shadow-md transition-colors hover:bg-gray-50"
+                            class="p-1 bg-white rounded-full shadow-md transition-colors hover:bg-gray-50"
                             data-product-id="{{ $product->id }}"
                             title="{{ in_array($product->id, $wishlistProductIds) ? 'Remove from Wishlist' : 'Add to Wishlist' }}">
-                        <svg class="w-5 h-5 {{ in_array($product->id, $wishlistProductIds) ? 'text-red-500 fill-current' : 'text-gray-600' }}"
+                        <svg class="w-3 h-3 {{ in_array($product->id, $wishlistProductIds) ? 'text-red-500 fill-current' : 'text-gray-600' }}"
                              fill="{{ in_array($product->id, $wishlistProductIds) ? 'currentColor' : 'none' }}"
                              stroke="currentColor"
                              viewBox="0 0 24 24">
@@ -129,7 +129,7 @@
                         </svg>
                     </button>
                     <span wire:loading wire:target="toggleWishlist({{ $product->id }})" class="absolute top-2 right-2 p-1">
-                        <svg class="w-5 h-5 text-red-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg class="w-3 h-3 text-red-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -137,7 +137,7 @@
                 </div>
                 @else
                 <a href="{{ route('login') }}" class="absolute top-2 right-2 z-20 p-1 bg-white rounded-full shadow-md transition-colors hover:bg-gray-50" title="Login to add to wishlist">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                     </svg>
                 </a>
@@ -154,21 +154,22 @@
                             <p class="pt-3 text-sm text-gray-600">{{ $product->category->name }}</p>
                         @endif
                     </div>
-                    @if($product->compare_price > 0)
-                    <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">
-                        -{{ $product->discount_percentage }}%
-                    </span>
-                    @endif
+
                 </div>
                 <div class="flex justify-between items-center mt-2">
                     <div>
                         <span class="text-base font-bold">{{ number_format($product->converted_price ?? $product->price, 2) }} {{ $currencySymbol }}</span>
                     </div>
                     @if($product->compare_price > 0)
-                    <div>
+                    <div class="flex items-center gap-2">
                         <span class="text-sm text-gray-500 line-through">
                             {{ number_format($product->converted_compare_price ?? $product->compare_price, 2) }} {{ $currencySymbol }}
                         </span>
+
+                        <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">
+                            -{{ $product->discount_percentage }}%
+                        </span>
+
                     </div>
                     @endif
                 </div>
