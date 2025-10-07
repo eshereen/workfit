@@ -52,12 +52,12 @@
       <div class="flex flex-shrink-0 items-center space-x-3 md:hidden">
           <!-- Mobile Menu Button (bars) -->
           <button @click="mobileMenuOpen = !mobileMenuOpen" class="hover:cursor-pointer" type="button" aria-controls="mobileMenu">
-              <i class="text-xl fas fa-bars" :class="isHome && !scrolled ? 'text-gray-100' : 'text-gray-950'"></i>
+              <i class="text-xl fas fa-bars" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'"></i>
           </button>
 
           <!-- Search Icon -->
           <button @click="openSearchModal()" class="hover:cursor-pointer">
-              <i class="text-xl fas fa-search" :class="isHome && !scrolled ? 'text-gray-100' : 'text-gray-950'"></i>
+              <i class="text-xl fas fa-search" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'"></i>
           </button>
       </div>
 
