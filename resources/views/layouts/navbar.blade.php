@@ -52,12 +52,12 @@
       <div class="flex flex-shrink-0 items-center space-x-3 md:hidden">
           <!-- Mobile Menu Button (bars) -->
           <button @click="mobileMenuOpen = !mobileMenuOpen" class="hover:cursor-pointer" type="button" aria-controls="mobileMenu">
-              <i class="text-xl fas fa-bars" :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"></i>
+              <i class="text-xl fas fa-bars" :class="isHome && !scrolled ? 'text-gray-800' : 'text-gray-950'"></i>
           </button>
 
           <!-- Search Icon -->
           <button @click="openSearchModal()" class="hover:cursor-pointer">
-              <i class="text-xl fas fa-search" :class="isHome && !scrolled ? 'text-white' : 'text-gray-950'"></i>
+              <i class="text-xl fas fa-search" :class="isHome && !scrolled ? 'text-gray-800' : 'text-gray-950'"></i>
           </button>
       </div>
 
@@ -382,13 +382,13 @@
        x-transition:leave="transition ease-in duration-200"
        x-transition:leave-start="opacity-100 transform translate-y-0"
        x-transition:leave-end="opacity-0 transform -translate-y-2"
-       class="fixed top-16 left-0 right-0 h-32 bg-black text-gray-100 border-b border-gray-200 shadow-lg z-[1400]"
+       class="fixed top-16 left-0 right-0 h-32 bg-white text-gray-900 border-b border-gray-200 shadow-lg z-[1400]"
        style="display: none;">
 
     <!-- Search Modal Content -->
     <div class="container flex items-center px-8 mx-auto h-full">
       <div class="flex flex-1 items-center space-x-4">
-        <div class="relative flex-1 text-gray-900">
+        <div class="relative flex-1">
           <input
             x-ref="searchInput"
             x-model="searchQuery"
@@ -396,7 +396,7 @@
             @keydown.escape="closeSearchModal()"
             type="text"
             placeholder="Search products..."
-            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500 text-gray-900 caret-gray-900"
+            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500"
 
           >
         </div>
