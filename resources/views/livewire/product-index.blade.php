@@ -71,7 +71,7 @@
 
                     <!-- Flash Sale Badge -->
                     @if($product->compare_price > 0)
-                    <span class="p-1 font-bold text-white uppercase bg-red-600 text-xs rounded opacity-80 mx-px">
+                    <span class="p-1 font-bold text-white uppercase bg-red-600 text-xs  opacity-80 mx-px">
                          Sale
                     </span>
                     @endif
