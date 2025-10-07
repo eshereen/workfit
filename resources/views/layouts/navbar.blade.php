@@ -396,13 +396,13 @@
             @keydown.escape="closeSearchModal()"
             type="text"
             placeholder="Search products..."
-            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 text-gray-900 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500"
-
+            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 text-gray-900 caret-gray-900 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500"
+            style="color: #111827 !important; caret-color: #111827 !important;"
           >
         </div>
         <button @click="performSearch()"
                 :disabled="!searchQuery.trim()"
-                class="p-3 text-gray-600 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900">
+                class="p-3 text-gray-600 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed">
           <i class="text-xl fas fa-search"></i>
         </button>
         <button @click="closeSearchModal()"
