@@ -386,8 +386,8 @@
        style="display: none; color: #111827 !important;">
 
     <!-- Search Modal Content -->
-    <div class="container flex items-center px-8 mx-auto h-full">
-      <div class="flex flex-1 items-center space-x-4">
+    <div class="container flex items-center px-8 mx-auto h-full" style="color: #111827 !important;">
+      <div class="flex flex-1 items-center space-x-4" style="color: #111827 !important;">
         <div class="relative flex-1">
           <input
             x-ref="searchInput"
@@ -397,19 +397,19 @@
             type="text"
             placeholder="Search products..."
             class="px-4 py-3 w-full text-lg bg-white border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500"
-            style="color: #111827 !important; caret-color: #111827 !important; background-color: #ffffff !important;"
+            style="color: #111827 !important; caret-color: #111827 !important; background-color: #ffffff !important; -webkit-text-fill-color: #111827 !important;"
           >
         </div>
         <button @click="performSearch()"
                 :disabled="!searchQuery.trim()"
                 class="p-3 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 style="color: #4b5563 !important;">
-          <i class="text-xl fas fa-search"></i>
+          <i class="text-xl fas fa-search" style="color: #4b5563 !important;"></i>
         </button>
         <button @click="closeSearchModal()"
                 class="p-3 transition-colors hover:text-gray-600"
                 style="color: #111827 !important;">
-          <i class="text-xl fas fa-times"></i>
+          <i class="text-xl fas fa-times" style="color: #111827 !important;"></i>
         </button>
       </div>
     </div>
