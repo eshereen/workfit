@@ -96,9 +96,9 @@
 
                             <button
                                 type="button"
-                                onclick="togglePassword('current_password', this)"
+                                data-toggle-target="current_password"
                                 style="position: absolute; top: 0; bottom: 0; right: 0.5rem; display: flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none; padding: 0;"
-                                class="hover:text-gray-600 dark:hover:text-gray-300"
+                                class="hover:text-gray-600 dark:hover:text-gray-300 js-toggle-password"
                             >
                                 <svg class="eye-open" style="height: 1.125rem; width: 1.125rem; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -137,9 +137,9 @@
 
                             <button
                                 type="button"
-                                onclick="togglePassword('password', this)"
+                                data-toggle-target="password"
                                 style="position: absolute; top: 0; bottom: 0; right: 0.5rem; display: flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none; padding: 0;"
-                                class="hover:text-gray-600 dark:hover:text-gray-300"
+                                class="hover:text-gray-600 dark:hover:text-gray-300 js-toggle-password"
                             >
                                 <svg class="eye-open" style="height: 1.125rem; width: 1.125rem; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -178,9 +178,9 @@
 
                             <button
                                 type="button"
-                                onclick="togglePassword('password_confirmation', this)"
+                                data-toggle-target="password_confirmation"
                                 style="position: absolute; top: 0; bottom: 0; right: 0.5rem; display: flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none; padding: 0;"
-                                class="hover:text-gray-600 dark:hover:text-gray-300"
+                                class="hover:text-gray-600 dark:hover:text-gray-300 js-toggle-password"
                             >
                                 <svg class="eye-open" style="height: 1.125rem; width: 1.125rem; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -225,21 +225,35 @@
     </form>
 
     <script>
-        function togglePassword(inputId, button) {
-            const input = document.getElementById(inputId);
-            const eyeOpen = button.querySelector('.eye-open');
-            const eyeClosed = button.querySelector('.eye-closed');
+        (function () {
+            function togglePasswordBy(button) {
+                const inputId = button.getAttribute('data-toggle-target');
+                const input = document.getElementById(inputId);
+                if (!input) return;
 
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeOpen.style.display = 'none';
-                eyeClosed.style.display = 'block';
-            } else {
-                input.type = 'password';
-                eyeOpen.style.display = 'block';
-                eyeClosed.style.display = 'none';
+                const eyeOpen = button.querySelector('.eye-open');
+                const eyeClosed = button.querySelector('.eye-closed');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    if (eyeOpen) eyeOpen.style.display = 'none';
+                    if (eyeClosed) eyeClosed.style.display = 'block';
+                } else {
+                    input.type = 'password';
+                    if (eyeOpen) eyeOpen.style.display = 'block';
+                    if (eyeClosed) eyeClosed.style.display = 'none';
+                }
             }
-        }
+
+            function onClick(e) {
+                const button = e.target.closest('.js-toggle-password');
+                if (!button) return;
+                e.preventDefault();
+                togglePasswordBy(button);
+            }
+
+            document.addEventListener('click', onClick);
+        })();
     </script>
 
     <style>
