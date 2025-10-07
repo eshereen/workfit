@@ -91,13 +91,13 @@
                                 id="current_password"
                                 autocomplete="current-password"
                                 style="display: block; width: 100%; border: 2px solid #d1d5db; border-radius: 0.5rem; padding: 0.5rem 2.5rem 0.5rem 0.75rem; font-size: 0.875rem;"
-                                class="fi-input focus:border-primary-600 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm transition-colors"
+                                class="fi-input focus:border-primary-600 focus:ring-2 focus:ring-primary-500 shadow-sm transition-colors"
                             />
 
                             <button
                                 type="button"
                                 onclick="togglePassword('current_password', this)"
-                                style="position: absolute; top: 0; bottom: 0; right: 0; display: flex; align-items: center; padding-right: 0.75rem; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none;"
+                                style="position: absolute; top: 50%; right: 0; transform: translateY(-50%); display: flex; align-items: center; padding-right: 0.75rem; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none;"
                                 class="hover:text-gray-600 dark:hover:text-gray-300"
                             >
                                 <svg class="eye-open" style="height: 1.25rem; width: 1.25rem; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,13 +132,13 @@
                                 id="password"
                                 autocomplete="new-password"
                                 style="display: block; width: 100%; border: 2px solid #d1d5db; border-radius: 0.5rem; padding: 0.5rem 2.5rem 0.5rem 0.75rem; font-size: 0.875rem;"
-                                class="fi-input focus:border-primary-600 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm transition-colors"
+                                class="fi-input focus:border-primary-600 focus:ring-2 focus:ring-primary-500 shadow-sm transition-colors"
                             />
 
                             <button
                                 type="button"
                                 onclick="togglePassword('password', this)"
-                                style="position: absolute; top: 0; bottom: 0; right: 0; display: flex; align-items: center; padding-right: 0.75rem; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none;"
+                                style="position: absolute; top: 50%; right: 0; transform: translateY(-50%); display: flex; align-items: center; padding-right: 0.75rem; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none;"
                                 class="hover:text-gray-600 dark:hover:text-gray-300"
                             >
                                 <svg class="eye-open" style="height: 1.25rem; width: 1.25rem; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,13 +173,13 @@
                                 id="password_confirmation"
                                 autocomplete="new-password"
                                 style="display: block; width: 100%; border: 2px solid #d1d5db; border-radius: 0.5rem; padding: 0.5rem 2.5rem 0.5rem 0.75rem; font-size: 0.875rem;"
-                                class="fi-input focus:border-primary-600 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm transition-colors"
+                                class="fi-input focus:border-primary-600 focus:ring-2 focus:ring-primary-500 shadow-sm transition-colors"
                             />
 
                             <button
                                 type="button"
                                 onclick="togglePassword('password_confirmation', this)"
-                                style="position: absolute; top: 0; bottom: 0; right: 0; display: flex; align-items: center; padding-right: 0.75rem; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none;"
+                                style="position: absolute; top: 50%; right: 0; transform: translateY(-50%); display: flex; align-items: center; padding-right: 0.75rem; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none;"
                                 class="hover:text-gray-600 dark:hover:text-gray-300"
                             >
                                 <svg class="eye-open" style="height: 1.25rem; width: 1.25rem; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,6 +257,13 @@
         /* Additional CSS to force borders on all inputs */
         input.fi-input {
             border: 2px solid #d1d5db !important;
+        }
+
+        /* Dark mode border - lighter/more visible */
+        @media (prefers-color-scheme: dark) {
+            input.fi-input {
+                border: 2px solid #4b5563 !important;
+            }
         }
 
         /* Make sure icons are visible */
