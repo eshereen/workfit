@@ -388,7 +388,7 @@
     <!-- Search Modal Content -->
     <div class="container flex items-center px-8 mx-auto h-full">
       <div class="flex flex-1 items-center space-x-4">
-        <div class="relative flex-1">
+        <div class="relative flex-1 text-gray-900">
           <input
             x-ref="searchInput"
             x-model="searchQuery"
@@ -396,8 +396,8 @@
             @keydown.escape="closeSearchModal()"
             type="text"
             placeholder="Search products..."
-            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500"
-            style="color:#111827 !important; caret-color:#111827;"
+            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500 text-gray-900 caret-gray-900"
+
           >
         </div>
         <button @click="performSearch()"
