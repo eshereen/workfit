@@ -396,7 +396,7 @@
             @keydown.escape="closeSearchModal()"
             type="text"
             placeholder="Search products..."
-            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500 text-gray-900 caret-gray-900"
+            class="px-4 py-3 w-full text-lg bg-gray-800 border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500 text-gray-100 caret-gray-900"
 
           >
         </div>
