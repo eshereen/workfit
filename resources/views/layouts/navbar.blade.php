@@ -383,10 +383,9 @@
        x-transition:leave-start="opacity-100 transform translate-y-0"
        x-transition:leave-end="opacity-0 transform -translate-y-2"
        class="fixed top-16 left-0 right-0 h-32 bg-white border-b border-gray-200 shadow-lg z-[1400]"
-       style="display: none; color: #111827 !important;">
-
+      >
     <!-- Search Modal Content -->
-    <div class="container flex items-center px-8 mx-auto h-full" style="color: #111827 !important;">
+    <div class="container flex items-center px-8 mx-auto h-full" >
       <div class="flex flex-1 items-center space-x-4" style="color: #111827 !important;">
         <div class="relative flex-1">
           <input
