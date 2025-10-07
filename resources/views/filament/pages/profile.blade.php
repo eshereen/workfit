@@ -97,7 +97,7 @@
                             <button
                                 type="button"
                                 data-toggle-target="current_password"
-                                style="position: absolute; top: 0; bottom: 0; right: 0.5rem; display: flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none; padding: 0;"
+                                style="position: absolute; top: 50%; right: 0.75rem; transform: translateY(-50%); display: flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none; padding: 0; width: 1.5rem; height: 1.5rem;"
                                 class="hover:text-gray-600 dark:hover:text-gray-300 js-toggle-password"
                             >
                                 <svg class="eye-open" style="height: 1.125rem; width: 1.125rem; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,7 +138,7 @@
                             <button
                                 type="button"
                                 data-toggle-target="password"
-                                style="position: absolute; top: 0; bottom: 0; right: 0.5rem; display: flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none; padding: 0;"
+                                style="position: absolute; top: 50%; right: 0.75rem; transform: translateY(-50%); display: flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none; padding: 0; width: 1.5rem; height: 1.5rem;"
                                 class="hover:text-gray-600 dark:hover:text-gray-300 js-toggle-password"
                             >
                                 <svg class="eye-open" style="height: 1.125rem; width: 1.125rem; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +179,7 @@
                             <button
                                 type="button"
                                 data-toggle-target="password_confirmation"
-                                style="position: absolute; top: 0; bottom: 0; right: 0.5rem; display: flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none; padding: 0;"
+                                style="position: absolute; top: 50%; right: 0.75rem; transform: translateY(-50%); display: flex; align-items: center; justify-content: center; color: #9ca3af; cursor: pointer; outline: none; border: none; background: none; padding: 0; width: 1.5rem; height: 1.5rem;"
                                 class="hover:text-gray-600 dark:hover:text-gray-300 js-toggle-password"
                             >
                                 <svg class="eye-open" style="height: 1.125rem; width: 1.125rem; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
