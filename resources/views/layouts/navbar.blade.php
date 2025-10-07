@@ -382,8 +382,8 @@
        x-transition:leave="transition ease-in duration-200"
        x-transition:leave-start="opacity-100 transform translate-y-0"
        x-transition:leave-end="opacity-0 transform -translate-y-2"
-       class="fixed top-16 left-0 right-0 h-32 bg-white text-gray-900 border-b border-gray-200 shadow-lg z-[1400]"
-       style="display: none;">
+       class="fixed top-16 left-0 right-0 h-32 bg-white border-b border-gray-200 shadow-lg z-[1400]"
+       style="display: none; color: #111827 !important;">
 
     <!-- Search Modal Content -->
     <div class="container flex items-center px-8 mx-auto h-full">
@@ -396,17 +396,19 @@
             @keydown.escape="closeSearchModal()"
             type="text"
             placeholder="Search products..."
-            class="px-4 py-3 w-full text-lg bg-transparent border-0 border-b-2 border-gray-300 text-gray-900 caret-gray-900 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500"
-            style="color: #111827 !important; caret-color: #111827 !important;"
+            class="px-4 py-3 w-full text-lg bg-white border-0 border-b-2 border-gray-300 outline-none focus:ring-0 focus:border-red-500 placeholder-gray-500"
+            style="color: #111827 !important; caret-color: #111827 !important; background-color: #ffffff !important;"
           >
         </div>
         <button @click="performSearch()"
                 :disabled="!searchQuery.trim()"
-                class="p-3 text-gray-600 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="p-3 transition-colors hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                style="color: #4b5563 !important;">
           <i class="text-xl fas fa-search"></i>
         </button>
         <button @click="closeSearchModal()"
-                class="p-3 text-gray-900 transition-colors hover:text-gray-600">
+                class="p-3 transition-colors hover:text-gray-600"
+                style="color: #111827 !important;">
           <i class="text-xl fas fa-times"></i>
         </button>
       </div>
