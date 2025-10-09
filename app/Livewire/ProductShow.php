@@ -411,13 +411,32 @@ class ProductShow extends Component
 
     public function render()
     {
-        $relatedProducts = Product::where('category_id', $this->product->category_id)
-            ->where('subcategory_id', $this->product->subcategory_id)
-            ->where('id', '!=', $this->product->id)
-            ->where('products.active', true)
-            ->with('media')
-            ->take(4)
-            ->get();
+        // First try to get products from the same subcategory
+        $relatedProducts = collect();
+
+        if ($this->product->subcategory_id) {
+            $relatedProducts = Product::where('subcategory_id', $this->product->subcategory_id)
+                ->where('id', '!=', $this->product->id)
+                ->where('active', true)
+                ->with('media')
+                ->take(4)
+                ->get();
+        }
+
+        // If not enough products from subcategory, get from same category
+        if ($relatedProducts->count() < 4) {
+            $remainingCount = 4 - $relatedProducts->count();
+            $excludeIds = $relatedProducts->pluck('id')->push($this->product->id)->toArray();
+
+            $categoryProducts = Product::where('category_id', $this->product->category_id)
+                ->whereNotIn('id', $excludeIds)
+                ->where('active', true)
+                ->with('media')
+                ->take($remainingCount)
+                ->get();
+
+            $relatedProducts = $relatedProducts->merge($categoryProducts);
+        }
 
         // Convert related products prices to current currency
         $this->convertRelatedProductsPrices($relatedProducts);
