@@ -84,7 +84,7 @@
 
 
        <!-- Thumbnails -->
-       <div class="grid grid-cols-4 gap-1 mt-3">
+       <div class="grid grid-cols-4 gap-1 mt-2 md:mt-3">
            <template x-for="(image, index) in images" :key="index">
                <div class="overflow-hidden rounded border transition-colors cursor-pointer hover:border-gray-500"
                     :class="currentImage === image.large ? 'border-gray-500 ring-2 ring-gray-200' : 'border-gray-200'"
