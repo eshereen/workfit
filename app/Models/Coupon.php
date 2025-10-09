@@ -11,7 +11,7 @@ class Coupon extends Model
 {
     /** @use HasFactory<CouponFactory> */
     use HasFactory;
-    protected $fillable = ['code', 'type', 'value', 'min_order_amount', 'usage_limit', 'used_count', 'starts_at', 'expires_at', 'active'];
+    protected $fillable = ['code', 'type', 'value', 'min_order_amount', 'usage_limit', 'used_count', 'starts_at', 'expires_at', 'active', 'meta_data'];
 
 
      protected $casts = [
@@ -19,6 +19,7 @@ class Coupon extends Model
         'active' => 'boolean',
         'starts_at' => 'datetime',
         'expires_at' => 'datetime',
+        'meta_data' => 'array',
     ];
 
     public function isValid()
