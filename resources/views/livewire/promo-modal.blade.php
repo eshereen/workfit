@@ -151,23 +151,22 @@
     </div>
 </div>
 
+@script
 <script>
-document.addEventListener('livewire:initialized', () => {
-    // Listen for promo coupon success
-    Livewire.on('promoCouponSuccess', (data) => {
-        const event = new CustomEvent('show-promo-success', {
-            detail: { message: data[0]?.message || data.message || 'Coupon sent successfully!' }
-        });
-        window.dispatchEvent(event);
+// Listen for promo coupon success
+$wire.on('promoCouponSuccess', (data) => {
+    const event = new CustomEvent('show-promo-success', {
+        detail: { message: data[0]?.message || data.message || 'Coupon sent successfully!' }
     });
+    window.dispatchEvent(event);
+});
 
-    // Listen for promo coupon error
-    Livewire.on('promoCouponError', (data) => {
-        const event = new CustomEvent('show-promo-error', {
-            detail: { message: data[0]?.message || data.message || 'An error occurred' }
-        });
-        window.dispatchEvent(event);
+// Listen for promo coupon error
+$wire.on('promoCouponError', (data) => {
+    const event = new CustomEvent('show-promo-error', {
+        detail: { message: data[0]?.message || data.message || 'An error occurred' }
     });
+    window.dispatchEvent(event);
 });
 
 // Handle inline notifications
@@ -199,3 +198,4 @@ window.addEventListener('show-promo-error', (event) => {
     }
 });
 </script>
+@endscript
