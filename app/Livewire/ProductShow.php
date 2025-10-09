@@ -232,15 +232,6 @@ class ProductShow extends Component
     }
 
 
-
-
-
-
-
-
-
-
-
         public function selectVariant($variantId)
     {
         $this->selectedVariantId = $variantId;
@@ -420,9 +411,9 @@ class ProductShow extends Component
 
     public function render()
     {
-        $relatedProducts = Product::where('category_id', $this->product->category_id)
+        $relatedProducts = Product::where('subcategory_id', $this->product->subcategory_id)
             ->where('id', '!=', $this->product->id)
-            ->where('active', true)
+            ->where('products.active', true)
             ->with('media')
             ->take(4)
             ->get();

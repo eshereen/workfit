@@ -187,41 +187,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.showNotification(`Currency changed to ${currencyCode}`, 'success');
                 }
 
-                // Refresh Livewire component instead of reloading page
-                const currencySelector = document.querySelector('.currency-selector[wire\\:id]');
-                if (currencySelector && window.Livewire) {
-                    const wireId = currencySelector.getAttribute('wire:id');
-                    const component = window.Livewire.find(wireId);
-                    if (component) {
-                        component.call('updateToCurrency', currencyCode);
-                        component.$refresh();
-                    }
-                }
-
-                // Dispatch events to all Livewire components
-                if (window.Livewire) {
-                    // Dispatch multiple events for better compatibility
-                    window.Livewire.dispatch('currencyChanged', { currencyCode: currencyCode });
-                    window.Livewire.dispatch('currency-changed', { currencyCode: currencyCode });
-                    window.Livewire.dispatch('global-currency-changed', { currencyCode: currencyCode });
-
-                    // Also dispatch as window events for broader compatibility
-                    window.dispatchEvent(new CustomEvent('currency-changed', {
-                        detail: { currencyCode: currencyCode }
-                    }));
-                    window.dispatchEvent(new CustomEvent('global-currency-changed', {
-                        detail: { currencyCode: currencyCode }
-                    }));
-                }
-
-                // Force refresh all Livewire components on the page
-                if (window.Livewire) {
-                    window.Livewire.all().forEach(component => {
-                        if (component.$refresh) {
-                            component.$refresh();
-                        }
-                    });
-                }
+                // Reload the page to reflect currency changes
+                setTimeout(() => {
+                    window.location.reload();
+                }, 300); // Small delay to show notification
             } else {
                 console.error('❌ Currency change failed:', data.message);
             }
@@ -259,39 +228,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.showNotification('Currency reset to detected location', 'success');
                 }
 
-                // Refresh Livewire component
-                const currencySelector = document.querySelector('.currency-selector[wire\\:id]');
-                if (currencySelector && window.Livewire) {
-                    const wireId = currencySelector.getAttribute('wire:id');
-                    const component = window.Livewire.find(wireId);
-                    if (component) {
-                        component.$refresh();
-                    }
-                }
-
-                // Dispatch events to all Livewire components
-                if (window.Livewire) {
-                    window.Livewire.dispatch('currencyChanged', { currencyCode: data.currencyCode });
-                    window.Livewire.dispatch('currency-changed', { currencyCode: data.currencyCode });
-                    window.Livewire.dispatch('global-currency-changed', { currencyCode: data.currencyCode });
-
-                    // Also dispatch as window events
-                    window.dispatchEvent(new CustomEvent('currency-changed', {
-                        detail: { currencyCode: data.currencyCode }
-                    }));
-                    window.dispatchEvent(new CustomEvent('global-currency-changed', {
-                        detail: { currencyCode: data.currencyCode }
-                    }));
-                }
-
-                // Force refresh all Livewire components on the page
-                if (window.Livewire) {
-                    window.Livewire.all().forEach(component => {
-                        if (component.$refresh) {
-                            component.$refresh();
-                        }
-                    });
-                }
+                // Reload the page to reflect currency changes
+                setTimeout(() => {
+                    window.location.reload();
+                }, 300); // Small delay to show notification
             } else {
                 console.error('❌ Currency reset failed:', data.message);
             }
