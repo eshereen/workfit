@@ -83,10 +83,10 @@
          x-transition:leave-start="transform opacity-100 scale-100"
          x-transition:leave-end="transform opacity-0 scale-95"
          @click.away="open = false"
-         class="absolute right-0 z-50 mt-2 w-72 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg sm:w-80"
+         class="absolute right-0 z-50 mt-2 w-80 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg md:w-96"
          style="display: none;">
 
-        <div class="overflow-y-auto py-1 max-h-[60vh] sm:max-h-96 currency-dropdown-scroll">
+        <div class="overflow-y-scroll py-1 currency-dropdown-scroll" style="max-height: 400px;">
             <!-- Auto-detected currency info -->
             @if($isAutoDetected && $detectedCountry)
             <div class="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
