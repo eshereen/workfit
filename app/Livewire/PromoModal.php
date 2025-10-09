@@ -64,10 +64,7 @@ class PromoModal extends Component
                 ->first();
 
             if ($existingCoupon) {
-                $this->dispatch('showNotification', [
-                    'message' => 'This email has already received a welcome coupon.',
-                    'type' => 'error'
-                ]);
+                $this->addError('email', 'This email has already received a welcome coupon.');
                 $this->isSubmitting = false;
                 return;
             }
@@ -94,45 +91,35 @@ class PromoModal extends Component
                 'expires_at' => $coupon->expires_at
             ]);
 
-            // Queue email sending (more reliable for live servers)
+            // Send email (sync or queue based on config - same as newsletter)
             try {
-                Mail::to($this->email)->queue(new PromoCouponMail($coupon));
-
-                Log::info('Promo coupon email queued successfully', [
-                    'coupon_code' => $couponCode,
-                    'email' => $this->email
-                ]);
+                $usingSyncQueue = config('queue.default') === 'sync';
+                if ($usingSyncQueue) {
+                    Mail::to($this->email)->send(new PromoCouponMail($coupon));
+                    Log::info('Promo coupon email sent synchronously', ['email' => $this->email]);
+                } else {
+                    Mail::to($this->email)->queue(new PromoCouponMail($coupon));
+                    Log::info('Promo coupon email queued', ['email' => $this->email]);
+                }
             } catch (\Exception $mailException) {
-                Log::error('Failed to queue promo coupon email', [
-                    'coupon_code' => $couponCode,
+                Log::error('Promo coupon email dispatch failed', [
                     'email' => $this->email,
                     'error' => $mailException->getMessage()
                 ]);
 
-                // Try sending immediately as fallback
-                try {
-                    Mail::to($this->email)->send(new PromoCouponMail($coupon));
-                    Log::info('Promo coupon email sent immediately (fallback)', [
-                        'coupon_code' => $couponCode,
-                        'email' => $this->email
-                    ]);
-                } catch (\Exception $sendException) {
-                    Log::error('Failed to send promo coupon email (both queue and immediate)', [
-                        'coupon_code' => $couponCode,
-                        'email' => $this->email,
-                        'error' => $sendException->getMessage()
-                    ]);
-                }
+                $this->addError('email', 'We could not send the coupon email right now. Please try again later.');
+                $this->isSubmitting = false;
+                return;
             }
 
-            // Show success notification
+            // Clear the email input (same as newsletter)
+            $this->reset(['email']);
+
+            // Dispatch success notification
             $this->dispatch('showNotification', [
-                'message' => 'Check your email! Your exclusive 10% OFF coupon has been sent.',
+                'message' => 'Success! Check your email for your 10% OFF coupon.',
                 'type' => 'success'
             ]);
-
-            // Clear the email input immediately
-            $this->email = '';
 
             // Close modal after success
             $this->closeModal();
@@ -144,10 +131,7 @@ class PromoModal extends Component
                 'trace' => $e->getTraceAsString()
             ]);
 
-            $this->dispatch('showNotification', [
-                'message' => 'Something went wrong. Please try again.',
-                'type' => 'error'
-            ]);
+            $this->addError('email', 'Something went wrong. Please try again later.');
         }
 
         $this->isSubmitting = false;
