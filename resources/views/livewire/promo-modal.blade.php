@@ -74,19 +74,53 @@
                     </div>
                 </div>
                 <!-- Right section - Email Capture CTA -->
-                <div class="flex flex-col justify-center p-8 bg-gray-50 md:p-12">
+                <div class="flex flex-col justify-center p-8 bg-gray-50 md:p-12"
+                     x-data="{ showSuccess: false, showError: false, message: '' }">
                     <div class="text-center md:text-left">
                         <h2 class="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
                             Get Your <span class="text-red-600">10% OFF</span> Coupon!
                         </h2>
+
+                        <!-- Inline Success Notification -->
+                        <div x-show="showSuccess"
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 transform scale-95"
+                             x-transition:enter-end="opacity-100 transform scale-100"
+                             class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span x-text="message" class="font-semibold"></span>
+                            </div>
+                        </div>
+
+                        <!-- Inline Error Notification -->
+                        <div x-show="showError"
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 transform scale-95"
+                             x-transition:enter-end="opacity-100 transform scale-100"
+                             class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                <span x-text="message" class="font-semibold"></span>
+                            </div>
+                        </div>
+
                         <!-- Email Form -->
-                        <form wire:submit.prevent="submitEmail" class="space-y-4">
+                        <form wire:submit.prevent="submitEmail" class="space-y-4"
+                              @submit="showSuccess = false; showError = false;">
                             <div>
                                 <input type="email"
-                                       wire:model="email"
+                                       wire:model.live="email"
+                                       id="promo-email-input"
                                        placeholder="Enter your email address"
                                        class="px-3 py-2 w-full rounded-lg border border-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                       required>
+                                       required
+                                       @show-promo-success.window="$el.value = ''"
+                                       @show-promo-error.window="setTimeout(() => $el.select(), 100)">
                                 @error('email')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -117,3 +151,51 @@
     </div>
 </div>
 
+<script>
+document.addEventListener('livewire:initialized', () => {
+    // Listen for promo coupon success
+    Livewire.on('promoCouponSuccess', (data) => {
+        const event = new CustomEvent('show-promo-success', {
+            detail: { message: data[0]?.message || data.message || 'Coupon sent successfully!' }
+        });
+        window.dispatchEvent(event);
+    });
+
+    // Listen for promo coupon error
+    Livewire.on('promoCouponError', (data) => {
+        const event = new CustomEvent('show-promo-error', {
+            detail: { message: data[0]?.message || data.message || 'An error occurred' }
+        });
+        window.dispatchEvent(event);
+    });
+});
+
+// Handle inline notifications
+window.addEventListener('show-promo-success', (event) => {
+    const alpineComponent = Alpine.$data(document.querySelector('[x-data*="showSuccess"]'));
+    if (alpineComponent) {
+        alpineComponent.message = event.detail.message;
+        alpineComponent.showSuccess = true;
+        alpineComponent.showError = false;
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            alpineComponent.showSuccess = false;
+        }, 5000);
+    }
+});
+
+window.addEventListener('show-promo-error', (event) => {
+    const alpineComponent = Alpine.$data(document.querySelector('[x-data*="showSuccess"]'));
+    if (alpineComponent) {
+        alpineComponent.message = event.detail.message;
+        alpineComponent.showError = true;
+        alpineComponent.showSuccess = false;
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            alpineComponent.showError = false;
+        }, 5000);
+    }
+});
+</script>

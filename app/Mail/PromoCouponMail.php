@@ -9,8 +9,9 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
-class PromoCouponMail extends Mailable
+class PromoCouponMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -21,7 +22,8 @@ class PromoCouponMail extends Mailable
         public Coupon $coupon
     )
     {
-        //
+        // Set queue connection and queue name
+        $this->onQueue('emails');
     }
 
     /**
