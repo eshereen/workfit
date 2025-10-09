@@ -411,7 +411,8 @@ class ProductShow extends Component
 
     public function render()
     {
-        $relatedProducts = Product::where('subcategory_id', $this->product->subcategory_id)
+        $relatedProducts = Product::where('category_id', $this->product->category_id)
+            ->where('subcategory_id', $this->product->subcategory_id)
             ->where('id', '!=', $this->product->id)
             ->where('products.active', true)
             ->with('media')
