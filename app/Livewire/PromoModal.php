@@ -68,11 +68,6 @@ class PromoModal extends Component
                     'message' => 'This email has already received a welcome coupon.',
                     'type' => 'error'
                 ]);
-
-                $this->dispatch('promoCouponError', [
-                    'message' => '✗ This email has already received a welcome coupon.'
-                ]);
-
                 $this->isSubmitting = false;
                 return;
             }
@@ -130,18 +125,17 @@ class PromoModal extends Component
                 }
             }
 
-            // Show success notification (both global and inline)
+            // Show success notification
             $this->dispatch('showNotification', [
                 'message' => 'Check your email! Your exclusive 10% OFF coupon has been sent.',
                 'type' => 'success'
             ]);
 
-            $this->dispatch('promoCouponSuccess', [
-                'message' => '✓ Success! Check your email for your 10% OFF coupon.'
-            ]);
-
             // Clear the email input immediately
             $this->email = '';
+
+            // Close modal after success
+            $this->closeModal();
 
         } catch (\Exception $e) {
             Log::error('Error in promo modal email submission', [
@@ -153,10 +147,6 @@ class PromoModal extends Component
             $this->dispatch('showNotification', [
                 'message' => 'Something went wrong. Please try again.',
                 'type' => 'error'
-            ]);
-
-            $this->dispatch('promoCouponError', [
-                'message' => '✗ Error: Something went wrong. Please try again.'
             ]);
         }
 
