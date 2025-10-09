@@ -21,8 +21,14 @@
         closeModal() {
             this.open = false;
             sessionStorage.setItem('promo_modal_seen', 'true');
+        },
+        closeDelayed() {
+            setTimeout(() => {
+                this.closeModal();
+            }, 2000);
         }
      }"
+     @close-promo-modal-delayed.window="closeDelayed()"
      x-show="open"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"

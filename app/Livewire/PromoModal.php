@@ -58,12 +58,15 @@ class PromoModal extends Component
         $this->isSubmitting = true;
 
         try {
+            Log::info('Promo modal: Starting email submission', ['email' => $this->email]);
+
             // Check if email already has a promo coupon
             $existingCoupon = Coupon::where('code', 'LIKE', 'WELCOME%')
                 ->where('meta_data->email', strtolower($this->email))
                 ->first();
 
             if ($existingCoupon) {
+                Log::info('Promo modal: Email already has coupon', ['email' => $this->email]);
                 $this->addError('email', 'This email has already received a welcome coupon.');
                 $this->isSubmitting = false;
                 return;
@@ -71,6 +74,8 @@ class PromoModal extends Component
 
             // Generate unique coupon code
             $couponCode = 'WELCOME' . strtoupper(Str::random(8));
+
+            Log::info('Promo modal: Creating coupon', ['code' => $couponCode, 'email' => $this->email]);
 
             // Create one-time use coupon (10% off)
             $coupon = Coupon::create([
@@ -82,10 +87,11 @@ class PromoModal extends Component
                 'starts_at' => now(),
                 'expires_at' => now()->addDays(30),
                 'active' => true,
-                'meta_data' => ['email' => strtolower($this->email)] // Store email in meta_data
+                'meta_data' => ['email' => strtolower($this->email)]
             ]);
 
-            Log::info('Promo coupon created', [
+            Log::info('Promo coupon created successfully', [
+                'coupon_id' => $coupon->id,
                 'coupon_code' => $couponCode,
                 'email' => $this->email,
                 'expires_at' => $coupon->expires_at
@@ -94,6 +100,11 @@ class PromoModal extends Component
             // Send email (sync or queue based on config - same as newsletter)
             try {
                 $usingSyncQueue = config('queue.default') === 'sync';
+                Log::info('Promo modal: Attempting to send email', [
+                    'using_sync' => $usingSyncQueue,
+                    'email' => $this->email
+                ]);
+
                 if ($usingSyncQueue) {
                     Mail::to($this->email)->send(new PromoCouponMail($coupon));
                     Log::info('Promo coupon email sent synchronously', ['email' => $this->email]);
@@ -104,13 +115,16 @@ class PromoModal extends Component
             } catch (\Exception $mailException) {
                 Log::error('Promo coupon email dispatch failed', [
                     'email' => $this->email,
-                    'error' => $mailException->getMessage()
+                    'error' => $mailException->getMessage(),
+                    'trace' => $mailException->getTraceAsString()
                 ]);
 
-                $this->addError('email', 'We could not send the coupon email right now. Please try again later.');
+                $this->addError('email', 'Email sending failed: ' . $mailException->getMessage());
                 $this->isSubmitting = false;
                 return;
             }
+
+            Log::info('Promo modal: Email sent/queued successfully, clearing form');
 
             // Clear the email input (same as newsletter)
             $this->reset(['email']);
@@ -121,17 +135,21 @@ class PromoModal extends Component
                 'type' => 'success'
             ]);
 
-            // Close modal after success
-            $this->closeModal();
+            Log::info('Promo modal: Success notification dispatched, will close modal');
+
+            // Dispatch browser event to close modal after delay (allows notification to show)
+            $this->dispatch('close-promo-modal-delayed');
 
         } catch (\Exception $e) {
-            Log::error('Error in promo modal email submission', [
+            Log::error('Error in promo modal email submission (outer catch)', [
                 'email' => $this->email,
                 'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
                 'trace' => $e->getTraceAsString()
             ]);
 
-            $this->addError('email', 'Something went wrong. Please try again later.');
+            $this->addError('email', 'Error: ' . $e->getMessage());
         }
 
         $this->isSubmitting = false;
