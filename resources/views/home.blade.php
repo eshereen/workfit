@@ -221,9 +221,6 @@
     </div>
 </section>
 
-@endsection
-
-@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Ensure mobile video plays
@@ -251,4 +248,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush
+
+@endsection
