@@ -1,3 +1,24 @@
+<style>
+    .currency-dropdown-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #D1D5DB #F3F4F6;
+    }
+    .currency-dropdown-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+    .currency-dropdown-scroll::-webkit-scrollbar-track {
+        background: #F3F4F6;
+        border-radius: 3px;
+    }
+    .currency-dropdown-scroll::-webkit-scrollbar-thumb {
+        background: #D1D5DB;
+        border-radius: 3px;
+    }
+    .currency-dropdown-scroll::-webkit-scrollbar-thumb:hover {
+        background: #9CA3AF;
+    }
+</style>
+
 <div class="relative currency-selector x-cloak"
      x-data="{
        open: false,
@@ -42,8 +63,8 @@
                 ];
                 $countryCode = $countryCodeMap[$currentCurrency] ?? 'US';
             @endphp
-            <span class="inline-flex items-center w-6 h-4">
-                {!! country_flag($countryCode, 'w-6 h-4 rounded shadow-sm') !!}
+            <span class="inline-flex items-center">
+                <span class="overflow-hidden w-6 h-4 rounded shadow-sm">{!! country_flag($countryCode) !!}</span>
             </span>
             <span class="hidden sm:inline" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">{{ $currentCurrency }}</span>
 
@@ -62,10 +83,10 @@
          x-transition:leave-start="transform opacity-100 scale-100"
          x-transition:leave-end="transform opacity-0 scale-95"
          @click.away="open = false"
-         class="absolute right-0 z-50 mt-2 w-56 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg"
+         class="absolute right-0 z-50 mt-2 w-72 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg sm:w-80"
          style="display: none;">
 
-        <div class="py-1">
+        <div class="overflow-y-auto py-1 max-h-[60vh] sm:max-h-96 currency-dropdown-scroll">
             <!-- Auto-detected currency info -->
             @if($isAutoDetected && $detectedCountry)
             <div class="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
@@ -103,8 +124,8 @@
                         class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === $code ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                     <div class="flex justify-between items-center">
                         <span class="flex items-center space-x-3">
-                            <span class="inline-flex items-center w-6 h-4">
-                                {!! country_flag($currency['country'], 'w-6 h-4 rounded shadow-sm') !!}
+                            <span class="inline-flex items-center">
+                                <span class="overflow-hidden w-6 h-4 rounded shadow-sm">{!! country_flag($currency['country']) !!}</span>
                             </span>
                             <span>{{ $currency['name'] }}</span>
                         </span>
