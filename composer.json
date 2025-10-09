@@ -21,7 +21,8 @@
         "mgcodeur/laravel-currency-converter": "^1.0",
         "spatie/laravel-medialibrary": "^11.0",
         "srmklive/paypal": "~3.0",
-        "stevebauman/location": "^7.6"
+        "stevebauman/location": "^7.6",
+        "stidges/laravel-country-flags": "^3.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",

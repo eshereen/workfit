@@ -19,7 +19,32 @@
     <button @click="open = !open" type="button"
             class="flex items-center px-1 py-2 space-x-2 text-sm font-semibold rounded-md transition-colors md:px-3 hover:text-red-600"
             :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">
-            <span class="text-lg" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">{{ $currentSymbol }}</span>
+            @php
+                $countryCodeMap = [
+                    'USD' => 'US',
+                    'EUR' => 'EU',
+                    'GBP' => 'GB',
+                    'EGP' => 'EG',
+                    'AED' => 'AE',
+                    'SAR' => 'SA',
+                    'KWD' => 'KW',
+                    'QAR' => 'QA',
+                    'BHD' => 'BH',
+                    'OMR' => 'OM',
+                    'JOD' => 'JO',
+                    'LBP' => 'LB',
+                    'IQD' => 'IQ',
+                    'LYD' => 'LY',
+                    'TND' => 'TN',
+                    'DZD' => 'DZ',
+                    'MAD' => 'MA',
+                    'SDG' => 'SD',
+                ];
+                $countryCode = $countryCodeMap[$currentCurrency] ?? 'US';
+            @endphp
+            <span class="inline-flex items-center w-6 h-4">
+                {!! country_flag($countryCode, 'w-6 h-4 rounded shadow-sm') !!}
+            </span>
             <span class="hidden sm:inline" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">{{ $currentCurrency }}</span>
 
 
@@ -55,23 +80,33 @@
 
             <!-- Currency options -->
             @foreach ([
-                'USD' => '$ USD - US Dollar',
-                'EGP' => 'E£ EGP - Egyptian Pound',
-                'EUR' => '€ EUR - Euro',
-                'GBP' => '£ GBP - British Pound',
-                'AED' => 'د.إ AED - UAE Dirham',
-                'SAR' => 'ر.س SAR - Saudi Riyal',
-                'AUD' => 'A$ AUD - Australian Dollar',
-                'CAD' => 'C$ CAD - Canadian Dollar',
-                'JPY' => '¥ JPY - Japanese Yen',
-                'CHF' => 'CHF CHF - Swiss Franc',
-            ] as $code => $label)
+                'USD' => ['country' => 'US', 'name' => 'USD - US Dollar'],
+                'EUR' => ['country' => 'EU', 'name' => 'EUR - Euro'],
+                'GBP' => ['country' => 'GB', 'name' => 'GBP - British Pound'],
+                'EGP' => ['country' => 'EG', 'name' => 'EGP - Egyptian Pound'],
+                'AED' => ['country' => 'AE', 'name' => 'AED - UAE Dirham'],
+                'SAR' => ['country' => 'SA', 'name' => 'SAR - Saudi Riyal'],
+                'KWD' => ['country' => 'KW', 'name' => 'KWD - Kuwaiti Dinar'],
+                'QAR' => ['country' => 'QA', 'name' => 'QAR - Qatari Riyal'],
+                'BHD' => ['country' => 'BH', 'name' => 'BHD - Bahraini Dinar'],
+                'OMR' => ['country' => 'OM', 'name' => 'OMR - Omani Rial'],
+                'JOD' => ['country' => 'JO', 'name' => 'JOD - Jordanian Dinar'],
+                'LBP' => ['country' => 'LB', 'name' => 'LBP - Lebanese Pound'],
+                'IQD' => ['country' => 'IQ', 'name' => 'IQD - Iraqi Dinar'],
+                'LYD' => ['country' => 'LY', 'name' => 'LYD - Libyan Dinar'],
+                'TND' => ['country' => 'TN', 'name' => 'TND - Tunisian Dinar'],
+                'DZD' => ['country' => 'DZ', 'name' => 'DZD - Algerian Dinar'],
+                'MAD' => ['country' => 'MA', 'name' => 'MAD - Moroccan Dirham'],
+                'SDG' => ['country' => 'SD', 'name' => 'SDG - Sudanese Pound'],
+            ] as $code => $currency)
                 <button type="button" onclick="changeCurrencyManual('{{ $code }}')" @click="open = false"
                         class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === $code ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                     <div class="flex justify-between items-center">
-                        <span class="flex items-center">
-                            <span class="mr-2 text-lg">{{ explode(' ', $label)[0] }}</span>
-                            <span>{{ substr($label, strpos($label, ' ') + 1) }}</span>
+                        <span class="flex items-center space-x-3">
+                            <span class="inline-flex items-center w-6 h-4">
+                                {!! country_flag($currency['country'], 'w-6 h-4 rounded shadow-sm') !!}
+                            </span>
+                            <span>{{ $currency['name'] }}</span>
                         </span>
                         @if($currentCurrency === $code)
                             <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">

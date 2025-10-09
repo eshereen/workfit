@@ -298,4 +298,15 @@
       0 => 'Stevebauman\\Location\\LocationServiceProvider',
     ),
   ),
+  'stidges/laravel-country-flags' => 
+  array (
+    'aliases' => 
+    array (
+      'CountryFlag' => 'Stidges\\LaravelCountryFlags\\CountryFlagFacade',
+    ),
+    'providers' => 
+    array (
+      0 => 'Stidges\\LaravelCountryFlags\\CountryFlagsServiceProvider',
+    ),
+  ),
 );

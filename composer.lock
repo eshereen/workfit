@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "680b7d2581c2880573a51d7eb6615172",
+    "content-hash": "a654e1050cc9b3076fc9697cf727ec22",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -6877,6 +6877,129 @@
                 "source": "https://github.com/stevebauman/location/tree/v7.6.0"
             },
             "time": "2025-08-04T02:33:41+00:00"
+        },
+        {
+            "name": "stidges/country-flags",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stidges/country-flags.git",
+                "reference": "303f78f3f352c86a7d9bcf410b8bb91004843922"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stidges/country-flags/zipball/303f78f3f352c86a7d9bcf410b8bb91004843922",
+                "reference": "303f78f3f352c86a7d9bcf410b8bb91004843922",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.3|^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.0",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Stidges\\CountryFlags\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stidges",
+                    "email": "info@stidges.com",
+                    "homepage": "https://stidges.com"
+                }
+            ],
+            "description": "A small package to convert a country code to the corresponding country flag emoji",
+            "homepage": "https://github.com/stidges/country-flags",
+            "keywords": [
+                "countries",
+                "country",
+                "country-flags",
+                "emoji",
+                "flag",
+                "unicode"
+            ],
+            "support": {
+                "issues": "https://github.com/stidges/country-flags/issues",
+                "source": "https://github.com/stidges/country-flags/tree/v2.0.0"
+            },
+            "time": "2021-01-08T13:52:23+00:00"
+        },
+        {
+            "name": "stidges/laravel-country-flags",
+            "version": "v3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stidges/laravel-country-flags.git",
+                "reference": "60f66a61ad3cf675d628fecbbe271c395443f471"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stidges/laravel-country-flags/zipball/60f66a61ad3cf675d628fecbbe271c395443f471",
+                "reference": "60f66a61ad3cf675d628fecbbe271c395443f471",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0",
+                "php": "^8.2",
+                "stidges/country-flags": "^2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "CountryFlag": "Stidges\\LaravelCountryFlags\\CountryFlagFacade"
+                    },
+                    "providers": [
+                        "Stidges\\LaravelCountryFlags\\CountryFlagsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Stidges\\LaravelCountryFlags\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stidges",
+                    "email": "info@stidges.com",
+                    "homepage": "https://stidges.com"
+                }
+            ],
+            "description": "A Laravel 5.5 wrapper for the stidges/country-flags package",
+            "homepage": "https://github.com/stidges/laravel-country-flags",
+            "keywords": [
+                "countries",
+                "country",
+                "country-flags",
+                "emoji",
+                "flag",
+                "laravel",
+                "unicode"
+            ],
+            "support": {
+                "issues": "https://github.com/stidges/laravel-country-flags/issues",
+                "source": "https://github.com/stidges/laravel-country-flags/tree/v3.0.1"
+            },
+            "time": "2025-03-04T13:56:14+00:00"
         },
         {
             "name": "symfony/clock",
