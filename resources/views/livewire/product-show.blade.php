@@ -41,7 +41,7 @@
         }">
 
        <!-- Main image with zoom -->
-       <div class="relative overflow-hidden rounded-lg h-[480px] md:h-[600px] flex items-center justify-center bg-white"
+       <div class="relative overflow-hidden rounded-lg  flex items-center justify-center bg-white"
        x-data="{
           magnifierEnabled: false,
           zoomX: 0,
@@ -84,7 +84,7 @@
 
 
        <!-- Thumbnails -->
-       <div class="grid grid-cols-4 gap-1 mt-1 md:mt-3">
+       <div class="grid grid-cols-4 gap-1 mt-2 md:mt-3">
            <template x-for="(image, index) in images" :key="index">
                <div class="overflow-hidden rounded border transition-colors cursor-pointer hover:border-gray-500"
                     :class="currentImage === image.large ? 'border-gray-500 ring-2 ring-gray-200' : 'border-gray-200'"
