@@ -35,11 +35,11 @@
                         @php
                             $category = \App\Models\Category::find($categoryId);
                         @endphp
-                        @if($category)
+                      {{-- -   @if($category)
                             <span class="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
                                 Category: {{ $category->name }}
                             </span>
-                        @endif
+                        @endif --}}
                     @endforeach
                     @foreach($selectedSubcategories as $subcategoryId)
                         @php
@@ -169,10 +169,10 @@
                         <div class="p-4">
                             <h3 class="mb-2 font-semibold text-gray-900 line-clamp-2">{{ $product->name }}</h3>
 
-                            @if($product->category)
+                          {{--  @if($product->category)
                                 <p class="mb-2 text-sm text-gray-600">{{ $product->category->name }}</p>
                             @endif
-
+ --}} 
                             <!-- Price -->
                             <div class="flex gap-2 items-center mb-3">
                                 <span class="text-lg font-bold text-gray-900">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->price), 2) }}</span>
