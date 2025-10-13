@@ -71,7 +71,7 @@
 
                     <!-- Flash Sale Badge -->
                     @if($product->compare_price > 0)
-                    <span class="p-1 font-bold text-white uppercase bg-red-600 text-xs  opacity-80 mx-px">
+                    <span class="px-2 py-1 ml-2 text-[8px] font-bold text-white uppercase rounded-sm bg-gray-700">
                          Sale
                     </span>
                     @endif
@@ -147,29 +147,25 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <a href="{{ route('product.show', $product->slug) }}"
-                           class="text-base font-semibold hover:text-red-600">
+                           class="text-xs font-semibold hover:text-red-600">
                             {{ $product->name }}
                         </a>
-                        @if($product->category)
-                            <p class="pt-3 text-sm text-gray-600">{{ $product->category->name }}</p>
-                        @endif
                     </div>
-
                 </div>
-                <div class="flex justify-between items-center mt-2">
+                <div class="flex {{ $product->compare_price > 0 ? 'justify-between' : 'justify-center' }} items-center mt-2">
                     <div>
-                        <span class="text-base font-bold">{{ number_format($product->converted_price ?? $product->price, 2) }} {{ $currencySymbol }}</span>
+                        <span class="text-xs font-bold">{{ number_format($product->converted_price ?? $product->price, 2) }} {{ $currencySymbol }}</span>
                     </div>
                     @if($product->compare_price > 0)
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-500 line-through">
-                            {{ number_format($product->converted_compare_price ?? $product->compare_price, 2) }} {{ $currencySymbol }}
+                    <div class="flex gap-2 items-center">
+                        <span class="text-xs text-gray-500 line-through">
+                            {{ number_format($product->converted_compare_price ?? $product->compare_price, 2)}}{{ $currencySymbol }}
                         </span>
 
-                        <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">
+                      {{-- -  <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">
                             -{{ $product->discount_percentage }}%
                         </span>
-
+--}}
                     </div>
                     @endif
                 </div>
