@@ -144,7 +144,7 @@
                 @endauth
             </div>
             <div class="p-4">
-                <div class="text-cente">
+                <div class="text-center">
                     <a href="{{ route('product.show', $product->slug) }}"
                        class="text-xs font-semibold hover:text-red-600">
                         {{ $product->name }}
