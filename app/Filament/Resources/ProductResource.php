@@ -50,10 +50,20 @@ class ProductResource extends Resource
                     TextInput::make('name')
                     ->required()
                     ->maxLength(255)->columnSpanFull(),
-                Select::make('category.name')
-                    ->relationship('category', 'name'),
-                Select::make('subcategory.name')
-                    ->relationship('subcategory', 'name'),
+                Select::make('category_id')
+                    ->relationship('category', 'name')
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(fn (callable $set) => $set('subcategory_id', null)),
+                Select::make('subcategory_id')
+                    ->relationship('subcategory', 'name', fn ($query, callable $get) =>
+                        $query->when($get('category_id'), fn ($q, $categoryId) =>
+                            $q->where('category_id', $categoryId)
+                        )
+                    )
+                    ->required()
+                    ->disabled(fn (callable $get) => !$get('category_id'))
+                    ->helperText('Please select a category first'),
 
                     Textarea::make('description')
                     ->columnSpanFull(),
@@ -128,7 +138,7 @@ class ProductResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(), 
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

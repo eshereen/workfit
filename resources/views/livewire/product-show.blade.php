@@ -12,8 +12,6 @@
         </div>
     @endif
 
-
-
     <div class="flex flex-col gap-8 lg:flex-row">
         <!-- Product Images -->
         <div class="lg:w-1/2"
