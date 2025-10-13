@@ -71,7 +71,7 @@
 
                     <!-- Flash Sale Badge -->
                     @if($product->compare_price > 0)
-                    <span class="px-2 py-1 ml-2 text-[8px] font-bold text-white uppercase rounded-sm bg-gray-700">
+                    <span class="px-2 py-[2px] ml-2 text-[8px] font-bold text-white uppercase rounded-sm bg-gray-500">
                          Sale
                     </span>
                     @endif
@@ -144,17 +144,15 @@
                 @endauth
             </div>
             <div class="p-4">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <a href="{{ route('product.show', $product->slug) }}"
-                           class="text-xs font-semibold hover:text-red-600">
-                            {{ $product->name }}
-                        </a>
-                    </div>
+                <div class="text-center md:text-left">
+                    <a href="{{ route('product.show', $product->slug) }}"
+                       class="text-xs font-semibold hover:text-red-600">
+                        {{ $product->name }}
+                    </a>
                 </div>
-                <div class="flex {{ $product->compare_price > 0 ? 'justify-between' : 'justify-center' }} items-center mt-2">
-                    <div>
-                        <span class="text-xs font-bold">{{ number_format($product->converted_price ?? $product->price, 2) }} {{ $currencySymbol }}</span>
+                <div class="flex justify-center items-center mx-2">
+                    <div class="mx-2">
+                        <span class="text-xs font-bold">{{ number_format($product->converted_price ?? $product->price, 2) }}{{ $currencySymbol }}</span>
                     </div>
                     @if($product->compare_price > 0)
                     <div class="flex gap-2 items-center">
