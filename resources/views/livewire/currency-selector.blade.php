@@ -83,7 +83,7 @@
          x-transition:leave-start="transform opacity-100 scale-100"
          x-transition:leave-end="transform opacity-0 scale-95"
          @click.away="open = false"
-         class="absolute right-0 z-50 mt-2 w-64 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg md:w-72 md:right-4"
+         class="absolute right-0 z-50 mt-2 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg w-84 md:w-96 md:right-4"
          style="display: none;">
 
         <div class="overflow-y-scroll py-1 currency-dropdown-scroll" style="max-height: 400px;">
