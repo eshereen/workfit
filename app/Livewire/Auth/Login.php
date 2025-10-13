@@ -43,6 +43,15 @@ class Login extends Component
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
+        // Check if user is admin and redirect to Filament panel
+        $user = Auth::user();
+
+        if ($user->is_admin) {
+            $this->redirect('/admin', navigate: true);
+            return;
+        }
+
+        // Regular users go to dashboard
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 

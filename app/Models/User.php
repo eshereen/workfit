@@ -96,7 +96,7 @@ class User extends Authenticatable implements FilamentUser
     //for live server
      public function canAccessPanel(Panel $panel): bool
     {
-        return str_ends_with($this->email, '@workfit.medsite.dev') && $this->hasVerifiedEmail();
+        return $this->is_admin && $this->hasVerifiedEmail();
     }
 
 
