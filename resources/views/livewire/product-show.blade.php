@@ -41,7 +41,7 @@
         }">
 
        <!-- Main image with zoom -->
-       <div class="relative overflow-hidden rounded-lg  flex items-center justify-center bg-white"
+       <div class="flex overflow-hidden relative justify-center items-center bg-white rounded-lg"
        x-data="{
           magnifierEnabled: false,
           zoomX: 0,
@@ -276,7 +276,7 @@
                             wire:loading.attr="disabled"
                             wire:loading.class="opacity-75 cursor-not-allowed"
                             wire:target="addToCart"
-                            class="px-6 py-3 w-full font-semibold text-white rounded-lg transition-colors bg-gray-950 hover:bg-gray-100 hover:text-gray-950 border-2 border-gray-950 disabled:opacity-50 disabled:cursor-not-allowed hover:border-2 hover:border-gray-900 cursor-pointer">
+                            class="px-6 py-3 w-full font-semibold text-white rounded-lg border-2 transition-colors cursor-pointer bg-gray-950 hover:bg-gray-100 hover:text-gray-950 border-gray-950 disabled:opacity-50 disabled:cursor-not-allowed hover:border-2 hover:border-gray-900">
                         <span wire:loading.remove wire:target="addToCart">Add to Cart</span>
                         <span wire:loading wire:target="addToCart">
                             <svg class="inline-block mr-2 -ml-1 w-4 h-4 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -301,7 +301,7 @@
         <h2 class="mb-6 text-2xl font-bold text-center lg:text-left">You May Also Like</h2>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             @foreach($relatedProducts as $relatedProduct)
-            <div class="overflow-hidden transition rounded-xs bg-white">
+            <div class="overflow-hidden bg-white transition rounded-xs">
                 <a href="{{ route('product.show', $relatedProduct->slug) }}">
                     <picture class="w-full h-80">
                         {{-- Modern formats first --}}
@@ -320,10 +320,10 @@
                 </a>
                 <div class="p-4 text-center lg:text-left">
                     <a href="{{ route('product.show', $relatedProduct->slug) }}"
-                       class="block mb-1 text-lg font-semibold hover:text-red-600">
+                       class="block mb-1 text-xs font-semibold hover:text-red-600">
                         {{ $relatedProduct->name }}
                     </a>
-                    <span class="font-bold">{{ $currencySymbol }}{{ number_format($relatedProduct->converted_price ?? $relatedProduct->price, 2) }}</span>
+                    <span class="text-xs font-bold">{{ number_format($relatedProduct->converted_price ?? $relatedProduct->price, 2) }}{{ $currencySymbol }}</span>
                 </div>
             </div>
             @endforeach
