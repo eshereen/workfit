@@ -83,7 +83,7 @@
          x-transition:leave-start="transform opacity-100 scale-100"
          x-transition:leave-end="transform opacity-0 scale-95"
          @click.away="open = false"
-         class="absolute right-0 z-50 mt-2 w-1/3 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg md:w-1/2 md:right-4"
+         class="absolute right-0 z-50 mt-2 w-80 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg md:w-96 md:right-4"
          style="display: none;">
 
         <div class="overflow-y-scroll py-1 currency-dropdown-scroll" style="max-height: 400px;">
@@ -121,7 +121,7 @@
                 'SDG' => ['country' => 'SD', 'name' => 'SDG - Sudanese Pound'],
             ] as $code => $currency)
                 <button type="button" onclick="changeCurrencyManual('{{ $code }}')" @click="open = false"
-                        class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 {{ $currentCurrency === $code ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
+                        class="w-full text-left px-4 py-2 text-xs hover:bg-gray-100 {{ $currentCurrency === $code ? 'bg-gray-50 text-gray-900' : 'text-gray-700' }}">
                     <div class="flex justify-between items-center">
                         <span class="flex items-center space-x-3">
                             <span class="inline-flex items-center">
