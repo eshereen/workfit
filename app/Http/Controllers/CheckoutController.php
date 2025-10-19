@@ -126,7 +126,7 @@ class CheckoutController extends Controller
     /**
      * Process checkout for authenticated users
      */
-            public function processAuthenticatedCheckout(Request $request)
+    public function processAuthenticatedCheckout(Request $request)
     {
         // Get data directly from request (traditional form submission) - AUTHENTICATED METHOD
         $validated = $request->validate([
@@ -189,7 +189,6 @@ class CheckoutController extends Controller
                         $order,
                         "Order #{$order->order_number} discount"
                     );
-
                 } catch (Exception $e) {
                     Log::error('Failed to redeem loyalty points', [
                         'order_id' => $order->id,
@@ -212,8 +211,8 @@ class CheckoutController extends Controller
             // Special handling for PayPal credit card - if PayPal is available, credit card should also be available
             $paymentMethod = PaymentMethod::from($validated['payment_method']);
             $isPayPalCreditCard = ($validated['payment_method'] === 'paypal' &&
-                                 isset($validated['paypal_payment_type']) &&
-                                 $validated['paypal_payment_type'] === 'credit_card');
+                isset($validated['paypal_payment_type']) &&
+                $validated['paypal_payment_type'] === 'credit_card');
 
             if (!in_array($paymentMethod, $available, true)) {
                 // If it's PayPal credit card and PayPal is available, allow it
@@ -228,9 +227,9 @@ class CheckoutController extends Controller
                 }
             }
 
-// Initiate payment
-$returnUrl = route('payments.return', ['order' => $order->id]);
-$cancelUrl = route('payments.cancel', ['order' => $order->id]);
+            // Initiate payment
+            $returnUrl = route('payments.return', ['order' => $order->id]);
+            $cancelUrl = route('payments.cancel', ['order' => $order->id]);
 
             // Determine payment type for PayPal
             $paymentType = 'paypal_account'; // default
@@ -247,13 +246,19 @@ $cancelUrl = route('payments.cancel', ['order' => $order->id]);
                 $paymentType
             );
 
+            // If payment creation indicates immediate success (no frontend processing required), mark as paid
+            if (in_array($validated['payment_method'], ['paymob', 'paypal']) && empty($result['requires_frontend_processing'])) {
+                $order->payment_status = \App\Enums\PaymentStatus::PAID;
+                $order->save();
+            }
 
 
-// Order items already created above - no need to create them again
 
-// Clear cart
-$this->cartService->clearCart();
-DB::commit();
+            // Order items already created above - no need to create them again
+
+            // Clear cart
+            $this->cartService->clearCart();
+            DB::commit();
 
             // Log final state before redirection
             Log::info('CheckoutController: Final redirection decision', [
@@ -302,7 +307,6 @@ DB::commit();
                 return redirect()->route('thankyou', ['order' => $order->id])
                     ->with('error', 'Payment initiated, but no redirect was provided. Please check your order status.');
             }
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error processing authenticated checkout: ' . $e->getMessage(), [
@@ -313,7 +317,7 @@ DB::commit();
             ]);
 
             return back()->with('error', 'An error occurred while processing your order. Please try again.')
-                        ->withInput();
+                ->withInput();
         }
     }
 
@@ -344,12 +348,7 @@ DB::commit();
             'currency' => 'required|string|max:3',
         ]);
 
-
-
         $cart = $this->cartService->getCart();
-
-
-
         if ($cart->isEmpty()) {
 
             return redirect()->route('cart.index')->with('error', 'Your cart is empty. Please add items before checkout.');
@@ -381,8 +380,8 @@ DB::commit();
             // Special handling for PayPal credit card - if PayPal is available, credit card should also be available
             $paymentMethod = PaymentMethod::from($validated['payment_method']);
             $isPayPalCreditCard = ($validated['payment_method'] === 'paypal' &&
-                                 isset($validated['paypal_payment_type']) &&
-                                 $validated['paypal_payment_type'] === 'credit_card');
+                isset($validated['paypal_payment_type']) &&
+                $validated['paypal_payment_type'] === 'credit_card');
 
             if (!in_array($paymentMethod, $available, true)) {
                 // If it's PayPal credit card and PayPal is available, allow it
@@ -397,22 +396,22 @@ DB::commit();
                 }
             }
 
-// Initiate payment
-$returnUrl = route('payments.return', ['order' => $order->id]);
-$cancelUrl = route('payments.cancel', ['order' => $order->id]);
+            // Initiate payment
+            $returnUrl = route('payments.return', ['order' => $order->id]);
+            $cancelUrl = route('payments.cancel', ['order' => $order->id]);
 
-// Determine payment type for PayPal
-$paymentType = 'paypal_account'; // default
-if ($validated['payment_method'] === 'paypal' && isset($validated['paypal_payment_type'])) {
-    $paymentType = $validated['paypal_payment_type'];
-}
+            // Determine payment type for PayPal
+            $paymentType = 'paypal_account'; // default
+            if ($validated['payment_method'] === 'paypal' && isset($validated['paypal_payment_type'])) {
+                $paymentType = $validated['paypal_payment_type'];
+            }
 
 
 
-// For credit card payments, don't set a return URL since they don't redirect back from PayPal
-if ($paymentType === 'credit_card') {
-    $returnUrl = null;
-}
+            // For credit card payments, don't set a return URL since they don't redirect back from PayPal
+            if ($paymentType === 'credit_card') {
+                $returnUrl = null;
+            }
 
 
             $result = $this->paymentService->createPayment(
@@ -423,12 +422,18 @@ if ($paymentType === 'credit_card') {
                 $paymentType
             );
 
+            // If payment creation indicates immediate success (no frontend processing required), mark as paid
+            if (in_array($validated['payment_method'], ['paymob', 'paypal']) && empty($result['requires_frontend_processing'])) {
+                $order->payment_status = \App\Enums\PaymentStatus::PAID;
+                $order->save();
+            }
 
-// Order items already created above - no need to create them again
 
-// Clear cart
-$this->cartService->clearCart();
-DB::commit();
+            // Order items already created above - no need to create them again
+
+            // Clear cart
+            $this->cartService->clearCart();
+            DB::commit();
 
             // Log final state before redirection
             Log::info('CheckoutController: Guest checkout final redirection decision', [
@@ -477,7 +482,6 @@ DB::commit();
                 return redirect()->route('thankyou', ['order' => $order->id])
                     ->with('error', 'Payment initiated, but no redirect was provided. Please check your order status.');
             }
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error processing guest checkout: ' . $e->getMessage(), [
@@ -489,7 +493,7 @@ DB::commit();
             ]);
 
             return back()->with('error', 'An error occurred while processing your order. Please try again.')
-                        ->withInput();
+                ->withInput();
         }
     }
 
@@ -593,6 +597,9 @@ DB::commit();
             ]);
         }
 
+        // Determine initial payment status (keep pending; will update after synchronous payment success)
+        $initialPaymentStatus = \App\Enums\PaymentStatus::PENDING;
+
         $orderData = [
             'order_number' => $this->generateOrderNumber(),
             'guest_token' => $isGuest ? Str::random(32) : null,
@@ -614,7 +621,7 @@ DB::commit();
             'total_amount' => $finalTotal,
             'currency' => $currencyCode,
             'payment_method' => $data['payment_method'],
-            'payment_status' => 'pending',
+            'payment_status' => $initialPaymentStatus,
             'status' => 'pending',
             'is_guest' => $isGuest,
             'use_billing_for_shipping' => $data['use_billing_for_shipping'],
@@ -672,8 +679,6 @@ DB::commit();
                     'quantity' => $item['quantity'],
                     'price' => $item['price'],
                 ]);
-
-
             } catch (Exception $e) {
                 Log::error('Failed to create order item', [
                     'order_id' => $order->id,
@@ -686,8 +691,6 @@ DB::commit();
                 throw $e;
             }
         }
-
-
     }
 
     /**
@@ -717,7 +720,7 @@ DB::commit();
                 if ($variant->stock < $requestedQuantity) {
                     $product = \App\Models\Product::find($productId);
                     $availableStock = $variant->stock;
-                    
+
                     if ($availableStock == 0) {
                         throw new \Exception("Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is out of stock.");
                     } else {
@@ -733,7 +736,7 @@ DB::commit();
 
                 if ($product->quantity < $requestedQuantity) {
                     $availableStock = $product->quantity;
-                    
+
                     if ($availableStock == 0) {
                         throw new \Exception("Product '{$product->name}' is out of stock.");
                     } else {
@@ -759,9 +762,6 @@ DB::commit();
             $randomString = strtoupper(Str::random(6));
 
             $orderNumber = 'WF-' . date('Y-m-d-H-i-s') . '-' . $microseconds . '-' . $randomString . '-' . $ipHash;
-
-
-
         } while (Order::where('order_number', $orderNumber)->exists());
 
         return $orderNumber;
@@ -773,8 +773,8 @@ DB::commit();
     public function orderConfirmation($orderId)
     {
         $order = Order::with(['items.product', 'items.variant', 'customer'])
-                     ->where('id', $orderId)
-                     ->firstOrFail();
+            ->where('id', $orderId)
+            ->firstOrFail();
 
         // Check if user can view this order
         if (Auth::check()) {
@@ -870,8 +870,8 @@ DB::commit();
     public function thankYou($orderId)
     {
         $order = Order::with(['items.product', 'items.variant', 'customer'])
-                     ->where('id', $orderId)
-                     ->firstOrFail();
+            ->where('id', $orderId)
+            ->firstOrFail();
 
         // Get currency info for display
         $currencyInfo = $this->currencyService->getCurrentCurrencyInfo();
@@ -887,8 +887,10 @@ DB::commit();
     public function showPayPalCreditCard(Payment $payment)
     {
         // Verify this is a PayPal credit card payment
-        if ($payment->provider !== 'paypal' ||
-            ($payment->meta['payment_type'] ?? '') !== 'credit_card') {
+        if (
+            $payment->provider !== 'paypal' ||
+            ($payment->meta['payment_type'] ?? '') !== 'credit_card'
+        ) {
             abort(404);
         }
 
@@ -904,8 +906,10 @@ DB::commit();
     {
 
         // Verify this is a PayPal credit card payment
-        if ($payment->provider !== 'paypal' ||
-            ($payment->meta['payment_type'] ?? '') !== 'credit_card') {
+        if (
+            $payment->provider !== 'paypal' ||
+            ($payment->meta['payment_type'] ?? '') !== 'credit_card'
+        ) {
             Log::error('Invalid payment type for capture', [
                 'payment_id' => $payment->id,
                 'provider' => $payment->provider,
@@ -965,7 +969,6 @@ DB::commit();
 
                 return back()->with('error', 'Payment failed: ' . ($result['message'] ?? 'Unknown error'));
             }
-
         } catch (Exception $e) {
             Log::error('Error capturing PayPal credit card payment', [
                 'payment_id' => $payment->id,
@@ -984,5 +987,4 @@ DB::commit();
             return back()->with('error', 'An error occurred while processing your payment: ' . $e->getMessage());
         }
     }
-
 }
