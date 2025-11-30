@@ -24,16 +24,18 @@
   </section>
 
   <!-- Content -->
-  <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 my-8">
-    <!-- Sidebar Filters -->
-    <aside class="space-y-6">
-      @livewire('category-filters', ['categorySlug' => $categorySlug, 'subcategorySlug' => $subcategorySlug])
-    </aside>
+  <div class="max-w-7xl mx-auto px-4 py-10 my-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-8">
+      <!-- Sidebar Filters -->
+      <aside class="space-y-6 md:col-span-1">
+        @livewire('category-filters', ['categorySlug' => $categorySlug, 'subcategorySlug' => $subcategorySlug])
+      </aside>
 
-    <!-- Product Grid -->
-    <main class="md:col-span-3">
-      @livewire('category-products', ['categorySlug' => $categorySlug, 'subcategorySlug' => $subcategorySlug])
-    </main>
+      <!-- Product Grid -->
+      <main class="md:col-span-3 lg:col-span-4">
+        @livewire('category-products', ['categorySlug' => $categorySlug, 'subcategorySlug' => $subcategorySlug])
+      </main>
+    </div>
   </div>
 
 @endsection

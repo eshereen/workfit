@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('paypal-button-container').innerHTML = `
                 <div class="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p class="text-red-600 font-medium">PayPal SDK Failed to Load</p>
-                    <p class="text-red-500 text-sm mt-1">Please check your internet connection and refresh the page.</p>
+                    <p class="text-yellow-900 text-sm mt-1">Please check your internet connection and refresh the page.</p>
                     <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
                         Refresh Page
                     </button>
@@ -235,7 +235,7 @@ function createPayPalButtons() {
                     container.innerHTML = `
                         <div class="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
                             <p class="text-red-600 font-medium">Payment Failed</p>
-                            <p class="text-red-500 text-sm mt-1">Payment capture failed: ${error.message || 'Unknown error'}</p>
+                            <p class="text-yellow-900 text-sm mt-1">Payment capture failed: ${error.message || 'Unknown error'}</p>
                             <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
                                 Try Again
                             </button>
@@ -252,7 +252,7 @@ function createPayPalButtons() {
             container.innerHTML = `
                 <div class="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p class="text-red-600 font-medium">Payment Error</p>
-                    <p class="text-red-500 text-sm mt-1">An error occurred with PayPal. Please try again.</p>
+                    <p class="text-yellow-900 text-sm mt-1">An error occurred with PayPal. Please try again.</p>
                     <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
                         Try Again
                     </button>
@@ -322,7 +322,7 @@ function submitPaymentToBackend(orderID) {
         container.innerHTML = `
             <div class="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p class="text-red-600 font-medium">Submission Error</p>
-                <p class="text-red-500 text-sm mt-1">Error: ${error.message}</p>
+                <p class="text-yellow-900 text-sm mt-1">Error: ${error.message}</p>
                 <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
                     Try Again
                 </button>

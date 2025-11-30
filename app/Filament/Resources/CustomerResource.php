@@ -7,6 +7,7 @@ use BackedEnum;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Customer;
+use App\Traits\HasExports;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Actions\EditAction;
@@ -33,9 +34,27 @@ use App\Filament\Resources\CustomerResource\Pages\CreateCustomer;
 
 class CustomerResource extends Resource
 {
+    use HasExports;
     protected static ?string $model = Customer::class;
 
     protected static string | UnitEnum   | null $navigationGroup = 'Orders Details';
+
+    public static function getDefaultExportColumns(): array
+    {
+        return [
+            'email' => 'Email',
+            'first_name' => 'First Name',
+            'last_name' => 'Last Name',
+            'phone_number' => 'Phone Number',
+            'billingCountry.name' => 'Billing Country',
+            'billing_state' => 'Billing State',
+            'billing_city' => 'Billing City',
+            'billing_building_number' => 'Billing Building Number',
+            'shippingCountry.name' => 'Shipping Country',
+            'shipping_state' => 'Shipping State',
+            'created_at' => 'Created At',
+        ];
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -64,8 +83,8 @@ class CustomerResource extends Resource
 
                 Fieldset::make('Billing Address')
                 ->schema([
-                TextInput::make('billing_country_id')
-                    ->numeric(),
+                Select::make('billingCountry.name')
+                    ->relationship('billingCountry','name'),
                 TextInput::make('billing_state')
                     ->maxLength(255),
                 TextInput::make('billing_city')
@@ -78,8 +97,9 @@ class CustomerResource extends Resource
                 ])->columns(2)->columnSpanFull(),
                 Fieldset::make('Shipping Address')
                 ->schema([
-                TextInput::make('shipping_country_id')
-                    ->numeric(),
+                Select::make('shippingCountry.name')
+                    ->relationship('shippingCountry','name'),
+
                 TextInput::make('shipping_state')
                     ->maxLength(255),
                 TextInput::make('shipping_city')
@@ -123,17 +143,17 @@ class CustomerResource extends Resource
                     })
                     ->formatStateUsing(fn ($state) => number_format($state ?? 0))
                     ->sortable(false),
-                TextColumn::make('billing_country_id')
-                    ->numeric()
-                    ->sortable(),
+                    TextColumn::make('billingCountry.name')
+                        ->searchable()
+                        ->sortable(),
                 TextColumn::make('billing_state')
                     ->searchable(),
                 TextColumn::make('billing_city')
                     ->searchable(),
                 TextColumn::make('billing_building_number')
                     ->searchable(),
-                TextColumn::make('shipping_country_id')
-                    ->numeric()
+                TextColumn::make('shippingCountry.name')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('shipping_state')
                     ->searchable(),
@@ -162,11 +182,12 @@ class CustomerResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(), 
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    ...static::getExportBulkActions(),
                 ]),
             ]);
     }

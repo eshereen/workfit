@@ -81,7 +81,7 @@
                     </div>
                     <h3 class="text-xl font-bold mb-2">EMAIL US</h3>
                     <p class="text-gray-600 mb-4">We'll respond within 24 hours</p>
-                    <a href="mailto:support@workfit.com" class="text-red-600 font-bold text-lg hover:underline">support@workfit.com</a>
+                    <a href="mailto:info@workfiteg.com" class="text-red-600 font-bold text-lg hover:underline">info@workfiteg.com</a>
                 </div>
             </div>
         </div>
@@ -123,7 +123,7 @@
                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent @error('name') border-red-500 @enderror"
                                    required>
                             @error('name')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -133,7 +133,7 @@
                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent @error('email') border-red-500 @enderror"
                                    required>
                             @error('email')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
@@ -144,7 +144,7 @@
                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent @error('subject') border-red-500 @enderror"
                                required>
                         @error('subject')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -154,8 +154,14 @@
                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none @error('message') border-red-500 @enderror"
                                   required>{{ old('message') }}</textarea>
                         @error('message')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
                         @enderror
+                    </div>
+
+                    <!-- Honeypot field to prevent spam (hidden from users but visible to bots) -->
+                    <div style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;" aria-hidden="true">
+                        <label for="website">Website (leave blank)</label>
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                     </div>
 
                     <div class="text-center">

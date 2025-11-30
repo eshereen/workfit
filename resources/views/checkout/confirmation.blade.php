@@ -4,6 +4,19 @@
 <div class="min-h-screen bg-gray-50 py-12 my-20">
     <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto">
+            @php
+                $currencyService = app(\App\Services\CountryCurrencyService::class);
+                $currencyInfo = $currencyService->getCurrentCurrencyInfo();
+                $displayCurrency = $currencyInfo['currency_code'];
+                $displaySymbol = $currencyInfo['currency_symbol'];
+
+                $convertAmount = function ($amount) use ($currencyService, $displayCurrency) {
+                    if ($displayCurrency === 'USD') {
+                        return $amount;
+                    }
+                    return $currencyService->convertFromUSD($amount, $displayCurrency);
+                };
+            @endphp
             <!-- Header -->
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">Order Confirmation</h1>
@@ -34,8 +47,12 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-gray-900">Qty: {{ $item->quantity }}</p>
-                                <p class="font-medium text-gray-900">{{ $currencyInfo['currency_symbol'] ?? '$' }}{{ number_format($item->price, 2) }}</p>
-                                <p class="text-sm text-gray-600">Total: {{ $currencyInfo['currency_symbol'] ?? '$' }}{{ number_format($item->price * $item->quantity, 2) }}</p>
+                                @php
+                                    $linePrice = $convertAmount($item->price);
+                                    $lineTotal = $convertAmount($item->price * $item->quantity);
+                                @endphp
+                                <p class="font-medium text-gray-900">{{ $displaySymbol }}{{ number_format($linePrice, 2) }}</p>
+                                <p class="text-sm text-gray-600">Total: {{ $displaySymbol }}{{ number_format($lineTotal, 2) }}</p>
                             </div>
                         </div>
                         @endforeach
@@ -146,27 +163,27 @@
                         <div class="space-y-3">
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Subtotal:</span>
-                                <span class="text-gray-900">{{ $currencyInfo['currency_symbol'] ?? '$' }}{{ number_format($order->subtotal, 2) }}</span>
+                                <span class="text-gray-900">{{ $displaySymbol }}{{ number_format($convertAmount($order->subtotal), 2) }}</span>
                             </div>
 
                             @if($order->tax_amount > 0)
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Tax:</span>
-                                <span class="text-gray-900">{{ $currencyInfo['currency_symbol'] ?? '$' }}{{ number_format($order->tax_amount, 2) }}</span>
+                                <span class="text-gray-900">{{ $displaySymbol }}{{ number_format($convertAmount($order->tax_amount), 2) }}</span>
                             </div>
                             @endif
 
                             @if($order->shipping_amount > 0)
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Shipping:</span>
-                                <span class="text-gray-900">{{ $currencyInfo['currency_symbol'] ?? '$' }}{{ number_format($order->shipping_amount, 2) }}</span>
+                                <span class="text-gray-900">{{ $displaySymbol }}{{ number_format($convertAmount($order->shipping_amount), 2) }}</span>
                             </div>
                             @endif
 
                             @if($order->discount_amount > 0)
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Discount:</span>
-                                <span class="text-gray-900">-{{ $currencyInfo['currency_symbol'] ?? '$' }}{{ number_format($order->discount_amount, 2) }}</span>
+                                <span class="text-gray-900">-{{ $displaySymbol }}{{ number_format($convertAmount($order->discount_amount), 2) }}</span>
                             </div>
                             @endif
 
@@ -174,7 +191,7 @@
 
                             <div class="flex justify-between text-lg font-semibold">
                                 <span class="text-gray-900">Total:</span>
-                                <span class="text-gray-900">{{ $currencyInfo['currency_symbol'] ?? '$' }}{{ number_format($order->total_amount, 2) }}</span>
+                                <span class="text-gray-900">{{ $displaySymbol }}{{ number_format($convertAmount($order->total_amount), 2) }}</span>
                             </div>
                         </div>
 

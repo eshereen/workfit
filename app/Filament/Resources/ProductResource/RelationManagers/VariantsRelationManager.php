@@ -2,25 +2,25 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
+use App\Models\ProductVariant;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Actions\CreateAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\RestoreAction;
+use Illuminate\Support\Facades\Log;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
-
-
+use Filament\Forms\Components\TextInput;
+use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 
 class VariantsRelationManager extends RelationManager
@@ -29,10 +29,16 @@ class VariantsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'sku';
 
-    public function form(Schema $schema): Schema    {
+    public function form(Schema $schema): Schema
+    {
         return $schema->components([
-
-
+            TextInput::make('sku')
+                ->required()
+                ->unique(
+                    table: ProductVariant::class,
+                    column: 'sku',
+                    ignorable: fn ($record) => $record
+                ),
             Select::make('size')
                 ->options([
                     'XS' => 'XS',
@@ -44,13 +50,11 @@ class VariantsRelationManager extends RelationManager
                     'XXXL' => 'XXXL',
                 ])
                 ->required(),
-
-                Select::make('color')
+            Select::make('color')
                 ->label('Color')
                 ->options(array_combine(array_keys(config('colors')), array_keys(config('colors')))) // key => value both as color names
                 ->searchable()
                 ->required(),
-
             TextInput::make('stock')
                 ->numeric()
                 ->minValue(0)
@@ -74,8 +78,8 @@ class VariantsRelationManager extends RelationManager
                 ->label('Color')
                 ->formatStateUsing(function ($state) {
                     // Debug: Log the state value
-                    \Log::info('Color state value:', ['state' => $state, 'type' => gettype($state)]);
-                    
+                    Log::info('Color state value:', ['state' => $state, 'type' => gettype($state)]);
+
                     // If state is a number, get the color name from config keys
                     if (is_numeric($state)) {
                         $colorKeys = array_keys(config('colors'));
@@ -83,10 +87,10 @@ class VariantsRelationManager extends RelationManager
                     } else {
                         $colorName = $state;
                     }
-                    
+
                     $colorCode = config('colors')[$colorName] ?? '#ccc';
                     $textColor = $this->getContrastColor($colorCode);
-                    
+
                     return "<span style='background-color: {$colorCode}; color: {$textColor}; padding: 4px 8px; border-radius: 4px; display: inline-block;'>{$colorName}</span>";
                 })
                 ->html(),
@@ -136,15 +140,15 @@ class VariantsRelationManager extends RelationManager
     {
         // Remove # if present
         $hexColor = ltrim($hexColor, '#');
-        
+
         // Convert to RGB
         $r = hexdec(substr($hexColor, 0, 2));
         $g = hexdec(substr($hexColor, 2, 2));
         $b = hexdec(substr($hexColor, 4, 2));
-        
+
         // Calculate luminance
         $luminance = (0.299 * $r + 0.587 * $g + 0.114 * $b) / 255;
-        
+
         // Return black for light colors, white for dark colors
         return $luminance > 0.5 ? '#000000' : '#FFFFFF';
     }

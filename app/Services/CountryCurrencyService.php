@@ -160,7 +160,7 @@ class CountryCurrencyService
                         ->to($currencyCode)
                         ->get();
 
-                    return round($result, 2);
+                    return $result; // Return full precision, no rounding
                 } catch (Exception $e) {
                     Log::error("CurrencyConverter package error: " . $e->getMessage());
                     // Fallback to manual rate calculation

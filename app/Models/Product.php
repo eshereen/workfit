@@ -21,10 +21,10 @@ class Product extends Model implements HasMedia
     protected $fillable = ['name', 'slug', 'description', 'price', 'compare_price','featured', 'active','category_id','subcategory_id'];
 
     protected $casts = [
-
+        'price' => 'decimal:2',
+        'compare_price' => 'decimal:2',
         'featured' => 'boolean',
         'active' => 'boolean',
-
     ];
 
     protected $appends = ['quantity', 'has_variants'];

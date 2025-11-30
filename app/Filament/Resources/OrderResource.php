@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use UnitEnum;
 use BackedEnum;
+use App\Models\Shipping;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Order;
@@ -15,6 +16,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -108,6 +110,13 @@ class OrderResource extends Resource
                     ->placeholder('Building number (optional)')
                     ->visible(fn ($get) => !$get('use_billing_for_shipping'))
                     ->default(fn ($record) => $record?->shipping_building_number ?? ''),
+                Select::make('shipping_id')
+                    ->relationship('shipping', 'country.name')
+                    ->label('Shipping')
+                    ->searchable()
+                    ->preload()
+                    ->columnSpanFull()
+                    ->default(fn ($record) => $record?->shipping_id ?? null),
                 ])->columns(3)->columnSpanFull(),
 
                 Section::make('Order Summary')
@@ -207,6 +216,13 @@ class OrderResource extends Resource
                     ->searchable(),
                 TextColumn::make('shipping_address')
                     ->searchable(),
+                TextColumn::make('shipping.country.name')
+                    ->label('Shipping Country')
+                    ->sortable(),
+                TextColumn::make('shipping.price')
+                    ->money('USD')
+                    ->label('Shipping Price')
+                    ->sortable(),
                 TextColumn::make('shipping_building_number')
                     ->searchable(),
                 IconColumn::make('use_billing_for_shipping')
@@ -239,7 +255,24 @@ class OrderResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(), 
+                Action::make('view_invoice')
+                    ->label('View Invoice')
+                    ->icon('heroicon-o-document-text')
+                    ->color('info')
+                    ->url(fn (Order $record) => route('admin.invoice.show', $record))
+                    ->openUrlInNewTab(),
+                Action::make('print_invoice')
+                    ->label('Print Invoice')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->url(fn (Order $record) => route('admin.invoice.show', $record))
+                    ->openUrlInNewTab(),
+                Action::make('export_pdf')
+                    ->label('Export PDF')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('danger')
+                    ->action(fn (Order $record) => redirect()->route('admin.invoice.pdf', $record)),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

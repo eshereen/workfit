@@ -141,10 +141,6 @@ class ProductIndex extends Component
 
     protected function convertProductPrices($products = null)
     {
-        if ($this->currencyCode === 'USD') {
-            return; // No conversion needed
-        }
-
         try {
             $currencyService = app(CountryCurrencyService::class);
 
@@ -152,16 +148,41 @@ class ProductIndex extends Component
             $productsToConvert = $products;
             if ($productsToConvert) {
                 foreach ($productsToConvert as $product) {
+                    //  set converted_price for consistency (even for USD)
                     if ($product->price) {
-                        $product->converted_price = $currencyService->convertFromUSD($product->price, $this->currencyCode);
+                        if ($this->currencyCode === 'USD') {
+                            $product->converted_price = $product->price;
+                        } else {
+                            $product->converted_price = $currencyService->convertFromUSD($product->price, $this->currencyCode);
+                        }
                     }
+
+                    // Always set converted_compare_price for consistency (even for USD)
                     if ($product->compare_price && $product->compare_price > 0) {
-                        $product->converted_compare_price = $currencyService->convertFromUSD($product->compare_price, $this->currencyCode);
+                        if ($this->currencyCode === 'USD') {
+                            $product->converted_compare_price = $product->compare_price;
+                        } else {
+                            $product->converted_compare_price = $currencyService->convertFromUSD($product->compare_price, $this->currencyCode);
+                        }
                     }
                 }
             }
         } catch (Exception $e) {
-            // Handle conversion error silently
+            Log::error('ProductIndex: Error in convertProductPrices', [
+                'error' => $e->getMessage(),
+                'currency_code' => $this->currencyCode
+            ]);
+            // Fallback: set original prices if conversion fails
+            if ($productsToConvert) {
+                foreach ($productsToConvert as $product) {
+                    if ($product->price && !isset($product->converted_price)) {
+                        $product->converted_price = $product->price;
+                    }
+                    if ($product->compare_price && $product->compare_price > 0 && !isset($product->converted_compare_price)) {
+                        $product->converted_compare_price = $product->compare_price;
+                    }
+                }
+            }
         }
     }
 
@@ -533,14 +554,14 @@ class ProductIndex extends Component
                 if ($this->useBestSellerLogic && $this->sortBy === 'newest') {
                     $bestSellerService = app(BestSellerService::class);
                     $perPage = request()->routeIs('home') ? 8 : 12;
-                    
+
                     // Get products with best seller priority
                     $products = $bestSellerService->getProductsWithBestSellerPriority(
-                        $query, 
-                        $perPage, 
+                        $query,
+                        $perPage,
                         $this->category
                     );
-                    
+
                     // Convert to paginated format
                     return new \Illuminate\Pagination\LengthAwarePaginator(
                         $products,
@@ -660,10 +681,6 @@ class ProductIndex extends Component
      */
     protected function convertProductPricesOptimized($products)
     {
-        if ($this->currencyCode === 'USD') {
-            return; // No conversion needed
-        }
-
         try {
             $currencyService = app(CountryCurrencyService::class);
 
@@ -676,12 +693,24 @@ class ProductIndex extends Component
 
             // Transform the collection
             $collection->transform(function ($product) use ($currencyService) {
+                // Always set converted_price for consistency (even for USD)
                 if ($product->price) {
-                    $product->converted_price = $currencyService->convertFromUSD($product->price, $this->currencyCode);
+                    if ($this->currencyCode === 'USD') {
+                        $product->converted_price = $product->price;
+                    } else {
+                        $product->converted_price = $currencyService->convertFromUSD($product->price, $this->currencyCode);
+                    }
                 }
+
+                // Always set converted_compare_price for consistency (even for USD)
                 if ($product->compare_price && $product->compare_price > 0) {
-                    $product->converted_compare_price = $currencyService->convertFromUSD($product->compare_price, $this->currencyCode);
+                    if ($this->currencyCode === 'USD') {
+                        $product->converted_compare_price = $product->compare_price;
+                    } else {
+                        $product->converted_compare_price = $currencyService->convertFromUSD($product->compare_price, $this->currencyCode);
+                    }
                 }
+
                 return $product;
             });
 
@@ -690,7 +719,30 @@ class ProductIndex extends Component
                 $products->setCollection($collection);
             }
         } catch (Exception $e) {
-            // Handle conversion error silently
+            Log::error('ProductIndex: Error converting prices', [
+                'error' => $e->getMessage(),
+                'currency_code' => $this->currencyCode
+            ]);
+            // Fallback: set original prices if conversion fails
+            if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator || $products instanceof \Illuminate\Pagination\Paginator) {
+                $collection = $products->getCollection();
+            } else {
+                $collection = $products;
+            }
+
+            $collection->transform(function ($product) {
+                if ($product->price && !isset($product->converted_price)) {
+                    $product->converted_price = $product->price;
+                }
+                if ($product->compare_price && $product->compare_price > 0 && !isset($product->converted_compare_price)) {
+                    $product->converted_compare_price = $product->compare_price;
+                }
+                return $product;
+            });
+
+            if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator || $products instanceof \Illuminate\Pagination\Paginator) {
+                $products->setCollection($collection);
+            }
         }
     }
 
@@ -832,7 +884,7 @@ class ProductIndex extends Component
         if (!$this->useBestSellerLogic) {
             return false;
         }
-        
+
         $bestSellerService = app(BestSellerService::class);
         return $bestSellerService->isBestSeller($productId, $this->category);
     }

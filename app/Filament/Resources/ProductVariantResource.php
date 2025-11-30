@@ -69,7 +69,6 @@ class ProductVariantResource extends Resource
                     ->numeric()
                     ->sortable(),
                     TextColumn::make('product.name')
-
                     ->sortable(),
                 TextColumn::make('color')
                     ->searchable(),
@@ -109,7 +108,7 @@ class ProductVariantResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                 DeleteAction::make(), 
+                 DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

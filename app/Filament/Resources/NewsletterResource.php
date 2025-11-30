@@ -8,6 +8,7 @@ use Filament\Tables;
 use App\Models\Newsletter;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
+use App\Traits\HasExports;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
@@ -29,9 +30,25 @@ use App\Filament\Resources\NewsletterResource\Pages\CreateNewsletter;
 
 class NewsletterResource extends Resource
 {
+    use HasExports;
+
     protected static ?string $model = Newsletter::class;
 
     protected static string | UnitEnum   | null $navigationGroup = 'Settings';
+
+    /**
+     * Get default export columns for Newsletter
+     *
+     * @return array
+     */
+    public static function getDefaultExportColumns(): array
+    {
+        return [
+            'email' => 'Email',
+            'verified' => 'Verified',
+            'created_at' => 'Created At',
+        ];
+    }
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -77,11 +94,12 @@ class NewsletterResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(), 
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    ...static::getExportBulkActions(),
                 ]),
             ]);
     }

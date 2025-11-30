@@ -22,7 +22,7 @@
                    required 
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('first_name')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
         
@@ -35,7 +35,7 @@
                    required 
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('last_name')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
     </div>
@@ -48,7 +48,7 @@
                value="{{ old('phone_number', $user->phone ?? '') }}" 
                class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
         @error('phone_number')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
         @enderror
     </div>
     
@@ -67,7 +67,7 @@
                 @endforeach
             </select>
             @error('country_id')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
         
@@ -79,7 +79,7 @@
                    value="{{ old('state') }}" 
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('state')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
         
@@ -91,7 +91,7 @@
                    value="{{ old('city') }}" 
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('city')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
     </div>

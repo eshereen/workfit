@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Services\PaymentMethodResolver;
 use App\Services\CountryCurrencyService;
 use Illuminate\Support\Facades\Log;
+use App\Models\Shipping;
 
 class CheckoutForm extends Component
 {
@@ -65,6 +66,8 @@ class CheckoutForm extends Component
         if ($country) {
             $this->billingCountry = $country->id;
             $this->shippingCountry = $country->id;
+            // Set shipping country in session
+            session(['checkout_shipping_country_id' => $country->id]);
         }
 
         // Load payment methods for current country
@@ -118,23 +121,39 @@ class CheckoutForm extends Component
         // Update session
         session(['checkout_country' => $country->code]);
 
+        // Store billing country ID in session for tax calculation
+        if ($source === 'billing') {
+            session(['checkout_billing_country_id' => $countryId]);
+        }
+
+        // Store shipping country ID in session for CartService
+        // Always use shipping country if available, otherwise use billing if "use billing for shipping" is checked
+        if ($source === 'shipping' || $source === 'shipping_from_billing') {
+            session(['checkout_shipping_country_id' => $countryId]);
+        } elseif ($source === 'billing' && $this->useBillingForShipping) {
+            // If billing country changes and using billing for shipping, update shipping country
+            session(['checkout_shipping_country_id' => $countryId]);
+        }
+
         // Update payment methods
         $this->updatePaymentMethods($country->code);
 
         // Update currency
         $this->updateCurrencyInfo($country->code);
 
-                // Dispatch events to other components
+        // Dispatch events to other components
         $this->dispatch('country-changed', $country->code);
         $this->dispatch('currency-changed', $this->currentCurrency);
         $this->dispatch('global-currency-changed', $this->currentCurrency);
+        // Send the resolved country ID so listeners don't depend on session timing
+        $this->dispatch('shipping-country-changed', id: $countryId);
 
         // Force refresh of the CurrencySelector component specifically
         $this->dispatch('$refresh')->to('currency-selector');
 
         // Force refresh currency selector and update session
         $this->js("
-            console.log('🚀 CheckoutForm: Updating currency to: {$this->currentCurrency}');
+            console.log(' CheckoutForm: Updating currency to: {$this->currentCurrency}');
 
             // Dispatch browser events that all components can listen to
             window.dispatchEvent(new CustomEvent('livewire-currency-changed', {
@@ -160,7 +179,7 @@ class CheckoutForm extends Component
             })
             .then(response => response.json())
             .then(data => {
-                console.log('✅ Currency updated in session:', data);
+                console.log('Currency updated in session:', data);
 
                                 // Find and refresh the currency selector component
                 if (window.Livewire) {
@@ -173,38 +192,38 @@ class CheckoutForm extends Component
                         currencySelector = document.querySelector('[x-data*=\"open\"][wire\\\\:id]');
                     }
 
-                    console.log('🔍 Looking for CurrencySelector component...');
+                    console.log(' Looking for CurrencySelector component...');
                     console.log('Found currency selector:', currencySelector ? 'YES' : 'NO');
 
                     if (currencySelector) {
                         const wireId = currencySelector.getAttribute('wire:id');
-                        console.log('📍 Found CurrencySelector with wire:id:', wireId);
+                        console.log(' Found CurrencySelector with wire:id:', wireId);
 
                         try {
                             const livewireComponent = window.Livewire.find(wireId);
-                            console.log('🔗 Livewire component found:', livewireComponent ? 'YES' : 'NO');
+                            console.log(' Livewire component found:', livewireComponent ? 'YES' : 'NO');
 
                             if (livewireComponent) {
-                                console.log('🔄 Refreshing CurrencySelector component');
+                                console.log(' Refreshing CurrencySelector component');
                                 livewireComponent.\$refresh();
 
                                 // Also call updateToCurrency directly
                                 setTimeout(() => {
-                                    console.log('📞 Calling updateToCurrency with: {$this->currentCurrency}');
+                                    console.log(' Calling updateToCurrency with: {$this->currentCurrency}');
                                     livewireComponent.call('updateToCurrency', '{$this->currentCurrency}');
                                 }, 200);
 
                                 // Double-check with another method
                                 setTimeout(() => {
-                                    console.log('📞 Second attempt: handleCurrencyChanged');
+                                    console.log(' Second attempt: handleCurrencyChanged');
                                     livewireComponent.call('handleCurrencyChanged', '{$this->currentCurrency}');
                                 }, 400);
                             }
                         } catch (e) {
-                            console.error('❌ Error refreshing CurrencySelector:', e);
+                            console.error('Error refreshing CurrencySelector:', e);
                         }
                     } else {
-                        console.error('⚠️ CurrencySelector component not found at all');
+                        console.error(' CurrencySelector component not found at all');
                         console.log('Available Livewire components:', window.Livewire.all());
                     }
 
@@ -215,7 +234,7 @@ class CheckoutForm extends Component
                         try {
                             const orderLivewireComponent = window.Livewire.find(orderWireId);
                             if (orderLivewireComponent) {
-                                console.log('🔄 Refreshing OrderSummary component');
+                                console.log(' Refreshing OrderSummary component');
                                 orderLivewireComponent.\$refresh();
                             }
                         } catch (e) {
@@ -230,7 +249,7 @@ class CheckoutForm extends Component
                         try {
                             const cartLivewireComponent = window.Livewire.find(cartWireId);
                             if (cartLivewireComponent) {
-                                console.log('🔄 Refreshing cart component for currency update');
+                                console.log('Refreshing cart component for currency update');
                                 cartLivewireComponent.\$refresh();
                             }
                         } catch (e) {
@@ -240,7 +259,7 @@ class CheckoutForm extends Component
                 }
             })
             .catch(error => {
-                console.error('❌ Error updating currency:', error);
+                console.error('Error updating currency:', error);
             });
         ");
 
@@ -521,9 +540,9 @@ class CheckoutForm extends Component
                     $availableStock = $variant->stock;
 
                     if ($availableStock <= 0) {
-                        $stockIssues[] = "❌ Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is out of stock.";
+                        $stockIssues[] = "Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is out of stock.";
                     } else {
-                        $stockIssues[] = "⚠️ Only {$availableStock} items available for '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}).";
+                        $stockIssues[] = " Only {$availableStock} items available for '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}).";
                     }
                 }
             } else {
@@ -538,9 +557,9 @@ class CheckoutForm extends Component
                     $availableStock = $product->quantity;
 
                     if ($availableStock <= 0) {
-                        $stockIssues[] = "❌ Product '{$product->name}' is out of stock.";
+                        $stockIssues[] = "Product '{$product->name}' is out of stock.";
                     } else {
-                        $stockIssues[] = "⚠️ Only {$availableStock} items available for '{$product->name}'.";
+                        $stockIssues[] = " Only {$availableStock} items available for '{$product->name}'.";
                     }
                 }
             }
@@ -588,9 +607,9 @@ class CheckoutForm extends Component
                     $availableStock = $variant->stock;
 
                     if ($availableStock <= 0) {
-                        throw new \Exception("❌ Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is currently out of stock. Please remove it from your cart or try a different variant.");
+                        throw new \Exception("Product '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}) is currently out of stock. Please remove it from your cart or try a different variant.");
                     } else {
-                        throw new \Exception("⚠️ Only {$availableStock} items available for '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}). Please reduce the quantity in your cart.");
+                        throw new \Exception(" Only {$availableStock} items available for '{$product->name}' (Size: {$variant->size}, Color: {$variant->color}). Please reduce the quantity in your cart.");
                     }
                 }
             } else {
@@ -604,9 +623,9 @@ class CheckoutForm extends Component
                     $availableStock = $product->quantity;
 
                     if ($availableStock <= 0) {
-                        throw new \Exception("❌ Product '{$product->name}' is currently out of stock. Please remove it from your cart.");
+                        throw new \Exception("Product '{$product->name}' is currently out of stock. Please remove it from your cart.");
                     } else {
-                        throw new \Exception("⚠️ Only {$availableStock} items available for '{$product->name}'. Please reduce the quantity in your cart.");
+                        throw new \Exception(" Only {$availableStock} items available for '{$product->name}'. Please reduce the quantity in your cart.");
                     }
                 }
             }

@@ -46,20 +46,17 @@
                 <span class="text-gray-900">{{ number_format($subtotal, 2) }} {{ $currencySymbol }}</span>
             </div>
 
-       {{--      @if($taxAmount > 0)
+            @if($taxAmount > 0)
             <div class="flex justify-between">
                 <span class="text-gray-600">Tax:</span>
                 <span class="text-gray-900">{{ number_format($taxAmount, 2) }} {{ $currencySymbol }}</span>
             </div>
-            @endif --}}
+            @endif
 
-         {{--    @if($shippingAmount > 0)
             <div class="flex justify-between">
-                <span class="text-gray-600">Shipping:</span>
+                <span class="text-gray-600">Shipping (calculated after country selection):</span>
                 <span class="text-gray-900">{{ $currencySymbol }}{{ number_format($shippingAmount, 2) }}</span>
             </div>
-            @endif
-            --}}
 
             @if($couponDiscount > 0)
             <div class="flex justify-between text-red-600">
@@ -76,13 +73,8 @@
             @endif
 
             <div class="flex justify-between pt-3 text-lg font-bold border-t border-gray-200">
-                @if($loyaltyDiscount > 0 || $couponDiscount > 0)
-                    <span class="text-gray-900">Final Total:</span>
-                    <span class="text-gray-900">{{ number_format($finalTotal, 2) }} {{ $currencySymbol }}</span>
-                @else
-                    <span class="text-gray-900">Total:</span>
-                    <span class="text-gray-900">{{ number_format($total, 2) }} {{ $currencySymbol }}</span>
-                @endif
+                <span class="text-gray-900">Total:</span>
+                <span class="text-gray-900">{{ number_format($finalTotal, 2) }} {{ $currencySymbol }}</span>
             </div>
 
             @if($loyaltyDiscount > 0)
@@ -109,7 +101,7 @@ window.testOrderSummaryEvent = function() {
             const component = window.Livewire.find(wireId);
             if (component) {
                 component.$refresh();
-                console.log('✅ OrderSummary refreshed manually');
+                console.log('OrderSummary refreshed manually');
             }
         }
     }

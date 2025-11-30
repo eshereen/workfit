@@ -5,6 +5,7 @@ namespace App\Services;
 use Exception;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Country;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
@@ -204,9 +205,61 @@ class CartService
         });
     }
 
-    public function getTotal()
+    /**
+     * Get subtotal for items without compare_price (items eligible for coupon discount)
+     */
+    public function getSubtotalWithoutComparePrice()
     {
-        return $this->getSubtotal() + $this->getShippingCost() + $this->getTaxAmount();
+        $cart = $this->getCart();
+        $subtotal = 0;
+
+        foreach ($cart as $item) {
+            $productId = $this->extractProductId($item['id']);
+            $product = Product::find($productId);
+
+            if ($product && (!$product->compare_price || $product->compare_price <= 0)) {
+                $subtotal += $item['price'] * $item['quantity'];
+            }
+        }
+
+        return $subtotal;
+    }
+
+    /**
+     * Check if cart has any items with compare_price (on sale)
+     */
+    public function hasItemsWithComparePrice()
+    {
+        $cart = $this->getCart();
+
+        foreach ($cart as $item) {
+            $productId = $this->extractProductId($item['id']);
+            $product = Product::find($productId);
+
+            if ($product && $product->compare_price && $product->compare_price > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Extract product ID from cart item ID (handles both simple product IDs and variant IDs like "123-456")
+     */
+    protected function extractProductId($itemId)
+    {
+        // If item ID contains a dash, it's a variant (format: "productId-variantId")
+        if (strpos($itemId, '-') !== false) {
+            return (int) explode('-', $itemId)[0];
+        }
+
+        return (int) $itemId;
+    }
+
+    public function getTotal($countryId = null)
+    {
+        return $this->getSubtotal() + $this->getShippingCost($countryId) + $this->getTaxAmount($countryId);
     }
 
     public function getCount()
@@ -215,14 +268,77 @@ class CartService
         return $cart->sum('quantity');
     }
 
-    public function getShippingCost()
+    public function getShippingCost($countryId = null)
     {
-        return 0; // Free shipping
+        // If no country provided, try to get from session (ID first, then code)
+        if (!$countryId) {
+            $countryId = session('checkout_shipping_country_id');
+
+            if (!$countryId) {
+                $countryCode = session('checkout_country');
+                if ($countryCode) {
+                    $country = Country::where('code', $countryCode)->first();
+                    if ($country) {
+                        $countryId = $country->id;
+                    }
+                }
+            }
+        }
+
+        // If still no country, return 0 (no shipping applied)
+        if (!$countryId) {
+            return 0;
+        }
+
+        // Fetch shipping from database
+        $shipping = \App\Models\Shipping::where('country_id', $countryId)->first();
+
+        // If shipping not found or is_free_for_order is true, return 0
+        if (!$shipping || $shipping->is_free_for_order) {
+            return 0;
+        }
+
+        // Return shipping price in USD
+        return (float) $shipping->price;
     }
 
-    public function getTaxAmount()
+    public function getTaxAmount($countryId = null)
     {
-        return 0; // No tax
+        // Get country ID from session if not provided
+        if (!$countryId) {
+            $countryId = session('checkout_shipping_country_id');
+
+            if (!$countryId) {
+                $countryCode = session('checkout_country');
+                if ($countryCode) {
+                    $country = Country::where('code', $countryCode)->first();
+                    if ($country) {
+                        $countryId = $country->id;
+                    }
+                }
+            }
+        }
+
+        // If no country found, return 0
+        if (!$countryId) {
+            return 0;
+        }
+
+        // Get country and tax rate
+        $country = Country::find($countryId);
+        if (!$country || is_null($country->tax_rate) || $country->tax_rate == 0) {
+            return 0;
+        }
+
+        // Calculate tax on subtotal + shipping
+        $subtotal = $this->getSubtotal();
+        $shippingCost = $this->getShippingCost($countryId);
+        $taxableAmount = $subtotal + $shippingCost;
+
+        // Calculate tax amount (tax_rate is percentage, e.g., 14 means 14%)
+        $taxAmount = $taxableAmount * ((float) $country->tax_rate / 100);
+
+        return round($taxAmount, 2);
     }
 
     public function isEmpty()

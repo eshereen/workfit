@@ -21,4 +21,9 @@ class Country extends Model
     {
         return $this->hasMany(Newsletter::class);
     }
+
+    public function shippings()
+    {
+        return $this->hasMany(Shipping::class);
+    }
 }

@@ -61,7 +61,7 @@
     </div>
 
     @error('payment_method')
-        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+        <p class="text-yellow-900 text-sm mt-2">{{ $message }}</p>
     @enderror
 
     <div class="mt-6 p-4 bg-gray-50 rounded-lg">

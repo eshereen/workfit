@@ -50,12 +50,24 @@ class ProductController extends Controller
 
             // Convert product prices to current currency (batch processing)
             $products->getCollection()->transform(function ($product) use ($currencyInfo) {
+                // Always set converted_price for consistency (even for USD)
                 if ($product->price) {
-                    $product->converted_price = $this->currencyService->convertFromUSD($product->price, $currencyInfo['currency_code']);
+                    if ($currencyInfo['currency_code'] === 'USD') {
+                        $product->converted_price = $product->price;
+                    } else {
+                        $product->converted_price = $this->currencyService->convertFromUSD($product->price, $currencyInfo['currency_code']);
+                    }
                 }
+
+                // Always set converted_compare_price for consistency (even for USD)
                 if ($product->compare_price && $product->compare_price > 0) {
-                    $product->converted_compare_price = $this->currencyService->convertFromUSD($product->compare_price, $currencyInfo['currency_code']);
+                    if ($currencyInfo['currency_code'] === 'USD') {
+                        $product->converted_compare_price = $product->compare_price;
+                    } else {
+                        $product->converted_compare_price = $this->currencyService->convertFromUSD($product->compare_price, $currencyInfo['currency_code']);
+                    }
                 }
+
                 return $product;
             });
 
@@ -95,11 +107,22 @@ class ProductController extends Controller
             ]);
 
             // Convert product price to current currency
+            // Always set converted_price for consistency (even for USD)
             if ($product->price) {
-                $product->converted_price = $this->currencyService->convertFromUSD($product->price, $currencyInfo['currency_code']);
+                if ($currencyInfo['currency_code'] === 'USD') {
+                    $product->converted_price = $product->price;
+                } else {
+                    $product->converted_price = $this->currencyService->convertFromUSD($product->price, $currencyInfo['currency_code']);
+                }
             }
+
+            // Always set converted_compare_price for consistency (even for USD)
             if ($product->compare_price && $product->compare_price > 0) {
-                $product->converted_compare_price = $this->currencyService->convertFromUSD($product->compare_price, $currencyInfo['currency_code']);
+                if ($currencyInfo['currency_code'] === 'USD') {
+                    $product->converted_compare_price = $product->compare_price;
+                } else {
+                    $product->converted_compare_price = $this->currencyService->convertFromUSD($product->compare_price, $currencyInfo['currency_code']);
+                }
             }
 
             return $product;
@@ -154,12 +177,24 @@ class ProductController extends Controller
 
         // Convert product prices to current currency
         $products->getCollection()->transform(function ($product) use ($currencyInfo) {
+            // Always set converted_price for consistency (even for USD)
             if ($product->price) {
-                $product->converted_price = $this->currencyService->convertFromUSD($product->price, $currencyInfo['currency_code']);
+                if ($currencyInfo['currency_code'] === 'USD') {
+                    $product->converted_price = $product->price;
+                } else {
+                    $product->converted_price = $this->currencyService->convertFromUSD($product->price, $currencyInfo['currency_code']);
+                }
             }
+
+            // Always set converted_compare_price for consistency (even for USD)
             if ($product->compare_price && $product->compare_price > 0) {
-                $product->converted_compare_price = $this->currencyService->convertFromUSD($product->compare_price, $currencyInfo['currency_code']);
+                if ($currencyInfo['currency_code'] === 'USD') {
+                    $product->converted_compare_price = $product->compare_price;
+                } else {
+                    $product->converted_compare_price = $this->currencyService->convertFromUSD($product->compare_price, $currencyInfo['currency_code']);
+                }
             }
+
             return $product;
         });
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Shipping;
 use App\Services\CountryCurrencyService;
 use App\Enums\PaymentStatus;
 use App\Enums\OrderStatus;
@@ -27,6 +28,7 @@ class Order extends Model
         'email',
         'phone_number',
         'subtotal',
+        'tax_rate',
         'tax_amount',
         'shipping_amount',
         'discount_amount',
@@ -39,17 +41,19 @@ class Order extends Model
         'billing_building_number',
         'shipping_address',
         'shipping_building_number',
+        'shipping_id',
         'use_billing_for_shipping',
         'coupon_id',
         'notes',
         'is_guest',
     ];
     protected $casts = [
-        'subtotal' => 'integer',
-        'tax_amount' => 'integer',
-        'shipping_amount' => 'integer',
-        'discount_amount' => 'integer',
-        'total_amount' => 'integer',
+        'subtotal' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'shipping_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'total_amount' => 'decimal:2',
         'billing_address' => 'string',
         'shipping_address' => 'string',
         'billing_building_number' => 'string',
@@ -74,6 +78,11 @@ class Order extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function shipping()
+    {
+        return $this->belongsTo(Shipping::class);
+    }
+
     public function payments()
     {
         return $this->hasMany(Payment::class);
@@ -87,12 +96,12 @@ class Order extends Model
     public function getShippingAddressAttribute()
     {
         $address = $this->attributes['shipping_address'] ?? null;
-        
+
         // If it's null or empty, return null
         if (empty($address)) {
             return null;
         }
-        
+
         // If it's a string, check if it's JSON
         if (is_string($address)) {
             $decoded = json_decode($address, true);
@@ -103,24 +112,24 @@ class Order extends Model
             // Otherwise, return the string as-is
             return $address;
         }
-        
+
         // If it's already an array, return it
         if (is_array($address)) {
             return $address;
         }
-        
+
         return null;
     }
 
     public function getBillingAddressAttribute()
     {
         $address = $this->attributes['billing_address'] ?? null;
-        
+
         // If it's null or empty, return null
         if (empty($address)) {
             return null;
         }
-        
+
         // If it's a string, check if it's JSON
         if (is_string($address)) {
             $decoded = json_decode($address, true);
@@ -131,12 +140,12 @@ class Order extends Model
             // Otherwise, return the string as-is
             return $address;
         }
-        
+
         // If it's already an array, return it
         if (is_array($address)) {
             return $address;
         }
-        
+
         return null;
     }
 

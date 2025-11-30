@@ -10,7 +10,6 @@ use App\Filament\Resources\CollectionProducts\Schemas\CollectionProductForm;
 use App\Filament\Resources\CollectionProducts\Schemas\CollectionProductInfolist;
 use App\Filament\Resources\CollectionProducts\Tables\CollectionProductsTable;
 use App\Models\CollectionProduct;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;

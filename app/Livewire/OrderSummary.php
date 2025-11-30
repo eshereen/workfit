@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Exception;
 use Livewire\Component;
+use App\Models\Country;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
 use App\Models\Coupon;
@@ -72,6 +73,19 @@ class OrderSummary extends Component
         $this->loadOrderData();
     }
 
+    #[On('shipping-country-changed')]
+    public function handleShippingCountryChanged($id = null)
+    {
+        Log::info('OrderSummary: Received shipping-country-changed event', ['id' => $id]);
+
+        // Ensure session has the latest ID from the event payload
+        if ($id) {
+            Session::put('checkout_shipping_country_id', $id);
+        }
+
+        $this->loadOrderData();
+    }
+
     #[On('$refresh')]
     public function handleRefresh()
     {
@@ -117,7 +131,8 @@ class OrderSummary extends Component
 
     protected function calculateFinalTotal()
     {
-        $this->finalTotal = max(0, $this->total - $this->loyaltyDiscount - $this->couponDiscount);
+        // max(0, ...) prevents negative totals, round(..., 2) ensures currency precision
+        $this->finalTotal = round(max(0, $this->total - $this->loyaltyDiscount - $this->couponDiscount), 2);
 
         Log::info('OrderSummary: Final total calculated', [
             'original_total' => $this->total,
@@ -146,11 +161,38 @@ class OrderSummary extends Component
             $this->currencyCode = $currencyInfo['currency_code'];
             $this->currencySymbol = $currencyInfo['currency_symbol'];
 
+            // Get shipping country ID from session (fallback to country code)
+            $shippingCountryId = Session::get('checkout_shipping_country_id');
+            if (!$shippingCountryId) {
+                $countryCode = Session::get('checkout_country');
+                if ($countryCode) {
+                    $country = Country::where('code', $countryCode)->first();
+                    if ($country) {
+                        $shippingCountryId = $country->id;
+                    }
+                }
+            }
+
+            // Get billing country ID from session (for tax calculation)
+            // Tax is calculated based on billing country, not shipping country
+            $billingCountryId = Session::get('checkout_billing_country_id');
+            if (!$billingCountryId) {
+                // Try to get from checkout_data (form submission)
+                $checkoutData = Session::get('checkout_data');
+                if ($checkoutData && isset($checkoutData['billing_country_id'])) {
+                    $billingCountryId = $checkoutData['billing_country_id'];
+                } else {
+                    // Fallback: use shipping country if billing not set yet
+                    $billingCountryId = $shippingCountryId;
+                }
+            }
+
             // Get base prices in USD
             $baseSubtotal = $this->cartService->getSubtotal();
-            $baseTaxAmount = $this->cartService->getTaxAmount();
-            $baseShippingAmount = $this->cartService->getShippingCost();
-            $baseTotal = $this->cartService->getTotal();
+            // Tax is calculated based on billing country
+            $baseTaxAmount = $this->cartService->getTaxAmount($billingCountryId);
+            $baseShippingAmount = $this->cartService->getShippingCost($shippingCountryId);
+            $baseTotal = $this->cartService->getTotal($shippingCountryId);
 
             // Convert prices to preferred currency
             $this->subtotal = $this->currencyService->convertFromUSD($baseSubtotal, $this->currencyCode);
@@ -177,9 +219,14 @@ class OrderSummary extends Component
                 'currency' => $this->currencyCode,
                 'symbol' => $this->currencySymbol,
                 'subtotal' => $this->subtotal,
+                'tax_amount' => $this->taxAmount,
+                'shipping_amount' => $this->shippingAmount,
                 'total' => $this->total,
+                'coupon_discount' => $this->couponDiscount,
                 'loyalty_discount' => $this->loyaltyDiscount,
                 'final_total' => $this->finalTotal,
+                'billing_country_id' => $billingCountryId,
+                'shipping_country_id' => $shippingCountryId,
                 'item_count' => count($this->cartItems)
             ]);
 
@@ -206,18 +253,46 @@ class OrderSummary extends Component
             return;
         }
 
-        // Base prices in USD
+        // Get shipping country ID from session (fallback to country code)
+        $shippingCountryId = Session::get('checkout_shipping_country_id');
+        if (!$shippingCountryId) {
+            $countryCode = Session::get('checkout_country');
+            if ($countryCode) {
+                $country = Country::where('code', $countryCode)->first();
+                if ($country) {
+                    $shippingCountryId = $country->id;
+                }
+            }
+        }
+
+        // Get billing country ID for tax calculation
+        $billingCountryId = Session::get('checkout_billing_country_id');
+        if (!$billingCountryId) {
+            $checkoutData = Session::get('checkout_data');
+            if ($checkoutData && isset($checkoutData['billing_country_id'])) {
+                $billingCountryId = $checkoutData['billing_country_id'];
+            } else {
+                $billingCountryId = $shippingCountryId;
+            }
+        }
+
+        // Base prices in USD - use subtotal without compare_price for eligible items
+        $baseSubtotalWithoutComparePrice = $this->cartService->getSubtotalWithoutComparePrice();
         $baseSubtotal = $this->cartService->getSubtotal();
-        $baseShipping = $this->cartService->getShippingCost();
-        $baseTax = $this->cartService->getTaxAmount();
+        $baseShipping = $this->cartService->getShippingCost($shippingCountryId);
+        $baseTax = $this->cartService->getTaxAmount($billingCountryId);
         $baseTotal = $baseSubtotal + $baseShipping + $baseTax;
 
+        // Convert eligible subtotal to local currency
+        $eligibleSubtotal = $this->currencyService->convertFromUSD($baseSubtotalWithoutComparePrice, $this->currencyCode);
+
         if ($coupon->type === CouponType::Percentage) {
-            // Percentage on local total
-            $this->couponDiscount = $this->total * ((float) $coupon->value / 100);
+            // Percentage discount on eligible subtotal only (items without compare_price)
+            // Note: Shipping and tax are NOT included in percentage discount calculation
+            $this->couponDiscount = $eligibleSubtotal * ((float) $coupon->value / 100);
         } else {
-            // Fixed in USD -> convert to local
-            $discountUSD = (float) $coupon->calculateDiscount($baseSubtotal);
+            // Fixed in USD -> calculate on eligible subtotal only, then convert to local
+            $discountUSD = (float) $coupon->calculateDiscount($baseSubtotalWithoutComparePrice);
             $this->couponDiscount = $this->currencyService->convertFromUSD($discountUSD, $this->currencyCode);
         }
 

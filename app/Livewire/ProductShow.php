@@ -69,28 +69,28 @@ class ProductShow extends Component
 
     protected function convertProductPrices()
     {
-        if ($this->currencyCode === 'USD') {
-            return; // No conversion needed
-        }
-
         try {
             $currencyService = app(CountryCurrencyService::class);
 
-            // Convert product price
-            if ($this->product->price) {
-                $this->product->converted_price = $currencyService->convertFromUSD($this->product->price, $this->currencyCode);
-            }
-
-            // Convert compare price
-            if ($this->product->compare_price && $this->product->compare_price > 0) {
-                $this->product->converted_compare_price = $currencyService->convertFromUSD($this->product->compare_price, $this->currencyCode);
-            }
-
-            // Convert variant prices
-            if ($this->product->variants) {
-                foreach ($this->product->variants as $variant) {
-                    $this->convertVariantPrice($variant);
+            if ($this->currencyCode === 'USD') {
+                $this->product->converted_price = $this->product->price;
+                $this->product->converted_compare_price = $this->product->compare_price;
+            } else {
+                if ($this->product->price) {
+                    $this->product->converted_price = $currencyService->convertFromUSD($this->product->price, $this->currencyCode);
                 }
+
+                if ($this->product->compare_price && $this->product->compare_price > 0) {
+                    $this->product->converted_compare_price = $currencyService->convertFromUSD($this->product->compare_price, $this->currencyCode);
+                }
+            }
+
+            foreach ($this->product->variants as $variant) {
+                $this->convertVariantPrice($variant);
+            }
+
+            if ($this->selectedVariantId) {
+                $this->selectedVariant = $this->product->variants->find($this->selectedVariantId);
             }
         } catch (Exception $e) {
             // Handle conversion error silently
@@ -99,14 +99,19 @@ class ProductShow extends Component
 
     protected function convertVariantPrice($variant)
     {
+        if (!$variant) {
+            return;
+        }
+
         if ($this->currencyCode === 'USD') {
-            return; // No conversion needed
+            $variant->converted_price = $variant->price;
+            return;
         }
 
         try {
             $currencyService = app(CountryCurrencyService::class);
 
-            if ($variant && $variant->price) {
+            if ($variant->price) {
                 $variant->converted_price = $currencyService->convertFromUSD($variant->price, $this->currencyCode);
             }
         } catch (Exception $e) {

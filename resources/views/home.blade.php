@@ -203,11 +203,13 @@
         @if($recent && $recent->isNotEmpty())
        @livewire('product-index',['products'=>$recent])
        @endif
+       @if($categories->isNotEmpty())
        <div class="text-center mt-4 animate-on-scroll">
         <a href="{{ route('categories.index', $categories->get(0)->slug) }}" class="border-2 border-gray-900 hover:bg-gray-800 hover:text-white font-bold py-3 px-8 transition-colors uppercase">
           shop now
         </a>
-    </div>
+       </div>
+       @endif
    </section>
 
    <section class="relative h-[1100px] overflow-hidden animate-on-scroll bg-[url(/imgs/bg-footer.jpg)] bg-cover bg-top mt-20 mb-0">

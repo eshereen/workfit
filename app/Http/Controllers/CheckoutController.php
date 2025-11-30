@@ -14,6 +14,7 @@ use App\Events\OrderPlaced;
 use Illuminate\Support\Str;
 use App\Enums\PaymentMethod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use App\Services\CartService;
 use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
@@ -67,11 +68,14 @@ class CheckoutController extends Controller
             }
         }
 
+        // Get shipping country ID from session
+        $shippingCountryId = session('checkout_shipping_country_id');
+
         // Get base prices in USD
         $baseSubtotal = $this->cartService->getSubtotal();
         $baseTaxAmount = $this->cartService->getTaxAmount();
-        $baseShippingAmount = $this->cartService->getShippingCost();
-        $baseTotal = $this->cartService->getTotal();
+        $baseShippingAmount = $this->cartService->getShippingCost($shippingCountryId);
+        $baseTotal = $this->cartService->getTotal($shippingCountryId);
 
         // Convert prices to preferred currency
         $subtotal = $this->currencyService->convertFromUSD($baseSubtotal, $currencyInfo['currency_code']);
@@ -508,6 +512,7 @@ class CheckoutController extends Controller
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'phone_number' => $data['phone_number'],
+            'country_id' => $data['billing_country_id'], // Primary country from billing address
 
             // Billing address
             'billing_country_id' => $data['billing_country_id'],
@@ -545,6 +550,7 @@ class CheckoutController extends Controller
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'phone_number' => $data['phone_number'],
+            'country_id' => $data['billing_country_id'], // Primary country from billing address
 
             // Billing address
             'billing_country_id' => $data['billing_country_id'],
@@ -578,21 +584,71 @@ class CheckoutController extends Controller
         $currencyCode = $country ? $country->currency_code : 'USD';
 
         // Convert prices to local currency
-        $subtotal = $this->currencyService->convertFromUSD($this->cartService->getSubtotal(), $currencyCode);
-        $taxAmount = $this->currencyService->convertFromUSD($this->cartService->getTaxAmount(), $currencyCode);
-        $shippingAmount = $this->currencyService->convertFromUSD($this->cartService->getShippingCost(), $currencyCode);
-        $totalAmount = $this->currencyService->convertFromUSD($this->cartService->getTotal(), $currencyCode);
+        $shippingCountryId = session('checkout_shipping_country_id');
+        $baseSubtotal = $this->cartService->getSubtotal();
+        $baseShipping = $this->cartService->getShippingCost($shippingCountryId);
+        $baseTax = $this->cartService->getTaxAmount($data['billing_country_id']); // Use billing country for tax
+
+        // Get tax rate from country (as percentage) - return 0 if null or not set
+        $taxRate = ($country && !is_null($country->tax_rate)) ? (float) $country->tax_rate : 0;
+
+        // Convert to local currency
+        $subtotal = $this->currencyService->convertFromUSD($baseSubtotal, $currencyCode);
+        $shippingAmount = $this->currencyService->convertFromUSD($baseShipping, $currencyCode);
+        $taxAmount = $this->currencyService->convertFromUSD($baseTax, $currencyCode);
+
+        // Calculate total amount (subtotal + shipping + tax)
+        $totalBeforeDiscounts = $subtotal + $shippingAmount + $taxAmount;
 
         // Apply loyalty discount if provided - already in local currency
         $loyaltyDiscountLocal = $data['loyalty_discount'] ?? 0;
-        $finalTotal = max(0, $totalAmount - $loyaltyDiscountLocal);
 
-        // Log loyalty discount application
-        if ($loyaltyDiscountLocal > 0) {
-            Log::info('Loyalty discount applied', [
+        // Get coupon discount from session (stored by CartIndex in USD, need to convert)
+        $couponDiscountLocal = 0;
+        $couponId = Session::get('applied_coupon_id');
+        if ($couponId) {
+            $coupon = \App\Models\Coupon::find($couponId);
+            if ($coupon && $coupon->isValid()) {
+                // Get base prices in USD for coupon calculation
+                // Use subtotal without compare_price for eligible items only
+                $baseSubtotalWithoutComparePrice = $this->cartService->getSubtotalWithoutComparePrice();
+                $baseSubtotal = $this->cartService->getSubtotal();
+                $baseShipping = $this->cartService->getShippingCost($shippingCountryId);
+                $baseTax = $this->cartService->getTaxAmount($data['billing_country_id']);
+                $baseTotal = $baseSubtotal + $baseShipping + $baseTax;
+
+                // Convert eligible subtotal to local currency
+                $eligibleSubtotal = $this->currencyService->convertFromUSD($baseSubtotalWithoutComparePrice, $currencyCode);
+
+                if ($coupon->type === \App\Enums\CouponType::Percentage) {
+                    // Percentage discount on eligible subtotal only (items without compare_price)
+                    // Note: Shipping and tax are NOT included in percentage discount calculation
+                    $couponDiscountLocal = $eligibleSubtotal * ((float) $coupon->value / 100);
+                } else {
+                    // Fixed discount in USD - calculate on eligible subtotal only
+                    $discountUSD = (float) $coupon->calculateDiscount($baseSubtotalWithoutComparePrice);
+                    $couponDiscountLocal = $this->currencyService->convertFromUSD($discountUSD, $currencyCode);
+                }
+                $couponDiscountLocal = round(max(0, $couponDiscountLocal), 2);
+            }
+        }
+
+        // Calculate final total: subtotal + shipping + tax - discounts
+        // max(0, ...) prevents negative totals (safety measure)
+        // round(..., 2) ensures 2 decimal precision for currency
+        $finalTotal = round(max(0, $totalBeforeDiscounts - $loyaltyDiscountLocal - $couponDiscountLocal), 2);
+
+        // Log discount application
+        if ($loyaltyDiscountLocal > 0 || $couponDiscountLocal > 0) {
+            Log::info('Discounts applied', [
                 'loyalty_discount_local' => $loyaltyDiscountLocal,
+                'coupon_discount_local' => $couponDiscountLocal,
                 'target_currency' => $currencyCode,
-                'original_total' => $totalAmount,
+                'subtotal' => $subtotal,
+                'shipping' => $shippingAmount,
+                'tax' => $taxAmount,
+                'tax_rate' => $taxRate,
+                'total_before_discounts' => $totalBeforeDiscounts,
                 'final_total' => $finalTotal
             ]);
         }
@@ -613,11 +669,12 @@ class CheckoutController extends Controller
             'state' => $data['billing_state'],
             'city' => $data['billing_city'],
             'notes' => $data['notes'] ?? null,
-            'coupon_id' => $data['coupon_id'] ?? null,
+            'coupon_id' => $couponId ?? null,
             'subtotal' => $subtotal,
+            'tax_rate' => $taxRate,
             'tax_amount' => $taxAmount,
             'shipping_amount' => $shippingAmount,
-            'discount_amount' => ($data['coupon_discount'] ?? 0) + $loyaltyDiscountLocal,
+            'discount_amount' => $couponDiscountLocal + $loyaltyDiscountLocal,
             'total_amount' => $finalTotal,
             'currency' => $currencyCode,
             'payment_method' => $data['payment_method'],
@@ -869,7 +926,7 @@ class CheckoutController extends Controller
      */
     public function thankYou($orderId)
     {
-        $order = Order::with(['items.product', 'items.variant', 'customer'])
+        $order = Order::with(['items.product', 'items.variant', 'customer', 'country'])
             ->where('id', $orderId)
             ->firstOrFail();
 

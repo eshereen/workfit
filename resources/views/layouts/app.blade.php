@@ -148,17 +148,65 @@ p,a,span,li,ul,ol,button{
 <body class="overflow-x-hidden antialiased bg-white text-gray-950">
         <!-- Loader Overlay -->
 <div
+id="page-loader"
 x-data="{ show: true }"
-x-init="window.addEventListener('load', () => { show = false })"
+x-init="
+    // Hide loader when DOM is ready (much faster than waiting for all resources)
+    const hideLoader = () => {
+        setTimeout(() => { show = false; }, 200);
+    };
+
+    // Try multiple events to ensure it hides quickly
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        hideLoader();
+    } else {
+        document.addEventListener('DOMContentLoaded', hideLoader);
+        window.addEventListener('load', hideLoader);
+    }
+
+    // Fallback timeout - hide after max 1.5 seconds regardless
+    setTimeout(() => { show = false; }, 1500);
+"
 x-show="show"
-x-transition:leave="transition-opacity duration-700"
+x-transition:leave="transition-opacity duration-400"
 x-transition:leave-start="opacity-100"
 x-transition:leave-end="opacity-0"
 class="flex fixed inset-0 z-50 justify-center items-center bg-white"
-style="background: rgba(255,255,255,0.95);"
+style="background: rgba(255,255,255,0.95); pointer-events: none;"
 >
 <img src="/imgs/workfit_logo_black.png" alt="Loading..." class="w-32 animate-pulse">
 </div>
+
+<script>
+// Vanilla JS fallback to hide loader quickly (works even if Alpine.js hasn't loaded)
+(function() {
+    const loader = document.getElementById('page-loader');
+    if (!loader) return;
+
+    const hideLoader = function() {
+        if (loader) {
+            loader.style.opacity = '0';
+            loader.style.transition = 'opacity 0.4s ease-out';
+            setTimeout(function() {
+                loader.style.display = 'none';
+            }, 400);
+        }
+    };
+
+    // Hide immediately if DOM is already ready
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(hideLoader, 200);
+    } else {
+        // Hide on DOMContentLoaded (faster than window.load)
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(hideLoader, 200);
+        });
+    }
+
+    // Fallback: hide after max 1.5 seconds
+    setTimeout(hideLoader, 1500);
+})();
+</script>
 
     @include('layouts.navbar')
 

@@ -121,7 +121,7 @@
                             class="p-1 bg-white rounded-full shadow-md transition-colors hover:bg-gray-50"
                             data-product-id="{{ $product->id }}"
                             title="{{ in_array($product->id, $wishlistProductIds) ? 'Remove from Wishlist' : 'Add to Wishlist' }}">
-                        <svg class="w-3 h-3 {{ in_array($product->id, $wishlistProductIds) ? 'text-red-500 fill-current' : 'text-gray-600' }}"
+                        <svg class="w-3 h-3 {{ in_array($product->id, $wishlistProductIds) ? 'text-yellow-900 fill-current' : 'text-gray-600' }}"
                              fill="{{ in_array($product->id, $wishlistProductIds) ? 'currentColor' : 'none' }}"
                              stroke="currentColor"
                              viewBox="0 0 24 24">
@@ -129,7 +129,7 @@
                         </svg>
                     </button>
                     <span wire:loading wire:target="toggleWishlist({{ $product->id }})" class="absolute top-2 right-2 p-1">
-                        <svg class="w-3 h-3 text-red-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg class="w-3 h-3 text-yellow-900 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -152,12 +152,18 @@
                 </div>
                 <div class="flex justify-center items-center mx-2">
                     <div class="mx-2">
-                        <span class="text-xs font-bold">{{ number_format($product->converted_price ?? $product->price, 2) }}{{ $currencySymbol }}</span>
+                        @php
+                            $displayPrice = $product->converted_price ?? $product->price ?? 0;
+                        @endphp
+                        <span class="text-xs font-bold">{{ number_format($displayPrice, 2) }} {{ $currencySymbol }}</span>
                     </div>
                     @if($product->compare_price > 0)
                     <div class="flex gap-2 items-center">
+                        @php
+                            $displayComparePrice = $product->converted_compare_price ?? $product->compare_price ?? 0;
+                        @endphp
                         <span class="text-xs text-gray-500 line-through">
-                            {{ number_format($product->converted_compare_price ?? $product->compare_price, 2)}}{{ $currencySymbol }}
+                            {{ number_format($displayComparePrice, 2) }} {{ $currencySymbol }}
                         </span>
 
                       {{-- -  <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">

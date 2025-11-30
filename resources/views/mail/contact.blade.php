@@ -1,10 +1,17 @@
 <x-mail::message>
+# New Contact Form Submission
 
-Contact Message
+**From:** {{ $contact->name }}
 
-Name: {{ $contact->name }}
-Email: {{ $contact->email }}
-Message: {{ $contact->message }}
+**Email:** {{ $contact->email }}
+
+**Subject:** {{ $contact->subject ?? 'Contact Message' }}
+
+**Message:**
+
+{{ $contact->message }}
+
+---
 
 Thanks,<br>
 {{ config('app.name') }}

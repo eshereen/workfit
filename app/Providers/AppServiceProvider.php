@@ -50,32 +50,69 @@ class AppServiceProvider extends ServiceProvider
 
         // Share categories with all views - Optimized with caching and eager loading
         View::composer('*', function ($view) {
-            $categories = cache()->remember('header_categories', 1800, function () {
-                return Category::where('categories.active', true)
-                    ->with(['media', 'subcategories' => function ($query) {
-                        $query->where('subcategories.active', true)->orderBy('name');
-                    }])
-                    ->withCount(['products' => function ($query) {
-                        $query->where('products.active', true);
-                    }])
-                    ->orderBy('name')
-                    ->take(4)
-                    ->get()
-                    ->map(function ($category) {
-                        $category->media_url = $category->getFirstMediaUrl('main_image', 'small_webp');
-                        return $category;
-                    });
+            // Quick check: skip if no data exists
+            $hasCategories = cache()->remember('has_categories', 3600, function () {
+                try {
+                    return Category::exists();
+                } catch (\Exception $e) {
+                    return false;
+                }
             });
 
+            if (!$hasCategories) {
+                $view->with('categories', collect([]));
+                $view->with('collections', collect([]));
+                return;
+            }
+
+            try {
+                $categories = cache()->remember('header_categories', 1800, function () {
+                    try {
+                        return Category::where('categories.active', true)
+                            ->with(['media', 'subcategories' => function ($query) {
+                                $query->where('subcategories.active', true)->orderBy('name');
+                            }])
+                            ->withCount(['products' => function ($query) {
+                                $query->where('products.active', true);
+                            }])
+                            ->orderBy('name')
+                            ->take(4)
+                            ->get()
+                            ->map(function ($category) {
+                                $category->media_url = $category->getFirstMediaUrl('main_image', 'small_webp');
+                                return $category;
+                            });
+                    } catch (\Exception $e) {
+                        Log::warning('Failed to load header categories', [
+                            'error' => $e->getMessage()
+                        ]);
+                        return collect([]);
+                    }
+                });
+            } catch (\Exception $e) {
+                $categories = collect([]);
+            }
+
             // Get collections for dropdown
-            $collections = cache()->remember('header_collections', 1800, function () {
-                return \App\Models\Collection::where('collections.active', true)
-                    ->withCount(['products' => function ($query) {
-                        $query->where('products.active', true);
-                    }])
-                    ->orderBy('name')
-                    ->get();
-            });
+            try {
+                $collections = cache()->remember('header_collections', 1800, function () {
+                    try {
+                        return \App\Models\Collection::where('collections.active', true)
+                            ->withCount(['products' => function ($query) {
+                                $query->where('products.active', true);
+                            }])
+                            ->orderBy('name')
+                            ->get();
+                    } catch (\Exception $e) {
+                        Log::warning('Failed to load header collections', [
+                            'error' => $e->getMessage()
+                        ]);
+                        return collect([]);
+                    }
+                });
+            } catch (\Exception $e) {
+                $collections = collect([]);
+            }
 
             $view->with('categories', $categories);
             $view->with('collections', $collections);
@@ -83,22 +120,33 @@ class AppServiceProvider extends ServiceProvider
 
         // Share all categories for category pages - Cached separately
         View::composer(['livewire.categories-grid', 'livewire.category-products'], function ($view) {
-            $allCategories = cache()->remember('all_categories', 900, function () {
-                return Category::where('categories.active', true)
-                    ->with(['media'])
-                    ->withCount(['products' => function ($query) {
-                        $query->where('products.active', true);
-                    }])
-                    ->with(['subcategories' => function ($query) {
-                        $query->where('subcategories.active', true);
-                    }])
-                    ->orderBy('name')
-                    ->get()
-                    ->map(function ($category) {
-                        $category->media_url = $category->getFirstMediaUrl('main_image', 'small_webp');
-                        return $category;
-                    });
-            });
+            try {
+                $allCategories = cache()->remember('all_categories', 900, function () {
+                    try {
+                        return Category::where('categories.active', true)
+                            ->with(['media'])
+                            ->withCount(['products' => function ($query) {
+                                $query->where('products.active', true);
+                            }])
+                            ->with(['subcategories' => function ($query) {
+                                $query->where('subcategories.active', true);
+                            }])
+                            ->orderBy('name')
+                            ->get()
+                            ->map(function ($category) {
+                                $category->media_url = $category->getFirstMediaUrl('main_image', 'small_webp');
+                                return $category;
+                            });
+                    } catch (\Exception $e) {
+                        Log::warning('Failed to load all categories', [
+                            'error' => $e->getMessage()
+                        ]);
+                        return collect([]);
+                    }
+                });
+            } catch (\Exception $e) {
+                $allCategories = collect([]);
+            }
 
             $view->with('allCategories', $allCategories);
         });

@@ -154,18 +154,41 @@ class CartIndex extends Component
             }
 
             $currencyService = app(CountryCurrencyService::class);
-
             $cartService = app(CartService::class);
+
+            // Check if cart has items with compare_price (on sale)
+            $hasItemsWithSale = $cartService->hasItemsWithComparePrice();
+
+            // Get subtotal for items without compare_price (eligible for coupon)
+            $subtotalWithoutComparePriceUSD = (float) $cartService->getSubtotalWithoutComparePrice();
             $subtotalUSD = (float) $cartService->getSubtotal();
             $shippingUSD = (float) $cartService->getShippingCost();
             $taxUSD = (float) $cartService->getTaxAmount();
+
+            // If all items have compare_price, coupon cannot be applied
+            if ($subtotalWithoutComparePriceUSD <= 0) {
+                $this->dispatch('showNotification', [
+                    'message' => 'Discount applies only to items without sale prices. All items in your cart are on sale.',
+                    'type' => 'error',
+                ]);
+                return;
+            }
+
+            // Calculate eligible total (items without compare_price + shipping + tax)
+            // Note: Shipping and tax are calculated on full cart, but discount only applies to eligible items
+            $eligibleUSDTotal = $subtotalWithoutComparePriceUSD + $shippingUSD + $taxUSD;
             $baseUSDTotal = $subtotalUSD + $shippingUSD + $taxUSD;
+
+            // Convert eligible subtotal to local currency for percentage calculation
+            $eligibleLocalSubtotal = $this->currencyCode === 'USD'
+                ? $subtotalWithoutComparePriceUSD
+                : (float) $currencyService->convertFromUSD($subtotalWithoutComparePriceUSD, $this->currencyCode);
 
             // Local base total is already converted in $this->subtotal/shipping/tax
             $baseLocalTotal = (float) ($this->subtotal + $this->shipping + $this->tax);
 
             if ($coupon->type === CouponType::Percentage) {
-                // Enforce min order in USD if set
+                // Enforce min order in USD if set (check against full cart total)
                 if (!is_null($coupon->min_order_amount) && $baseUSDTotal < (float) $coupon->min_order_amount) {
                     $this->dispatch('showNotification', [
                         'message' => 'Coupon does not meet the minimum order amount.',
@@ -174,10 +197,12 @@ class CartIndex extends Component
                     return;
                 }
 
-                $discountLocal = $baseLocalTotal * ((float) $coupon->value / 100);
+                // Calculate discount only on eligible subtotal (items without compare_price)
+                // Note: Shipping and tax are NOT included in percentage discount calculation
+                $discountLocal = $eligibleLocalSubtotal * ((float) $coupon->value / 100);
             } else {
-                // Fixed coupons are stored/value in USD; use subtotal basis per calculateDiscount then convert
-                $discountUSD = (float) $coupon->calculateDiscount($subtotalUSD);
+                // Fixed coupons are stored/value in USD; use eligible subtotal basis
+                $discountUSD = (float) $coupon->calculateDiscount($subtotalWithoutComparePriceUSD);
                 $discountLocal = $this->currencyCode === 'USD'
                     ? $discountUSD
                     : (float) $currencyService->convertFromUSD($discountUSD, $this->currencyCode);
@@ -200,12 +225,21 @@ class CartIndex extends Component
             Session::put('applied_coupon_id', $this->appliedCouponId);
 
             // Update total on the fly (subtotal, shipping, tax already in current currency)
+            // IMPORTANT: Subtract discount, not add
             $this->total = max(0, ($this->subtotal + $this->shipping + $this->tax) - $this->couponDiscount);
 
-            $this->dispatch('showNotification', [
-                'message' => 'Coupon applied successfully!',
-                'type' => 'success',
-            ]);
+            // Show notification about sale items if present
+            if ($hasItemsWithSale) {
+                $this->dispatch('showNotification', [
+                    'message' => 'Coupon applied successfully! Note: Discount applies only to items without sale prices.',
+                    'type' => 'warning',
+                ]);
+            } else {
+                $this->dispatch('showNotification', [
+                    'message' => 'Coupon applied successfully!',
+                    'type' => 'success',
+                ]);
+            }
         } catch (Exception $e) {
             Log::error('Error applying coupon', ['error' => $e->getMessage()]);
             $this->dispatch('showNotification', [
@@ -244,7 +278,8 @@ class CartIndex extends Component
             $this->couponDiscount = 0.0;
             $this->appliedCouponId = null;
             $this->appliedCouponCode = null;
-            // Keep total as provided by service
+            // Calculate total without discount (subtotal + shipping + tax already converted)
+            $this->total = $this->subtotal + $this->shipping + $this->tax;
             return;
         }
 
@@ -255,32 +290,46 @@ class CartIndex extends Component
             $this->couponDiscount = 0.0;
             $this->appliedCouponId = null;
             $this->appliedCouponCode = null;
+            // Calculate total without discount (subtotal + shipping + tax already converted)
+            $this->total = $this->subtotal + $this->shipping + $this->tax;
             return;
         }
 
         try {
             $currencyService = app(CountryCurrencyService::class);
-
             $cartService = app(CartService::class);
+
+            // Get subtotal for items without compare_price (eligible for coupon)
+            $subtotalWithoutComparePriceUSD = (float) $cartService->getSubtotalWithoutComparePrice();
             $subtotalUSD = (float) $cartService->getSubtotal();
             $shippingUSD = (float) $cartService->getShippingCost();
             $taxUSD = (float) $cartService->getTaxAmount();
             $baseUSDTotal = $subtotalUSD + $shippingUSD + $taxUSD;
 
+            // Convert eligible subtotal to local currency for percentage calculation
+            $eligibleLocalSubtotal = $this->currencyCode === 'USD'
+                ? $subtotalWithoutComparePriceUSD
+                : (float) $currencyService->convertFromUSD($subtotalWithoutComparePriceUSD, $this->currencyCode);
+
             $baseLocalTotal = (float) ($this->subtotal + $this->shipping + $this->tax);
 
             if ($coupon->type === CouponType::Percentage) {
-                // Check min order requirement in USD
+                // Check min order requirement in USD (check against full cart total)
                 if (!is_null($coupon->min_order_amount) && $baseUSDTotal < (float) $coupon->min_order_amount) {
                     $this->couponDiscount = 0.0;
                     $this->appliedCouponId = null;
                     $this->appliedCouponCode = null;
+                    // Calculate total without discount (subtotal + shipping + tax already converted)
+                    $this->total = $this->subtotal + $this->shipping + $this->tax;
                     return;
                 }
 
-                $discountLocal = $baseLocalTotal * ((float) $coupon->value / 100);
+                // Calculate discount only on eligible subtotal (items without compare_price)
+                // Note: Shipping and tax are NOT included in percentage discount calculation
+                $discountLocal = $eligibleLocalSubtotal * ((float) $coupon->value / 100);
             } else {
-                $discountUSD = (float) $coupon->calculateDiscount($subtotalUSD);
+                // Fixed coupons use eligible subtotal
+                $discountUSD = (float) $coupon->calculateDiscount($subtotalWithoutComparePriceUSD);
                 $discountLocal = $this->currencyCode === 'USD'
                     ? $discountUSD
                     : (float) $currencyService->convertFromUSD($discountUSD, $this->currencyCode);
@@ -290,13 +339,15 @@ class CartIndex extends Component
             $this->appliedCouponCode = $coupon->code;
             $this->couponDiscount = round(max(0, $discountLocal), 2);
 
-            // Recompute total with discount
+            // Recompute total with discount (subtract discount, not add)
             $this->total = max(0, ($this->subtotal + $this->shipping + $this->tax) - $this->couponDiscount);
         } catch (Exception $e) {
             Log::error('Error recalculating coupon', ['error' => $e->getMessage()]);
             $this->couponDiscount = 0.0;
             $this->appliedCouponId = null;
             $this->appliedCouponCode = null;
+            // Calculate total without discount on error (subtotal + shipping + tax already converted)
+            $this->total = $this->subtotal + $this->shipping + $this->tax;
         }
     }
 
@@ -318,7 +369,8 @@ class CartIndex extends Component
             $this->subtotal = $currencyService->convertFromUSD($this->subtotal, $this->currencyCode);
             $this->shipping = $currencyService->convertFromUSD($this->shipping, $this->currencyCode);
             $this->tax = $currencyService->convertFromUSD($this->tax, $this->currencyCode);
-            $this->total = $currencyService->convertFromUSD($this->total, $this->currencyCode);
+            // Don't convert total here - it will be recalculated in recalculateCoupon() after discount is applied
+            // $this->total = $currencyService->convertFromUSD($this->total, $this->currencyCode);
 
             Log::info('Cart totals converted', [
                 'currency' => $this->currencyCode,

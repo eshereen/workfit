@@ -13,7 +13,7 @@
                        required
                        class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
                 @error('shipping_address.first_name')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -26,7 +26,7 @@
                        required
                        class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
                 @error('shipping_address.last_name')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
         </div>
@@ -40,7 +40,7 @@
                    required
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('shipping_address.email')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
@@ -53,7 +53,7 @@
                    required
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('shipping_address.phone')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
     @else
@@ -68,7 +68,7 @@
                        required
                        class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
                 @error('shipping_address.name')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -81,7 +81,7 @@
                        required
                        class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
                 @error('shipping_address.email')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
         </div>
@@ -95,7 +95,7 @@
                    required
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('shipping_address.phone')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
     @endif
@@ -109,7 +109,7 @@
                required
                class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
         @error('shipping_address.address')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
         @enderror
     </div>
 
@@ -123,7 +123,7 @@
                    required
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('shipping_address.city')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
@@ -135,7 +135,7 @@
                    value="{{ old('shipping_address.state') }}"
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('shipping_address.state')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
@@ -147,7 +147,7 @@
                    value="{{ old('shipping_address.postal_code') }}"
                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
             @error('shipping_address.postal_code')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
     </div>
@@ -166,7 +166,7 @@
             @endforeach
         </select>
         @error('shipping_address.country')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            <p class="text-yellow-900 text-sm mt-1">{{ $message }}</p>
         @enderror
     </div>
 </div>

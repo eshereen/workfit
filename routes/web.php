@@ -18,6 +18,7 @@ use App\Http\Controllers\PaymentReturnController;
 use App\Http\Controllers\PayPalWebhookController;
 use App\Http\Controllers\Newsletter\VerifyController;
 use App\Http\Controllers\Newsletter\UnsubscribeController;
+use App\Http\Controllers\InvoiceController;
 
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 /*** Products Pages */
@@ -126,6 +127,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist',\App\Livewire\WishlistIndex::class)->name('wishlist.index');
     // Route::get('/orders',\App\Livewire\OrdersIndex::class)->name('orders');
     // Route::get('/order/{order}',\App\Livewire\OrderView::class)->name('order.view');
+});
+
+// Admin Invoice Routes (protected by Filament middleware)
+Route::middleware(['auth'])->prefix('admin/invoice')->name('admin.invoice.')->group(function () {
+    Route::get('/{order}', [InvoiceController::class, 'show'])->name('show');
+    Route::get('/{order}/pdf', [InvoiceController::class, 'exportPdf'])->name('pdf');
 });
 
 

@@ -59,7 +59,7 @@
     </div>
 
     @error('payment_method')
-        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+        <p class="text-yellow-900 text-sm mt-2">{{ $message }}</p>
     @enderror
 
     <!-- Hidden input for PayPal payment type - REMOVED to prevent form submission issues -->
