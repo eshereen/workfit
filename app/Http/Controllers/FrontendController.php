@@ -44,8 +44,7 @@ class FrontendController extends Controller
                         ->take(4)
                         ->with(['directProducts' => function ($query) {
                             $query->with(['media' => function ($q) {
-                                    $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk', 'generated_conversions')
-                                    ->where('collection_name', ['main_image','product_images']);
+                                    $q->whereIn('collection_name', ['main_image','product_images']);
                                 }, 'category:id,name,slug', 'subcategory:id,name,slug,category_id'])
                                 ->where('products.active', true)
                                 ->take(8);
@@ -67,8 +66,7 @@ class FrontendController extends Controller
                         ->where('categories.slug', 'men ')  // Exact match for 'men ' (with trailing space)
                         ->with(['directProducts' => function ($query) {
                             $query->with(['media' => function ($q) {
-                                    $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk', 'generated_conversions')
-                                      ->whereIn('collection_name', ['main_image', 'product_images'])
+                                    $q->whereIn('collection_name', ['main_image', 'product_images'])
                                       ->whereNotNull('disk')
                                       ->orderBy('collection_name', 'asc')
                                       ->orderBy('id', 'asc');
@@ -99,8 +97,7 @@ class FrontendController extends Controller
                         })
                         ->with(['directProducts' => function ($query) {
                             $query->with(['media' => function ($q) {
-                                    $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk', 'generated_conversions')
-                                      ->whereIn('collection_name', ['main_image', 'product_images'])
+                                    $q->whereIn('collection_name', ['main_image', 'product_images'])
                                       ->whereNotNull('disk')
                                       ->orderBy('collection_name', 'asc')
                                       ->orderBy('id', 'asc');
@@ -125,8 +122,7 @@ class FrontendController extends Controller
                         ->with([
                             'category:id,name,slug',
                             'media' => function ($query) {
-                                $query->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk', 'generated_conversions')
-                                      ->whereIn('collection_name', ['main_image', 'product_images'])
+                                $query->whereIn('collection_name', ['main_image', 'product_images'])
                                       ->whereNotNull('disk');
                             }
                         ])
@@ -176,8 +172,7 @@ class FrontendController extends Controller
                     ->with([
                         'category:id,name,slug',
                         'media' => function ($q) {
-                            $q->select('id', 'model_id', 'model_type', 'collection_name', 'file_name', 'disk', 'generated_conversions')
-                              ->whereIn('collection_name', ['main_image', 'product_images'])
+                            $q->whereIn('collection_name', ['main_image', 'product_images'])
                               ->whereNotNull('disk');
                         }
                     ])
