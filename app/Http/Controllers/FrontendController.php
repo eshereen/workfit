@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Subcategory;
+use App\Models\Banner;
+use App\Services\BestSellerService;
 use Illuminate\Http\Request;
 
 class FrontendController extends Controller
@@ -163,11 +165,14 @@ class FrontendController extends Controller
             $collections = collect([]);
         }
 
-        // Featured Products
+        // Featured Products - sorted by most added (best sellers first)
         try {
             $featured = cache()->remember('home_featured_products', 900, function () {
                 try {
-                    return Product::select('id', 'name', 'slug', 'price', 'compare_price', 'active', 'featured', 'created_at')
+                    $bestSellerService = app(BestSellerService::class);
+                    $bestSellerIds = $bestSellerService->getBestSellingProducts(50);
+
+                    $query = Product::select('id', 'name', 'slug', 'price', 'compare_price', 'active', 'featured', 'created_at')
                     ->with([
                         'category:id,name,slug',
                         'media' => function ($q) {
@@ -180,9 +185,22 @@ class FrontendController extends Controller
                     ->where('products.featured', true)
                     ->whereHas('media', function ($query) {
                         $query->where('collection_name', 'product_images');
-                    })
-                    ->take(8)
-                    ->get();
+                    });
+
+                    // Sort by best sellers first, then by created_at
+                    if (!empty($bestSellerIds)) {
+                        $bestSellers = $query->whereIn('id', $bestSellerIds)
+                            ->orderByRaw('FIELD(id, ' . implode(',', $bestSellerIds) . ')')
+                            ->get();
+
+                        $remaining = $query->whereNotIn('id', $bestSellerIds)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+                        return $bestSellers->merge($remaining)->take(8);
+                    } else {
+                        return $query->orderBy('created_at', 'desc')->take(8)->get();
+                    }
                 } catch (\Exception $e) {
                     return collect([]);
                 }
@@ -206,8 +224,15 @@ class FrontendController extends Controller
         } catch (\Exception $e) {
             $sale = null;
         }
+        $heroBanner = Banner::getBySection('hero');
+        $run = Banner::getBySectionPattern('run')->first();
+        $train = Banner::getBySectionPattern('train')->first();
+        $rec = Banner::getBySectionPattern('rec')->first();
+        $women_banner = Banner::getBySectionPattern('women_banner')->first();
+        $group_banner = Banner::getBySectionPattern('group_banner')->first();
+        $featured_banner = Banner::getBySectionPattern('featured_banner')->first();
 
-        return view('home', compact('title', 'categories', 'recent', 'collections', 'featured', 'men', 'women', 'sale'));
+        return view('home', compact('title', 'categories', 'recent', 'collections','heroBanner', 'featured', 'men', 'women', 'sale', 'run', 'train', 'rec', 'women_banner', 'group_banner', 'featured_banner'));
     }
 
 

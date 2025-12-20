@@ -22,6 +22,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Select;
 use UnitEnum;
 use Filament\Actions\DeleteAction;
 
@@ -37,7 +38,7 @@ class WishlistResource extends Resource
                 TextInput::make('user_id')
                     ->required()
                     ->numeric(),
-                TextInput::make('product.name')
+                Select::make('product.name')
                     ->required()
                     ->relationship('product', 'name'),
             ]);

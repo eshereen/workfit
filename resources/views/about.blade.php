@@ -1,21 +1,8 @@
 @extends('layouts.app')
 @section('content')
-    <!-- Hero Section -->
-    <section class="relative h-screen overflow-hidden mt-16">
-        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="About Workfit" class="w-full h-full object-cover">
-        <div class="relative z-10 h-full flex items-center justify-center">
-            <div class="text-center text-white px-4">
-                <h1 class="text-4xl md:text-6xl font-bold mb-4 slide-in-left">ABOUT WORKFIT</h1>
-                <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto slide-in-right">Empowering your fitness journey with premium activewear</p>
-                <button class="bg-gray-950 hover:bg-gray-100 hover:text-gray-950 text-white font-bold py-3 px-8 transition-colors fade-in">
-                    OUR STORY
-                </button>
-            </div>
-        </div>
-    </section>
 
     <!-- Our Story Section -->
-    <section class="py-16 px-4">
+    <section class="relative overflow-hidden my-16 py-8 px-4 ">
         <div class="container mx-auto">
             <div class="flex flex-col lg:flex-row items-center gap-12">
                 <div class="lg:w-1/2 animate-on-scroll">

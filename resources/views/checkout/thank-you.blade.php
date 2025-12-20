@@ -48,7 +48,7 @@
         }
     }
 </style>
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-gray-50 py-10">
     <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto">
             @php
@@ -218,17 +218,42 @@
 
                 <!-- Itemized List -->
                 <div class="mb-6">
+                    @php
+                        // Calculate total USD value of all items to get the proportion
+                        $totalUsdValue = $order->items->sum(function($item) {
+                            return $item->price * $item->quantity;
+                        });
+                        // Get stored subtotal (already in session currency)
+                        $storedSubtotal = $order->subtotal ?? 0;
+                    @endphp
+                    
                     @foreach($order->items as $index => $item)
                         @php
                             $itemNumber = $index + 1;
                             $product = $item->product;
                             $variant = $item->variant;
-                            // Order item prices are stored in USD, so convert from USD to display currency
-                            $itemPrice = $currencyService->convertFromUSD($item->price, $displayCurrency);
-                            $originalPrice = $product->compare_price ? $currencyService->convertFromUSD($product->compare_price, $displayCurrency) : null;
+                            
+                            // Calculate this item's proportion of the total
+                            $itemUsdTotal = $item->price * $item->quantity;
+                            
+                            // Calculate item amount proportionally from stored subtotal
+                            // This ensures all items add up exactly to the subtotal
+                            if ($totalUsdValue > 0) {
+                                $itemTotal = ($itemUsdTotal / $totalUsdValue) * $storedSubtotal;
+                                $itemPrice = $itemTotal / $item->quantity;
+                            } else {
+                                $itemTotal = 0;
+                                $itemPrice = 0;
+                            }
+                            
+                            // For original/compare price, use same ratio
+                            $originalPrice = null;
+                            if ($product->compare_price && $product->compare_price > $item->price) {
+                                $originalPrice = ($product->compare_price / $item->price) * $itemPrice;
+                            }
                             $discountPrice = $itemPrice;
-                            $itemTotal = $itemPrice * $item->quantity;
                         @endphp
+
                         <div class="mb-4 pb-4 {{ !$loop->last ? 'border-b border-gray-200' : '' }}">
                             <div class="font-semibold mb-1">
                                 {{ $itemNumber }}. {{ strtoupper($product->name ?? 'Product') }}
@@ -250,51 +275,49 @@
                     @endforeach
                 </div>
 
+
                 <!-- Decorative Line -->
                 <div class="wavy-border mb-6"></div>
 
                 <!-- Summary Section -->
                 <div class="space-y-2 mb-6">
                     @php
-                        $convertedSubtotal = $convertAmount($order->subtotal);
-                        $convertedShipping = $convertAmount($order->shipping_amount);
-                        $convertedTax = $convertAmount($order->tax_amount);
-                        $convertedDiscount = $convertAmount($order->discount_amount);
-
-                        // Recalculate total to ensure it's correct: subtotal + shipping + tax - discount
-                        $calculatedTotal = $convertedSubtotal + $convertedShipping + $convertedTax - $convertedDiscount;
-                        $calculatedTotal = max(0, $calculatedTotal); // Prevent negative totals
-
-                        // Use calculated total (more reliable than stored value)
-                        $convertedTotal = $calculatedTotal;
+                        // Order totals are already stored in the session currency - no conversion needed
+                        $displaySubtotal = $order->subtotal ?? 0;
+                        $displayShipping = $order->shipping_amount ?? 0;
+                        $displayTax = $order->tax_amount ?? 0;
+                        $displayDiscount = $order->discount_amount ?? 0;
+                        $displayTotal = $order->total_amount ?? ($displaySubtotal + $displayShipping + $displayTax - $displayDiscount);
                     @endphp
+
                     <div class="flex justify-between">
                         <strong>SUBTOTAL:</strong>
-                        <span>{{ number_format($convertedSubtotal, 2) }}{{ $displaySymbol }}</span>
+                        <span>{{ number_format($displaySubtotal, 2) }}{{ $displaySymbol }}</span>
                     </div>
-                    @if($convertedShipping > 0)
+                    @if($displayShipping > 0)
                         <div class="flex justify-between">
                             <strong>SHIPPING:</strong>
-                            <span>{{ number_format($convertedShipping, 2) }}{{ $displaySymbol }}</span>
+                            <span>{{ number_format($displayShipping, 2) }}{{ $displaySymbol }}</span>
                         </div>
                     @endif
-                    @if($convertedTax > 0)
+                    @if($displayTax > 0)
                         <div class="flex justify-between">
                             <strong>TAX:</strong>
-                            <span>{{ number_format($convertedTax, 2) }}{{ $displaySymbol }}</span>
+                            <span>{{ number_format($displayTax, 2) }}{{ $displaySymbol }}</span>
                         </div>
                     @endif
-                    @if($convertedDiscount > 0)
+                    @if($displayDiscount > 0)
                         <div class="flex justify-between">
                             <strong>DISC/CODE:</strong>
-                            <span>-{{ number_format($convertedDiscount, 2) }}{{ $displaySymbol }}</span>
+                            <span>-{{ number_format($displayDiscount, 2) }}{{ $displaySymbol }}</span>
                         </div>
                     @endif
                     <div class="flex justify-between text-lg font-bold border-t-2 border-gray-300 pt-2 mt-2">
                         <strong>TOTAL:</strong>
-                        <span>{{ number_format($convertedTotal, 2) }}{{ $displaySymbol }}</span>
+                        <span>{{ number_format($displayTotal, 2) }}{{ $displaySymbol }}</span>
                     </div>
                 </div>
+
 
                 <!-- Payment Information -->
                 <div class="border-t-2 border-gray-300 pt-4">
@@ -345,3 +368,77 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+@php
+    // Facebook Pixel Purchase tracking
+    // Order totals are already stored in the session currency - no conversion needed
+    
+    $fbPixelContentIds = [];
+    $fbPixelContents = [];
+    $fbPixelNumItems = 0;
+    
+    // Extract product IDs and details from order items
+    if (isset($order) && $order->items && $order->items->isNotEmpty()) {
+        $fbPixelContentIds = $order->items
+            ->pluck('product_id')
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
+        
+        $fbPixelNumItems = $order->items->sum('quantity');
+
+        // Calculate item prices proportionally to match invoice display
+        // (Items are in USD, Subtotal is in Session Currency)
+        $totalUsdValue = $order->items->sum(function($item) {
+            return $item->price * $item->quantity;
+        });
+        $storedSubtotal = $order->subtotal ?? 0;
+
+        foreach ($order->items as $item) {
+            $itemUsdTotal = $item->price * $item->quantity;
+            $itemPriceProps = 0;
+            
+            if ($totalUsdValue > 0) {
+                 $itemTotalProps = ($itemUsdTotal / $totalUsdValue) * $storedSubtotal;
+                 if ($item->quantity > 0) {
+                     $itemPriceProps = $itemTotalProps / $item->quantity;
+                 }
+            }
+
+            $fbPixelContents[] = [
+                'id' => (string)$item->product_id,
+                'quantity' => (int)$item->quantity,
+                'item_price' => round($itemPriceProps, 2)
+            ];
+        }
+    }
+    
+    // Use order's total directly - it's already in session currency
+    // User indicated total_amount is the correct field
+    $fbPixelValue = $order->total_amount ?? $order->total ?? 0;
+    $fbPixelValue = round($fbPixelValue, 2);
+    
+    // Use order's currency (already stored at order time)
+    $fbPixelCurrency = $order->currency ?? 'EGP';
+    
+    // Get order number for transaction ID
+    $fbPixelTransactionId = $order->order_number ?? $order->id ?? '';
+@endphp
+
+fbq('track', 'Purchase', {
+    content_ids: @json($fbPixelContentIds),
+    contents: @json($fbPixelContents),
+    content_type: 'product',
+    num_items: {{ $fbPixelNumItems }},
+    value: {{ $fbPixelValue }},
+    currency: '{{ $fbPixelCurrency }}',
+    transaction_id: '{{ $fbPixelTransactionId }}'
+});
+
+
+</script>
+@endpush
+

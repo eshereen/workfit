@@ -1,5 +1,5 @@
 <div>
-<div class="container px-4 py-8 mx-auto my-20">
+<div class="container px-4 py-8 mx-auto my-16">
     <!-- Flash Messages -->
     @if (session()->has('success'))
         <div class="p-4 mb-4 text-green-700 bg-green-100 rounded-lg border border-green-400">
@@ -12,48 +12,164 @@
             {{ session('error') }}
         </div>
     @endif
-    @if(request()->routeIs('products.index'))
+    @if(!request()->routeIs('home') && (request()->routeIs('products.index') || request()->routeIs('categories.index') || $category || $categoryModel))
     <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-red-600">Shop</h1>
-        <div class="flex items-center space-x-4">
-            <!-- Search -->
+        <h1 class="text-3xl font-bold text-gray-950">
+            @if(request()->routeIs('products.index'))
+                WorkfitStore
+            @elseif($subcategoryModel && $categoryModel)
+                 {{ $categoryModel->name }} <span class="text-gray-400 mx-2 text-2xl font-normal">/</span> {{ $subcategoryModel->name }}
+            @elseif($categoryModel)
+                {{ $categoryModel->name }}
+            @else
+                Products
+            @endif
+        </h1>
+
+        <div class="flex items-center gap-3" x-data="{ showSearch: false }">
+            <!-- Search Icon & Input -->
             <div class="relative">
-                <input wire:model.live.debounce.300ms="search"
-                       type="text"
-                       placeholder="Search products..."
-                       class="px-4 py-2 pl-10 rounded-lg border focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                <svg class="absolute top-2.5 left-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
+                <!-- Search Icon Button -->
+                <button
+                    @click="showSearch = !showSearch"
+                    class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    type="button"
+                >
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </button>
+
+                <!-- Search Input (toggleable) -->
+                <div
+                    x-show="showSearch"
+                    x-cloak
+                    style="display: none;"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                   class="absolute right-0 top-12 z-50 w-80 min-w-max"
+                    @click.away="showSearch = false"
+                >
+                    <div class="relative">
+                        <input
+                            wire:model.live.debounce.300ms="search"
+                            type="text"
+                            placeholder="Search products..."
+                            class="px-4 py-2 pl-10 w-full rounded-lg border border-gray-300 shadow-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            x-ref="searchInput"
+                        >
+                        <svg class="absolute top-2.5 left-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
             </div>
-            <!-- Sort -->
-            <select wire:model.live="sortBy" class="px-3 py-2 rounded-lg border focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                <option value="newest">Newest</option>
-                <option value="price_low">Price: Low to High</option>
-                <option value="price_high">Price: High to Low</option>
-            </select>
+
+            <!-- Sort Filter Icon & Dropdown -->
+            <div class="relative" x-data="{ showSort: false }">
+                <!-- Filter Icon Button -->
+                <button
+                    @click="showSort = !showSort"
+                    class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    type="button"
+                >
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+                    </svg>
+                </button>
+
+                <!-- Sort Dropdown -->
+                <div
+                    x-show="showSort"
+                    x-cloak
+                    style="display: none;"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    class="absolute right-0 top-12 z-50 w-80 min-w-max bg-white rounded-lg shadow-lg border border-gray-200"
+                    @click.away="showSort = false"
+                >
+                    <div class="p-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sort by:</label>
+                        <select
+                            wire:model.live="sortBy"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            @change="showSort = false"
+                        >
+                            <option value="newest">Newest</option>
+                            <option value="price_low">Price: Low to High</option>
+                            <option value="price_high">Price: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     @endif
     @if(!request()->routeIs('home'))
     @if($currencyCode !== 'USD')
-    <div class="p-4 mb-6 bg-green-50 rounded-lg border border-green-200">
-        <div class="text-sm text-center text-green-800">
-            @if($isAutoDetected)
-                Prices automatically converted to {{ $currencyCode }} ({{ $currencySymbol }}) based on your location
-            @else
-                Prices converted to {{ $currencyCode }} ({{ $currencySymbol }})
-            @endif
+    <div x-data="{ show: true }"
+         x-init="setTimeout(() => show = false, 5000)"
+         x-show="show"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-4"
+         class="fixed bottom-4 right-4 z-50 p-4 bg-white rounded-lg shadow-lg border-l-4 border-green-500 max-w-sm"
+         style="display: none;">
+        <div class="flex items-center">
+            <div class="flex-shrink-0 text-green-500">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div class="ml-3 text-sm font-medium text-gray-800">
+                @if($isAutoDetected)
+                    Prices converted to {{ $currencyCode }} ({{ $currencySymbol }})
+                @else
+                    Currency set to {{ $currencyCode }} ({{ $currencySymbol }})
+                @endif
+            </div>
+            <button @click="show = false" class="ml-auto pl-3 text-gray-400 hover:text-gray-500">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
     </div>
     @endif
     @endif
 
+    {{-- Preload first product image for better LCP --}}
+    @if($products && $products->count() > 0)
+        @php
+            $firstProduct = $products->first();
+            $firstImageUrl = $firstProduct->getFirstMediaUrl('main_image', 'medium_webp');
+            if (!$firstImageUrl) {
+                $firstImageUrl = $firstProduct->getFirstMediaUrl('main_image');
+            }
+        @endphp
+        @if($firstImageUrl)
+            @push('head')
+                <link rel="preload" as="image" href="{{ $firstImageUrl }}" fetchpriority="high">
+            @endpush
+        @endif
+    @endif
+
     <div class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
         @if($products && $products->count() > 0)
             @foreach($products as $product)
-        <div class="overflow-hidden bg-white transition">
+        <div wire:key="product-{{ $product->id }}" class="overflow-hidden bg-white transition">
             <div class="relative overflow-hidden aspect-[4/5] product-image-container"
                  style="cursor: pointer;"
                  onmouseenter="this.querySelector('.main-image').style.opacity='0'; this.querySelector('.gallery-image').style.opacity='1';"
@@ -80,23 +196,56 @@
                 <div class="block relative w-full h-full">
                     {{-- Main image --}}
                     @php
-                        $mainImage = $product->getFirstMediaUrl('main_image') ;
+                        $mainImage = $product->getFirstMediaUrl('main_image', 'medium_webp');
+                        // Fallback to original if conversion doesn't exist
+                        if (!$mainImage) {
+                            $mainImage = $product->getFirstMediaUrl('main_image');
+                        }
+                        
+                        // Prevent src="" loop
+                        if (empty($mainImage)) {
+                             $mainImage = 'https://via.placeholder.com/400x400?text=No+Image';
+                        }
                     @endphp
                     <img src="{{ $mainImage }}"
                          alt="{{ $product->name }}"
-                         class="object-cover w-full h-full transition-opacity duration-500 main-image"
-                         style="opacity: 1; transition: opacity 0.5s ease; object-position: top;"
+                         class="object-cover w-full h-full {{ $loop->index >= 4 ? 'transition-opacity duration-500' : '' }} main-image"
+                         style="opacity: 1; {{ $loop->index >= 4 ? 'transition: opacity 0.5s ease;' : '' }} object-position: top;"
                          width="400"
                          height="400"
-                         loading="lazy">
+                         @if($loop->index === 0)
+                             fetchpriority="high"
+                             loading="eager"
+                             decoding="sync"
+                         @elseif($loop->index < 4)
+                             loading="eager"
+                             fetchpriority="high"
+                             decoding="async"
+                         @else
+                             loading="lazy"
+                             decoding="async"
+                         @endif
+                    >
 
-                    {{-- Gallery image (if exists) --}}
+                    {{-- Gallery image (if exists) - Optimized with WebP --}}
                     @php
                         $galleryImages = $product->getMedia('product_images');
                         $galleryImage = null;
                         foreach($galleryImages as $img) {
-                            if($img->getUrl() !== $mainImage) {
-                                $galleryImage = $img->getUrl();
+                            $url = '';
+                            try {
+                                // Check if conversion exists before accessing
+                                if ($img->hasGeneratedConversion('medium_webp')) {
+                                    $url = $img->getUrl('medium_webp');
+                                } else {
+                                    $url = $img->getUrl();
+                                }
+                            } catch (\Exception $e) {
+                                $url = $img->getUrl();
+                            }
+                            
+                            if($url && $url !== $mainImage) {
+                                $galleryImage = $url;
                                 break;
                             }
                         }
@@ -104,11 +253,12 @@
                     @if($galleryImage)
                         <img src="{{ $galleryImage }}"
                              alt="{{ $product->name }}"
-                             class="object-cover absolute top-0 left-0 w-full h-full transition-opacity duration-500 gallery-image"
-                             style="opacity: 0; z-index: 2; transition: opacity 0.5s ease;"
-                             width="300"
-                             height="300"
-                             loading="lazy">
+                             class="object-cover w-full h-full gallery-image"
+                             style="opacity: 0; z-index: 2; position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: opacity 0.5s ease;"
+                             width="400"
+                             height="400"
+                             loading="lazy"
+                             decoding="async">
                     @endif
                 </div>
 
@@ -143,15 +293,15 @@
                 </a>
                 @endauth
             </div>
-            <div class="p-4">
-                <div class="text-center">
+            <div>
+                <div class="text-center p-2">
                     <a href="{{ route('product.show', $product->slug) }}"
-                       class="text-xs font-semibold hover:text-red-600">
+                       class="text-[11px] md:text-xs lg:text-sm text-gray-600 font-semibold hover:text-red-600 block leading-tight">
                         {{ $product->name }}
                     </a>
                 </div>
-                <div class="flex justify-center items-center mx-2">
-                    <div class="mx-2">
+                <div class="flex justify-between text-xs items-center mx-2">
+                    <div>
                         @php
                             $displayPrice = $product->converted_price ?? $product->price ?? 0;
                         @endphp
@@ -188,9 +338,9 @@
             </div>
         @endif
     </div>
-    @if(request()->routeIs('products.index') && $products && method_exists($products, 'links'))
-    <div class="mt-8">
-        {{ $products->links() }}
+    @if($products && method_exists($products, 'links'))
+    <div class="my-6 py-6">
+        {{ $products->links('vendor.pagination.tailwind') }}
     </div>
     @endif
 </div>

@@ -186,7 +186,7 @@ class CategoryProducts extends Component
             $this->selectedProduct = Product::with('variants')->find($productId);
 
             if (!$this->selectedProduct) {
-                
+
                 Log::error('CategoryProducts: Product not found', ['product_id' => $productId]);
                 $this->dispatch('showNotification', [
                     'message' => 'Product not found.',
@@ -249,6 +249,24 @@ class CategoryProducts extends Component
         if (!$this->selectedVariant) {
             $this->dispatch('showNotification', [
                 'message' => 'Please select a variant before adding to cart.',
+                'type' => 'error'
+            ]);
+            return;
+        }
+
+        // Check if variant has stock
+        if ($this->selectedVariant->stock <= 0) {
+            $this->dispatch('showNotification', [
+                'message' => 'This variant is currently out of stock.',
+                'type' => 'error'
+            ]);
+            return;
+        }
+
+        // Check if requested quantity exceeds available stock
+        if ($this->quantity > $this->selectedVariant->stock) {
+            $this->dispatch('showNotification', [
+                'message' => 'Only ' . $this->selectedVariant->stock . ' items available in stock.',
                 'type' => 'error'
             ]);
             return;
@@ -362,39 +380,23 @@ class CategoryProducts extends Component
             $query->where('name', 'like', '%' . $this->search . '%');
         }
 
-        // Apply best seller logic for newest sort
-        if ($this->sortBy === 'newest') {
-            $bestSellerService = app(BestSellerService::class);
-            $products = $bestSellerService->getProductsWithBestSellerPriority(
-                $query, 
-                12, 
-                $this->category ? $this->category->id : null
-            );
-            
-            // Convert to paginated format
-            $products = new \Illuminate\Pagination\LengthAwarePaginator(
-                $products,
-                $products->count(),
-                12,
-                1,
-                ['path' => request()->url(), 'pageName' => 'page']
-            );
-        } else {
-            // Apply sorting for other cases
-            switch ($this->sortBy) {
-                case 'price_low':
-                    $query->orderBy('price', 'asc');
-                    break;
-                case 'price_high':
-                    $query->orderBy('price', 'desc');
-                    break;
-                default:
-                    $query->latest();
-                    break;
-            }
-
-            $products = $query->paginate(12);
+        // Apply sorting
+        switch ($this->sortBy) {
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'price_low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('price', 'desc');
+                break;
+            default:
+                $query->latest();
+                break;
         }
+
+        $products = $query->paginate(40);
 
         return view('livewire.category-products', [
             'products' => $products,

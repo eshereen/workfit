@@ -1,24 +1,7 @@
 @extends('layouts.app')
 @section('content')
-    <!-- Hero Section -->
-    <section class="relative h-96 overflow-hidden mt-16">
-        <img src=https://images.unsplash.com/photo-1631010231931-d2c396b444ec?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Shipping & Returns" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-black/50"></div>
-        <div class="relative z-10 h-full flex items-center justify-center">
-            <div class="text-center text-white px-4">
-                <div class="flex justify-center mb-4">
-                    <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-shipping-fast text-2xl"></i>
-                    </div>
-                </div>
-                <h1 class="text-4xl md:text-5xl font-bold mb-4 slide-in-left">SHIPPING & RETURNS</h1>
-                <p class="text-xl md:text-2xl max-w-2xl mx-auto slide-in-right">Everything you need to know about delivery and returns</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="py-12 px-4">
+  <!-- Main Content -->
+    <main class="relative  overflow-hidden my-16 py-8 px-4">
         <div class="container mx-auto">
 
             <!-- Returns Policy -->

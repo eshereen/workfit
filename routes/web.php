@@ -129,6 +129,17 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('/order/{order}',\App\Livewire\OrderView::class)->name('order.view');
 });
 
+// Temporary cache clearing route (REMOVE after using!)
+Route::get('/clear-all-caches', function () {
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    
+    return 'All caches cleared successfully! You can now remove this route from web.php';
+});
+
 // Admin Invoice Routes (protected by Filament middleware)
 Route::middleware(['auth'])->prefix('admin/invoice')->name('admin.invoice.')->group(function () {
     Route::get('/{order}', [InvoiceController::class, 'show'])->name('show');

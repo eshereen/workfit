@@ -5,12 +5,14 @@ namespace App\Livewire;
 use Exception;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Category;
 use App\Services\CartService;
 use App\Services\CountryCurrencyService;
 use App\Services\BestSellerService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
@@ -18,15 +20,27 @@ use Illuminate\Support\Facades\Cache;
 class ProductIndex extends Component
 {
     use WithPagination;
+    
+    protected $paginationTheme = 'tailwind';
 
+    #[Url(as: 'q', except: '')]
     public $search = '';
+    
+    #[Url(as: 'sort', except: 'newest')]
     public $sortBy = 'newest';
-    public $category = '';
+    
+    public $category = ''; // Category ID
+    public $categoryModel = null; // Category model for display
+    public $categorySlug = null; // SEO-friendly category slug
+    public $subcategory = ''; // Subcategory ID
+    public $subcategoryModel = null; // Subcategory model
+    public $subcategorySlug = null; // SEO-friendly subcategory slug
     public $wishlistProductIds = [];
     public $currencyCode = 'USD';
     public $currencySymbol = '$';
     public $isAutoDetected = false;
     public $useBestSellerLogic = false;
+    public $disableEagerLoading = false; // Optimization: Disable eager loading for grids below the fold
 
     // Cart modal properties
     public $showVariantModal = false;
@@ -57,30 +71,23 @@ class ProductIndex extends Component
         #[On('currencyChanged')]
     public function refreshCurrency()
     {
-        Log::info('Currency change event received in ProductIndex');
 
         $this->loadCurrencyInfo();
         // Force a re-render so paginated items get fresh conversion
         $this->dispatch('$refresh');
 
-        // Log the currency change
-        Log::info('Currency changed in ProductIndex', [
-            'new_currency' => $this->currencyCode,
-            'new_symbol' => $this->currencySymbol
-        ]);
+       
     }
 
     #[On('currency-changed')]
     public function handleCurrencyChanged($currencyCode = null)
     {
-        Log::info('ProductIndex: Received currency-changed event', ['currency_code' => $currencyCode]);
         $this->loadCurrencyInfo();
     }
 
     #[On('global-currency-changed')]
     public function handleGlobalCurrencyChanged($currencyCode = null)
     {
-        Log::info('ProductIndex: Received global-currency-changed event', ['currency_code' => $currencyCode]);
         $this->loadCurrencyInfo();
     }
 
@@ -98,10 +105,44 @@ class ProductIndex extends Component
 
     public $passedProducts = null;
 
-    public function mount($products = null)
+    public function mount($products = null, $category = null, $categorySlug = null, $subcategory = null, $subcategorySlug = null)
     {
         try {
             $this->passedProducts = $products;
+            
+            // If category is a model object, extract its properties
+            if ($category instanceof Category) {
+                $this->categoryModel = $category;
+                $this->category = $category->id;
+                $this->categorySlug = $category->slug;
+            }
+            // If categorySlug is provided, resolve it to category ID for SEO-friendly URLs
+            elseif ($categorySlug) {
+                $this->categorySlug = $categorySlug;
+                $categoryModel = Category::where('slug', $categorySlug)->first();
+                if ($categoryModel) {
+                    $this->categoryModel = $categoryModel;
+                    $this->category = $categoryModel->id;
+                }
+            } elseif ($category) {
+                // Otherwise use the category ID directly
+                $this->category = $category;
+            }
+
+            // Handle subcategory
+            if ($subcategory) {
+                $this->subcategory = $subcategory;
+                $this->subcategoryModel = \App\Models\Subcategory::find($subcategory);
+            }
+            if ($subcategorySlug) {
+                $this->subcategorySlug = $subcategorySlug;
+                $subcategoryModel = \App\Models\Subcategory::where('slug', $subcategorySlug)->first();
+                if ($subcategoryModel) {
+                    $this->subcategoryModel = $subcategoryModel;
+                    $this->subcategory = $subcategoryModel->id;
+                }
+            }
+            
             $this->loadWishlist();
             $this->loadCurrencyInfo();
 
@@ -126,11 +167,7 @@ class ProductIndex extends Component
             $this->currencySymbol = $currencyInfo['currency_symbol'];
             $this->isAutoDetected = $currencyInfo['is_auto_detected'];
 
-            Log::info('ProductIndex: Currency info loaded', [
-                'currency_code' => $this->currencyCode,
-                'currency_symbol' => $this->currencySymbol,
-                'is_auto_detected' => $this->isAutoDetected
-            ]);
+          
 
             // Convert product prices to current currency
             $this->convertProductPrices();
@@ -189,29 +226,16 @@ class ProductIndex extends Component
     protected function convertVariantPrices()
     {
         if ($this->currencyCode === 'USD' || !$this->selectedProduct) {
-            Log::info('ProductIndex: Skipping conversion', [
-                'currency_code' => $this->currencyCode,
-                'has_product' => !$this->selectedProduct
-            ]);
             return; // No conversion needed
         }
 
         try {
             $currencyService = app(CountryCurrencyService::class);
 
-            Log::info('ProductIndex: Starting variant price conversion', [
-                'currency_code' => $this->currencyCode,
-                'currency_symbol' => $this->currencySymbol,
-                'product_price' => $this->selectedProduct->price
-            ]);
 
             // Convert product price
             if ($this->selectedProduct->price) {
                 $this->selectedProduct->converted_price = $currencyService->convertFromUSD($this->selectedProduct->price, $this->currencyCode);
-                Log::info('ProductIndex: Product price converted', [
-                    'original' => $this->selectedProduct->price,
-                    'converted' => $this->selectedProduct->converted_price
-                ]);
             }
 
             // Convert variant prices with bulk processing
@@ -312,22 +336,12 @@ class ProductIndex extends Component
 
     public function selectVariant($variantId)
     {
-        Log::info('ProductIndex: selectVariant called', [
-            'variant_id' => $variantId,
-            'currency_code' => $this->currencyCode,
-            'currency_symbol' => $this->currencySymbol
-        ]);
+   
 
         $this->selectedVariantId = $variantId;
         $this->selectedVariant = $this->selectedProduct->variants->find($variantId);
 
-        Log::info('ProductIndex: Variant found', [
-            'variant_id' => $variantId,
-            'variant_price' => $this->selectedVariant ? $this->selectedVariant->price : 'NULL',
-            'variant_converted_price' => $this->selectedVariant ? ($this->selectedVariant->converted_price ?? 'NULL') : 'NULL',
-            'variant_stock' => $this->selectedVariant ? $this->selectedVariant->stock : 'NULL',
-            'quantity' => $this->quantity
-        ]);
+      
 
 
         // Ensure the selected variant has converted prices
@@ -339,12 +353,7 @@ class ProductIndex extends Component
                 $originalPrice = $this->selectedVariant->price;
                 $this->selectedVariant->converted_price = $currencyService->convertFromUSD($originalPrice, $this->currencyCode);
 
-                Log::info('ProductIndex: Variant price converted in selectVariant', [
-                    'variant_id' => $variantId,
-                    'original_price' => $originalPrice,
-                    'converted_price' => $this->selectedVariant->converted_price,
-                    'currency_code' => $this->currencyCode
-                ]);
+               
             } else {
                 // If variant has no price, use product price
                 if ($this->selectedProduct->price) {
@@ -368,20 +377,12 @@ class ProductIndex extends Component
             // If stock is negative or zero, set quantity to 0 (out of stock)
             if ($stock <= 0) {
                 $this->quantity = 0;
-                Log::info('ProductIndex: Variant out of stock', [
-                    'variant_id' => $variantId,
-                    'stock' => $stock,
-                    'quantity_set_to' => 0
-                ]);
+              
             }
             // If quantity exceeds stock, reset to stock level
             elseif ($this->quantity > $stock) {
                 $this->quantity = $stock;
-                Log::info('ProductIndex: Quantity adjusted to stock level', [
-                    'variant_id' => $variantId,
-                    'stock' => $stock,
-                    'quantity_set_to' => $stock
-                ]);
+              
             }
         }
     }
@@ -441,10 +442,7 @@ class ProductIndex extends Component
 
     public function addSimpleProductToCart($productId, $quantity = 1)
     {
-        Log::info('addSimpleProductToCart called', [
-            'product_id' => $productId,
-            'quantity' => $quantity
-        ]);
+    
 
         try {
             $cartService = app(CartService::class);
@@ -477,11 +475,7 @@ class ProductIndex extends Component
 
             $cartService->addItem($product, $quantity);
 
-            Log::info('Simple product added to cart successfully', [
-                'product_id' => $productId,
-                'product_name' => $product->name,
-                'quantity' => $quantity
-            ]);
+          
 
             $this->dispatch('cartUpdated');
             $this->dispatch('showNotification', [
@@ -510,10 +504,7 @@ class ProductIndex extends Component
                 // Convert currency for passed products
                 $this->convertProductPricesOptimized($productsToDisplay);
             } else {
-                // Use cached query logic for product index pages
-                $cacheKey = $this->buildCacheKey();
-                $cacheTime = request()->routeIs('home') ? 60 : 180;
-                $productsToDisplay = cache()->remember($cacheKey, $cacheTime, function () {
+                // Build query without caching to ensure accurate pagination
                 // Optimized eager loading with specific selects
                 $with = [
                     'category:id,name,slug',
@@ -526,12 +517,11 @@ class ProductIndex extends Component
                     }
                 ];
 
-                // Always load variants for product index pages to avoid N+1 queries
+               
                 if (!request()->routeIs('home')) {
                     $with[] = 'subcategory:id,name,slug';
                 }
-
-                // Always load variants to prevent N+1 queries
+               
                 $with[] = 'variants:id,product_id,color,size,price,stock';
 
                 $query = Product::with($with)
@@ -550,50 +540,54 @@ class ProductIndex extends Component
                     $query->where('category_id', $this->category);
                 }
 
-                // Apply best seller logic if enabled
-                if ($this->useBestSellerLogic && $this->sortBy === 'newest') {
-                    $bestSellerService = app(BestSellerService::class);
-                    $perPage = request()->routeIs('home') ? 8 : 12;
+                if ($this->subcategory) {
+                    $query->where('subcategory_id', $this->subcategory);
+                }
 
-                    // Get products with best seller priority
+                // Apply best seller logic if enabled (only on first page for accurate pagination)
+                $currentPage = request()->get('page', 1);
+                if ($this->useBestSellerLogic && $this->sortBy === 'newest' && $currentPage == 1) {
+                    $bestSellerService = app(BestSellerService::class);
+                    $perPage = request()->routeIs('home') ? 8 : 40;
+
+                    // Get products with best seller priority for first page only
                     $products = $bestSellerService->getProductsWithBestSellerPriority(
-                        $query,
+                        clone $query,
                         $perPage,
                         $this->category
                     );
 
-                    // Convert to paginated format
-                    return new \Illuminate\Pagination\LengthAwarePaginator(
+                    // For first page, create simple paginator
+                    $productsToDisplay = new \Illuminate\Pagination\LengthAwarePaginator(
                         $products,
-                        $products->count(),
+                        (clone $query)->count(), // Get total count for pagination
                         $perPage,
-                        1,
+                        $currentPage,
                         ['path' => request()->url(), 'pageName' => 'page']
                     );
-                }
+                } else {
+                    // Optimized sorting
+                    switch ($this->sortBy) {
+                        case 'price_low':
+                            $query->orderBy('price', 'asc')->orderBy('created_at', 'desc');
+                            break;
+                        case 'price_high':
+                            $query->orderBy('price', 'desc')->orderBy('created_at', 'desc');
+                            break;
+                        case 'newest':
+                        default:
+                            $query->orderBy('featured', 'desc')->orderBy('created_at', 'desc');
+                            break;
+                    }
 
-                // Optimized sorting
-                switch ($this->sortBy) {
-                    case 'price_low':
-                        $query->orderBy('price', 'asc')->orderBy('created_at', 'desc');
-                        break;
-                    case 'price_high':
-                        $query->orderBy('price', 'desc')->orderBy('created_at', 'desc');
-                        break;
-                    case 'newest':
-                    default:
-                        $query->orderBy('featured', 'desc')->orderBy('created_at', 'desc');
-                        break;
+                    $perPage = request()->routeIs('home') ? 8 : 40;
+                    $productsToDisplay = $query->paginate($perPage);
                 }
-
-                $perPage = request()->routeIs('home') ? 8 : 12;
-                return $query->paginate($perPage);
-            });
             }
 
-            // Products fetched successfully from cache
+          
 
-            // Don't convert paginated results to collections - this breaks pagination
+          
             if (!$productsToDisplay) {
                 // Only fallback if completely null - run query directly
                 $productsToDisplay = Product::with([
@@ -610,7 +604,7 @@ class ProductIndex extends Component
                 ->select('id', 'name', 'slug', 'description', 'price', 'compare_price', 'category_id', 'subcategory_id', 'active', 'featured', 'created_at')
                 ->where('products.active', true)
                 ->orderBy('created_at', 'desc')
-                ->paginate(12);
+                ->paginate(request()->routeIs('home') ? 8 : 40);
             }
 
             // Convert product prices to current currency (optimized) - only if not already converted
@@ -787,10 +781,7 @@ class ProductIndex extends Component
             $currentInfo = $currencyService->getCurrentCurrencyInfo();
 
             if ($this->currencyCode !== $currentInfo['currency_code']) {
-                Log::info('Currency change detected in render', [
-                    'old_currency' => $this->currencyCode,
-                    'new_currency' => $currentInfo['currency_code']
-                ]);
+             
 
                 $this->currencyCode = $currentInfo['currency_code'];
                 $this->currencySymbol = $currentInfo['currency_symbol'];

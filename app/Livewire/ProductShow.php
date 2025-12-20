@@ -122,7 +122,7 @@ class ProductShow extends Component
     // Handle currency changes
     public function handleCurrencyChange($currencyCode = null)
     {
-        Log::info('ProductShow: Currency change triggered', ['currency' => $currencyCode]);
+        
         $this->loadCurrencyInfo();
     }
 
@@ -165,7 +165,7 @@ class ProductShow extends Component
     #[On('currency-changed')]
     public function handleCurrencyChanged($currencyCode = null)
     {
-        Log::info('ProductShow: Received currency-changed event', ['currency_code' => $currencyCode]);
+       
         $this->loadCurrencyInfo();
         $this->convertProductPrices();
     }
@@ -173,19 +173,14 @@ class ProductShow extends Component
     #[On('global-currency-changed')]
     public function handleGlobalCurrencyChanged($currencyCode = null)
     {
-        Log::info('ProductShow: Received global-currency-changed event', ['currency_code' => $currencyCode]);
+      
         $this->loadCurrencyInfo();
         $this->convertProductPrices();
     }
 
     public function incrementQty()
     {
-        Log::info('incrementQty method called', [
-            'current_quantity_before' => $this->quantity,
-            'selected_variant' => $this->selectedVariant ? 'yes' : 'no',
-            'variant_stock' => $this->selectedVariant ? $this->selectedVariant->stock : 'N/A',
-            'product_quantity' => $this->product->quantity
-        ]);
+     
 
         $maxQty = $this->selectedVariant ? $this->selectedVariant->stock : $this->product->quantity;
         $maxQty = min($maxQty, 10); // Cap at 10 maximum
@@ -199,41 +194,20 @@ class ProductShow extends Component
             $oldQuantity = $this->quantity;
             $this->quantity++;
 
-            Log::info('Quantity incremented successfully', [
-                'old_quantity' => $oldQuantity,
-                'new_quantity' => $this->quantity,
-                'max_qty' => $maxQty,
-                'has_variant' => $this->selectedVariant ? 'yes' : 'no'
-            ]);
+         
 
-        } else {
-            Log::info('Cannot increment quantity - at maximum', [
-                'current_quantity' => $this->quantity,
-                'max_qty' => $maxQty
-            ]);
-        }
+        } 
     }
 
     public function decrementQty()
     {
-        Log::info('decrementQty method called', [
-            'current_quantity_before' => $this->quantity
-        ]);
+     
 
         if ($this->quantity > 1) {
             $oldQuantity = $this->quantity;
             $this->quantity--;
-
-            Log::info('Quantity decremented successfully', [
-                'old_quantity' => $oldQuantity,
-                'new_quantity' => $this->quantity
-            ]);
-
-        } else {
-            Log::info('Cannot decrement quantity - at minimum', [
-                'current_quantity' => $this->quantity
-            ]);
-        }
+        } 
+      
     }
 
 
@@ -257,16 +231,6 @@ class ProductShow extends Component
 
     public function addToCart()
     {
-        Log::info('addToCart called', [
-            'product_id' => $this->product->id,
-            'product_name' => $this->product->name,
-            'quantity' => $this->quantity,
-            'selected_variant_id' => $this->selectedVariantId,
-            'selected_variant' => $this->selectedVariant ? $this->selectedVariant->id : null,
-            'has_variants' => $this->product->variants->isNotEmpty(),
-            'variants_count' => $this->product->variants->count()
-        ]);
-
         $this->validate();
 
         if ($this->product->variants->isNotEmpty() && !$this->selectedVariantId) {
@@ -308,10 +272,7 @@ class ProductShow extends Component
                 // Add variant to cart
                 $cartService->addItemWithVariant($this->product, $variant, $this->quantity);
             } else {
-                Log::info('Adding simple product to cart', [
-                    'product_stock' => $this->product->quantity,
-                    'quantity' => $this->quantity
-                ]);
+             
 
                 // Check stock for simple product
                 if ($this->product->quantity < $this->quantity) {
@@ -329,17 +290,24 @@ class ProductShow extends Component
                 $cartService->addItem($this->product, $this->quantity);
             }
 
-            Log::info('Product added to cart successfully', [
-                'product_id' => $this->product->id,
-                'quantity' => $this->quantity,
-                'has_variant' => $variant ? 'yes' : 'no'
-            ]);
+
+            // Prepare Facebook Pixel data
+            $pixelData = [
+                'content_name' => $this->product->name,
+                'content_ids' => [$this->product->id],
+                'content_type' => 'product',
+                'value' => $variant ? $variant->price : $this->product->price,
+                'currency' => $this->currencyCode ?? 'USD',
+                'content_category' => $this->product->category->name ?? '',
+                'quantity' => $this->quantity
+            ];
 
             // Reset quantity to 1 after successful add to cart
             $this->quantity = 1;
 
             // Emit events
             $this->dispatch('cartUpdated');
+            $this->dispatch('fbPixelAddToCart', $pixelData);
             $this->dispatch('showNotification', [
                 'message' => 'Product added to cart successfully!',
                 'type' => 'success'

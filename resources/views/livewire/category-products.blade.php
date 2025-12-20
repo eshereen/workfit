@@ -1,7 +1,7 @@
 <div>
     <div class="space-y-6">
         <!-- Search and Sort Controls -->
-        <div class="flex flex-col gap-4 justify-between items-center md:flex-row">
+        <div class="flex flex-col gap-4 justify-between items-stretch md:items-center md:flex-row">
             <!-- Search -->
             <div class="w-full md:w-96">
                 <input
@@ -11,13 +11,12 @@
                     class="px-4 py-2 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
             </div>
-
             <!-- Sort -->
-            <div class="flex gap-2 items-center">
-                <label class="text-sm font-medium text-gray-700">Sort by:</label>
+            <div class="flex gap-2 items-center w-full md:w-auto">
+                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Sort by:</label>
                 <select
                     wire:model.live="sortBy"
-                    class="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    class="px-3 py-2 w-full md:w-auto rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
                     <option value="newest">Newest</option>
                     <option value="price_low">Price: Low to High</option>
@@ -167,18 +166,18 @@
 
                         <!-- Product Info -->
                         <div class="p-4">
-                            <h3 class="mb-2 font-semibold text-gray-900 line-clamp-2">{{ $product->name }}</h3>
+                            <h3 class="mb-2 font-semibold text-gray-900 line-clamp-2 text-xs">{{ $product->name }}</h3>
 
                           {{--  @if($product->category)
                                 <p class="mb-2 text-sm text-gray-600">{{ $product->category->name }}</p>
                             @endif
- --}} 
+ --}}
                             <!-- Price -->
                             <div class="flex gap-2 items-center mb-3">
-                                <span class="text-lg font-bold text-gray-900">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->price), 2) }}</span>
+                                <span class="text-xs font-bold text-gray-900">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->price), 2) }}</span>
 
                                 @if($product->compare_price && $product->compare_price > $product->price)
-                                    <span class="text-sm text-gray-500 line-through">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->compare_price), 2) }}</span>
+                                    <span class="text-xs text-gray-500 line-through">{{ $currencySymbol }}{{ number_format($this->convertPrice($product->compare_price), 2) }}</span>
                                 @endif
                             </div>
 
@@ -190,7 +189,7 @@
                             @if($product->variants->count() > 0)
                                 <button
                                     wire:click="openVariantModal({{ $product->id }})"
-                                    class="flex-1 px-4 py-2 text-white rounded-lg transition-colors cursor-pointer bg-gray-950 hover:bg-gray-100 hover:text-gray-950"
+                                    class="flex-1 px-4 py-2 text-white rounded-lg transition-colors cursor-pointer bg-gray-950 hover:bg-gray-100 hover:text-gray-950 text-sm"
                                 >
                                     View Options
                                 </button>
@@ -242,20 +241,21 @@
 
         <!-- Variant Selection Modal -->
         @if($showVariantModal && $selectedProduct)
-            <div class="flex fixed inset-0 z-50 justify-center items-center p-4 bg-black/50">
-                <div class="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-                    <div class="p-6">
-                        <!-- Modal Header -->
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold">{{ $selectedProduct->name }}</h3>
-                            <button
-                                wire:click="$set('showVariantModal', false)"
-                                class="text-gray-400 hover:text-gray-600"
-                            >
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+            <div class="flex fixed inset-0 z-[9999] justify-center items-center p-4 bg-black/50">
+                <div class="flex flex-col bg-white rounded-lg max-w-md w-full max-h-[70vh] shadow-xl">
+                    <!-- Modal Header - Fixed at top -->
+                    <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-200 shrink-0">
+                        <h3 class="text-lg font-semibold">{{ $selectedProduct->name }}</h3>
+                        <button
+                            wire:click="$set('showVariantModal', false)"
+                            class="p-2 text-gray-400 rounded-full hover:bg-gray-100 hover:text-gray-600 transition-colors"
+                        >
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
 
+                    <!-- Scrollable Content Area -->
+                    <div class="flex-1 overflow-y-auto p-6">
                         <!-- Product Image -->
                         @if($selectedProduct->media->count() > 0)
                             <img
@@ -322,20 +322,31 @@
                                     <i class="text-sm fas fa-plus"></i>
                                 </button>
                             </div>
+                            @if($selectedVariant)
+                                <p class="mt-2 text-xs text-gray-500">
+                                    {{ $selectedVariant->color ? ucfirst($selectedVariant->color) : '' }}{{ $selectedVariant->size ? ' - ' . strtoupper($selectedVariant->size) : '' }} quantity {{ $quantity }}
+                                </p>
+                            @endif
                         </div>
+                    </div>
 
-                        <!-- Add to Cart Button -->
+                    <!-- Add to Cart Button - Fixed at bottom -->
+                    <div class="p-6 pt-4 border-t border-gray-200 shrink-0">
                         <button
                             wire:click="addToCart"
                             class="px-4 py-3 w-full text-white bg-red-600 rounded-lg transition-colors hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            {{ !$selectedVariant ? 'disabled' : '' }}
+                            {{ !$selectedVariant || ($selectedVariant && $selectedVariant->stock <= 0) ? 'disabled' : '' }}
                         >
                             @if($selectedVariant)
-                                Add to Cart -
-                                @if($selectedVariant->price && $selectedVariant->price > 0)
-                                    {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedVariant->price), 2) }}
+                                @if($selectedVariant->stock <= 0)
+                                    Out of Stock
                                 @else
-                                    {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedProduct->price), 2) }}
+                                    Add to Cart -
+                                    @if($selectedVariant->price && $selectedVariant->price > 0)
+                                        {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedVariant->price), 2) }}
+                                    @else
+                                        {{ $currencySymbol }}{{ number_format($this->convertPrice($selectedProduct->price), 2) }}
+                                    @endif
                                 @endif
                             @else
                                 Select a variant first

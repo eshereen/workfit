@@ -156,7 +156,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN', null),
+    'domain' => env('APP_ENV') === 'local' ? null : env('SESSION_DOMAIN', null),
 
     /*
     |--------------------------------------------------------------------------
@@ -169,7 +169,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE', 'auto'),
+    'secure' => env('APP_ENV') === 'local' ? false : env('SESSION_SECURE_COOKIE', 'auto'),
 
     /*
     |--------------------------------------------------------------------------

@@ -15,6 +15,7 @@
         "filament/spatie-laravel-media-library-plugin": "^4.0",
         "genericmilk/docudoodle": "^2.2",
         "guzzlehttp/guzzle": "^7.9",
+        "intervention/image": "^3.11",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "livewire/flux": "^2.1.1",

@@ -350,5 +350,52 @@
 
 </div>
 
+<script>
+// Facebook Pixel - Custom Cart Event (tracks full cart contents)
+(function() {
+    if (typeof window.fbq !== 'function') {
+        console.warn('fbq not available for Cart event');
+        return;
+    }
 
+    var currency = @json($currencyCode ?? 'EGP');
+    var items = @json($cartItems ?? []);
+
+    if (!Array.isArray(items) || !items.length) {
+        return;
+    }
+
+    var contents = [];
+    var content_ids = [];
+    var totalValue = 0;
+    var totalItems = 0;
+
+    items.forEach(function(item) {
+        var id = String(item.id || item.rowId || '');
+        var quantity = parseInt(item.quantity || 0);
+        var itemPrice = Math.round(parseFloat(item.converted_price || item.price || 0) * 100) / 100;
+        
+        if (id && quantity > 0) {
+            contents.push({ id: id, quantity: quantity, item_price: itemPrice });
+            content_ids.push(id);
+            totalValue += itemPrice * quantity;
+            totalItems += quantity;
+        }
+    });
+
+    // Round total to 2 decimal places
+    totalValue = Math.round(totalValue * 100) / 100;
+
+    if (contents.length > 0) {
+        window.fbq('trackCustom', 'Cart', {
+            content_ids: content_ids,
+            contents: contents,
+            content_type: 'product',
+            currency: currency,
+            value: totalValue,
+            num_items: totalItems
+        });
+    }
+})();
+</script>
 

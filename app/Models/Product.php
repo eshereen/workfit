@@ -217,7 +217,7 @@ public function registerMediaCollections(?Media $media = null): void
                 ->width(300)
                 ->height(300)
 
-                ->nonQueued();
+                ->queued();
 
             $this->addMediaConversion('thumb_webp')
                 ->format('webp')
@@ -225,14 +225,14 @@ public function registerMediaCollections(?Media $media = null): void
                 ->height(150)
                 ->sharpen(10)
 
-                ->nonQueued();
+                ->queued();
 
             $this->addMediaConversion('medium_webp')
                 ->format('webp')
                 ->width(400)
                 ->height(400)
 
-                ->nonQueued();
+                ->queued();
 
             $this->addMediaConversion('large_webp')
                 ->format('webp')
@@ -240,7 +240,7 @@ public function registerMediaCollections(?Media $media = null): void
                 ->height(800)
 
 
-                ->nonQueued();
+                ->queued();
 
             // AVIF (optional — smaller but more CPU heavy)
             $this->addMediaConversion('thumb_avif')
@@ -249,7 +249,7 @@ public function registerMediaCollections(?Media $media = null): void
                 ->height(150)
 
 
-                ->nonQueued();
+                ->queued();
 
             $this->addMediaConversion('medium_avif')
                 ->format('avif')
@@ -257,7 +257,7 @@ public function registerMediaCollections(?Media $media = null): void
                 ->height(400)
 
 
-                ->nonQueued();
+                ->queued();
 
             $this->addMediaConversion('large_avif')
                 ->format('avif')
@@ -265,7 +265,7 @@ public function registerMediaCollections(?Media $media = null): void
                 ->height(800)
 
 
-                ->nonQueued();
+                ->queued();
         });
 
     // Product gallery (multiple images)
@@ -278,43 +278,43 @@ public function registerMediaCollections(?Media $media = null): void
                 ->format('webp')
                 ->width(150)
                 ->height(150)
-                ->nonQueued();
+                ->queued();
 
             $this->addMediaConversion('medium_webp')
                 ->format('webp')
                 ->width(600)
                 ->height(600)
-                ->nonQueued();
+                ->queued();
                 $this->addMediaConversion('large_webp')
                 ->format('webp')
                 ->width(800)
                 ->height(800)
-                ->nonQueued();
+                ->queued();
 
             $this->addMediaConversion('zoom_webp')
                 ->format('webp')
                 ->width(1200)
                 ->height(1200)
-                ->nonQueued();
+                ->queued();
 
             // AVIF versions (optional)
             $this->addMediaConversion('thumb_avif')
                 ->format('avif')
                 ->width(150)
                 ->height(150)
-                ->nonQueued();
+                ->queued();
 
             $this->addMediaConversion('medium_avif')
                 ->format('avif')
                 ->width(600)
                 ->height(600)
-                ->nonQueued();
+                ->queued();
 
             $this->addMediaConversion('zoom_avif')
                 ->format('avif')
                 ->width(1200)
                 ->height(1200)
-                ->nonQueued();
+                ->queued();
         });
 }
 

@@ -1,7 +1,7 @@
    <!-- Header -->
    @if(request()->routeIs('home'))
    @if($sale)
- <div class="relative z-[1100] bg-red-600 text-white py-3 px-4 h-auto w-full text-center transition-all duration-300">
+ <div class="relative z-[1100] bg-red-600 text-white py-3 px-4 h-auto w-full text-center transition-all duration-300 ">
  <p> <span >{{ $sale->description }}</span> <a href="{{ route('collection.show', $sale->slug) }}" class="px-2 font-bold text-gray-800 underline hover:text-white">Shop Now</a></p>
     </div>
     @endif
@@ -62,170 +62,71 @@
       </div>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden relative flex-1 space-x-4 md:flex">
-          <a href="{{route('categories.index', 'women')}}" class="text-sm transition-colors font-xs hover:text-red-600" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900' ">WOMEN</a>
-          <a href="{{route('categories.index', 'men')}}" class="text-sm transition-colors font-xs hover:text-red-600" :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">MEN</a>
+      <!-- Desktop Navigation -->
+      <nav class="hidden relative flex-1 space-x-12 md:flex" x-data="{ openCategory: null }">
+          @foreach($categories as $category)
+              <div class="relative" 
+                   @mouseenter="openCategory = '{{ $category->id }}'" 
+                   @mouseleave="openCategory = null">
+                  
+                  <a href="{{ route('categories.index', $category->slug) }}"
+                     class="flex items-center text-sm font-bold uppercase transition-colors hover:text-red-600 mx-2"
+                     :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">
+                      {{ $category->name }}
+                  </a>
 
-          <!-- Categories Dropdown -->
-          <div class="relative"
-               @mouseenter="categoriesDropdownOpen = true"
-               @mouseleave="categoriesDropdownOpen = false">
-              <button class="flex items-center text-sm font-light transition-colors font-xs hover:text-red-600"
-                      :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">
-                  CATEGORIES
-                  <svg class="ml-1 w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                  </svg>
-              </button>
-
-              <!-- Categories Full-Screen Overlay -->
-              <div x-show="categoriesDropdownOpen"
-                   x-transition:enter="transition ease-out duration-300"
-                   x-transition:enter-start="opacity-0 transform -translate-y-2"
-                   x-transition:enter-end="opacity-100 transform translate-y-0"
-                   x-transition:leave="transition ease-in duration-200"
-                   x-transition:leave-start="opacity-100 transform translate-y-0"
-                   x-transition:leave-end="opacity-0 transform -translate-y-2"
-                   class="fixed top-0 left-0 right-0 w-full bg-white shadow-lg border-b border-gray-200 z-[1300]"
-                   style="display: none;"
-                   @click.away="categoriesDropdownOpen = false">
-
-                  <!-- Header -->
-                  <div class="py-4 border-b border-gray-100">
-                      <div class="container px-4 mx-auto">
-                          <div class="flex justify-between items-center">
-                              <h2 class="text-2xl font-bold text-gray-900">Browse Categories</h2>
-                              <button @click="categoriesDropdownOpen = false"
-                                      class="p-2 rounded-full transition-colors hover:bg-gray-100">
-                                  <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                  </svg>
-                              </button>
-                          </div>
-                      </div>
-                  </div>
-
-                  <!-- Categories Content -->
-                  <div class="container px-4 py-6 mx-auto">
-                      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                          @foreach($categories as $category)
-                          <div class="space-y-3">
-                              <!-- Category Header -->
-                              <div class="pb-2 border-b border-gray-200">
-                                  <a href="{{ route('categories.index', $category->slug) }}"
-                                     class="block text-lg font-bold text-gray-900 uppercase transition-colors hover:text-red-600"
-                                     @click="categoriesDropdownOpen = false">
-                                      {{ $category->name }}
-                                  </a>
-                                  <div class="mt-1 text-xs text-gray-500">
-                                      {{ $category->products_count ?? 0 }} products
-                                  </div>
-                              </div>
-
-                              <!-- Subcategories -->
-                              @if($category->subcategories && $category->subcategories->count() > 0)
-                              <div class="space-y-1">
+                  <!-- Full Width Mega Menu -->
+                  @if($category->subcategories->count() > 0)
+                      <div x-show="openCategory === '{{ $category->id }}'"
+                           x-transition:enter="transition ease-out duration-200"
+                           x-transition:enter-start="opacity-0 -translate-y-1"
+                           x-transition:enter-end="opacity-100 translate-y-0"
+                           x-transition:leave="transition ease-in duration-150"
+                           x-transition:leave-start="opacity-100 translate-y-0"
+                           x-transition:leave-end="opacity-0 -translate-y-1"
+                           class="fixed top-[4.5rem] left-0 right-0 w-full bg-white shadow-lg border-t border-gray-100 z-[1200] pt-6 pb-8"
+                           style="display: none;"
+                           x-cloak>
+                          
+                          <div class="container mx-auto p-8">
+                              <div class="grid grid-cols-4 gap-8">
+                                  <!-- Subcategories with Products -->
                                   @foreach($category->subcategories as $subcategory)
-                                  <a href="{{ route('categories.subcategory', [$category->slug, $subcategory->slug]) }}"
-                                     class="block px-2 py-1 text-sm text-gray-700 capitalize rounded transition-colors hover:text-red-600 hover:bg-gray-50"
-                                     @click="categoriesDropdownOpen = false">
-                                      {{ $subcategory->name }}
-                                  </a>
+                                      <div class="space-y-3">
+                                          <!-- Subcategory Title -->
+                                          <a href="{{ route('categories.subcategory', [$category->slug, $subcategory->slug]) }}"
+                                             class="block font-bold text-gray-900 uppercase tracking-wider hover:text-red-600">
+                                              {{ $subcategory->name }}
+                                          </a>
+
+                                          <!-- Top Products List -->
+                                          @if($subcategory->products && $subcategory->products->count() > 0)
+                                              <ul class="space-y-2">
+                                                  @foreach($subcategory->products->take(4) as $product)
+                                                      <li>
+                                                          <a href="{{ route('product.show', $product->slug) }}" 
+                                                             class="block text-xs text-gray-500 hover:text-red-600 truncate transition-colors">
+                                                              {{ $product->name }}
+                                                          </a>
+                                                      </li>
+                                                  @endforeach
+                                              </ul>
+                                          @endif
+                                      </div>
                                   @endforeach
                               </div>
-                              @endif
-                          </div>
-                          @endforeach
-                      </div>
-
-                      <!-- Footer -->
-                      <div class="pt-8 mt-12 text-center border-t border-gray-200">
-                          <a href="{{ route('categories.all') }}"
-                             class="inline-flex items-center px-6 py-3 font-semibold text-white rounded-lg transition-colors bg-gray-950 hover:bg-gray-700"
-                             @click="categoriesDropdownOpen = false">
-                              View All Categories
-                              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                              </svg>
-                          </a>
-                      </div>
-                  </div>
-              </div>
-          </div>
-
-          <!-- Collections Dropdown -->
-          <div class="relative"
-               @mouseenter="collectionsDropdownOpen = true"
-               @mouseleave="collectionsDropdownOpen = false">
-              <button class="flex items-center text-sm transition-colors font-xs hover:text-red-600"
-                      :class="isHome && !scrolled ? 'text-white' : 'text-gray-900'">
-                  COLLECTIONS
-                  <svg class="ml-1 w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                  </svg>
-              </button>
-
-              <!-- Collections Full-Screen Overlay -->
-              <div x-show="collectionsDropdownOpen"
-                   x-transition:enter="transition ease-out duration-300"
-                   x-transition:enter-start="opacity-0 transform -translate-y-2"
-                   x-transition:enter-end="opacity-100 transform translate-y-0"
-                   x-transition:leave="transition ease-in duration-200"
-                   x-transition:leave-start="opacity-100 transform translate-y-0"
-                   x-transition:leave-end="opacity-0 transform -translate-y-2"
-                   class="fixed top-0 left-0 right-0 w-full bg-white shadow-lg border-b border-gray-200 z-[1300]"
-                   style="display: none;"
-                   @click.away="collectionsDropdownOpen = false">
-
-                  <!-- Header -->
-                  <div class="py-4 border-b border-gray-100">
-                      <div class="container px-4 mx-auto">
-                          <div class="flex justify-between items-center">
-                              <h2 class="text-2xl font-bold text-gray-900">Browse Collections</h2>
-                              <button @click="collectionsDropdownOpen = false"
-                                      class="p-2 rounded-full transition-colors hover:bg-gray-100">
-                                  <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                  </svg>
-                              </button>
+                              
+                              <div class="my-6 pt-4 border-t border-gray-100 text-center">
+                                  <a href="{{ route('categories.index', $category->slug) }}" 
+                                     class="inline-block text-sm font-semibold text-red-600 hover:text-red-700">
+                                      View All {{ $category->name }} →
+                                  </a>
+                              </div>
                           </div>
                       </div>
-                  </div>
-
-                  <!-- Collections Content -->
-                  <div class="container px-4 py-6 mx-auto">
-                      <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                          @foreach($collections as $collection)
-                          <a href="{{ route('collection.show', $collection->slug) }}"
-                             class="block p-4 rounded-lg border border-gray-200 transition-colors hover:border-red-300 hover:bg-gray-50 group"
-                             @click="collectionsDropdownOpen = false">
-                              <div class="mb-1 text-base font-bold text-gray-900 uppercase transition-colors group-hover:text-red-600">
-                                  {{ $collection->name }}
-                              </div>
-                              <div class="text-xs text-gray-500">
-                                  {{ $collection->products_count }} products
-                              </div>
-                              <div class="mt-2 text-xs font-medium text-red-600 group-hover:text-red-700">
-                                  Shop Now →
-                              </div>
-                          </a>
-                          @endforeach
-                      </div>
-
-                      <!-- Footer -->
-                      <div class="pt-8 mt-12 text-center border-t border-gray-200">
-                          <a href="{{ route('collections.index') }}"
-                             class="inline-flex items-center px-6 py-3 font-semibold text-white rounded-lg transition-colors bg-gray-950 hover:bg-gray-700"
-                             @click="collectionsDropdownOpen = false">
-                              View All Collections
-                              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                              </svg>
-                          </a>
-                      </div>
-                  </div>
+                  @endif
               </div>
-          </div>
+          @endforeach
       </nav>
 
           <!-- Logo (Perfectly Centered) -->
@@ -294,82 +195,50 @@
     </div>
 
     <nav class="px-4 py-4 space-y-2">
-      <a href="{{route('categories.index', 'women')}}" class="block py-2 font-semibold text-gray-900 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">WOMEN</a>
-      <a href="{{route('categories.index', 'men')}}" class="block py-2 font-semibold text-gray-900 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">MEN</a>
-
-      <!-- Categories Section -->
-      <div class="pt-2 border-t border-gray-200">
-        <button @click="mobileCategoriesOpen = !mobileCategoriesOpen"
-                class="flex justify-between items-center py-2 w-full font-semibold text-left text-gray-900 transition-colors hover:text-red-600">
-          <span>CATEGORIES</span>
-          <svg class="w-4 h-4 transition-transform duration-200"
-               :class="mobileCategoriesOpen ? 'rotate-45' : ''"
-               fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-        </button>
-
-        <div x-show="mobileCategoriesOpen"
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 max-h-0"
-             x-transition:enter-end="opacity-100 max-h-96"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-start="opacity-100 max-h-96"
-             x-transition:leave-end="opacity-0 max-h-0"
-             class="overflow-hidden"
-             style="display: none;">
-          <div class="pt-2 pl-4 space-y-1">
-            <a href="{{ route('categories.all') }}" class="block py-1 text-sm text-gray-700 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">All Categories</a>
-            @foreach($categories as $category)
-            <div class="space-y-1">
-              <a href="{{ route('categories.index', $category->slug) }}" class="block py-1 text-sm font-medium text-gray-800 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">{{ $category->name }}</a>
-              @if($category->subcategories && $category->subcategories->count() > 0)
-              <div class="pl-3 space-y-1">
-                @foreach($category->subcategories as $subcategory)
-                <a href="{{ route('categories.subcategory', [$category->slug, $subcategory->slug]) }}" class="block py-1 text-xs text-gray-600 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">{{ $subcategory->name }}</a>
-                @endforeach
-              </div>
-              @endif
+      @foreach($categories as $category)
+        <div x-data="{ open: false }" class="border-b border-gray-100 last:border-0 pb-2">
+            <div class="flex justify-between items-center">
+                <a href="{{ route('categories.index', $category->slug) }}"
+                   class="block py-2 font-semibold text-gray-900 uppercase transition-colors hover:text-red-600"
+                   @click="mobileMenuOpen = false">
+                    {{ $category->name }}
+                </a>
+                
+                @if($category->subcategories->count() > 0)
+                    <button @click="open = !open" class="p-2 text-gray-500 hover:text-red-600 focus:outline-none">
+                        <!-- Plus Icon -->
+                        <svg x-show="!open" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        <!-- Minus Icon -->
+                        <svg x-show="open" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                    </button>
+                @endif
             </div>
-            @endforeach
-          </div>
+
+            @if($category->subcategories->count() > 0)
+                <div x-show="open"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 max-h-0"
+                     x-transition:enter-end="opacity-100 max-h-[800px]"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 max-h-[800px]"
+                     x-transition:leave-end="opacity-0 max-h-0"
+                     class="pl-4 space-y-1 mt-1 overflow-hidden"
+                     style="display: none;">
+                    @foreach($category->subcategories as $subcategory)
+                        <a href="{{ route('categories.subcategory', [$category->slug, $subcategory->slug]) }}"
+                           class="block py-1 text-sm text-gray-600 hover:text-red-600 capitalize"
+                           @click="mobileMenuOpen = false">
+                            {{ $subcategory->name }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
         </div>
-      </div>
+      @endforeach
 
-      <!-- Collections Section -->
-      <div class="pt-2 border-t border-gray-200">
-        <button @click="mobileCollectionsOpen = !mobileCollectionsOpen"
-                class="flex justify-between items-center py-2 w-full font-semibold text-left text-gray-900 transition-colors hover:text-red-600">
-          <span>COLLECTIONS</span>
-          <svg class="w-4 h-4 transition-transform duration-200"
-               :class="mobileCollectionsOpen ? 'rotate-45' : ''"
-               fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-        </button>
-
-        <div x-show="mobileCollectionsOpen"
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 max-h-0"
-             x-transition:enter-end="opacity-100 max-h-96"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-start="opacity-100 max-h-96"
-             x-transition:leave-end="opacity-0 max-h-0"
-             class="overflow-hidden"
-             style="display: none;">
-          <div class="pt-2 pl-4 space-y-1">
-            <a href="{{ route('collections.index') }}" class="block py-1 text-sm text-gray-700 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">All Collections</a>
-            @foreach($collections as $collection)
-            <a href="{{ route('collection.show', $collection->slug) }}" class="block py-1 text-sm text-gray-700 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">{{ $collection->name }}</a>
-            @endforeach
-          </div>
-        </div>
-      </div>
-
-      <div class="pt-2 space-y-2 border-t border-gray-200">
+      <div class="pt-2 space-y-2 border-t border-gray-200 mt-4">
         <a href="{{ route('location') }}" class="block py-2 font-semibold text-gray-900 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">LOCATION</a>
         <a href="{{ route('login') }}" class="block py-2 font-semibold text-gray-900 transition-colors hover:text-red-600" @click="mobileMenuOpen = false">ACCOUNT</a>
-
       </div>
     </nav>
   </div>

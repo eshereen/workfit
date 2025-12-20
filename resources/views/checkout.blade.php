@@ -51,6 +51,62 @@
 </div>
 @endsection
 
-
-
+@push('scripts')
+<script>
+    // Facebook Pixel - InitiateCheckout Event
+    document.addEventListener('DOMContentLoaded', function() {
+        @php
+            $cartService = app(\App\Services\CartService::class);
+            $cart = $cartService->getCart();
+            $currencyService = app(\App\Services\CountryCurrencyService::class);
+            $currencyInfo = $currencyService->getCurrentCurrencyInfo();
+            $currencyCode = $currencyInfo['currency_code'];
+            
+            // Calculate converted total - convert each item price from USD to session currency
+            $convertedTotal = 0;
+            $convertedItems = [];
+            foreach ($cart as $item) {
+                $basePrice = $item['price'] ?? 0;
+                // Convert from USD if not already in USD
+                if ($currencyCode !== 'USD' && $basePrice > 0) {
+                    $convertedPrice = $currencyService->convertFromUSD($basePrice, $currencyCode);
+                } else {
+                    $convertedPrice = $basePrice;
+                }
+                $convertedItems[] = [
+                    'id' => $item['id'],
+                    'quantity' => $item['quantity'],
+                    'item_price' => round($convertedPrice, 2)
+                ];
+                $convertedTotal += $convertedPrice * $item['quantity'];
+            }
+            
+            // Add shipping cost (get default/selected shipping rate if available)
+            $shippingCost = session('shipping_cost', 0);
+            if ($shippingCost > 0) {
+                if ($currencyCode !== 'USD') {
+                    $shippingCost = $currencyService->convertFromUSD($shippingCost, $currencyCode);
+                }
+                $convertedTotal += $shippingCost;
+            }
+            
+            $convertedTotal = round($convertedTotal, 2);
+        @endphp
+        
+        @if(!$cart->isEmpty())
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'InitiateCheckout', {
+                    content_ids: @json($cart->pluck('id')->toArray()),
+                    contents: @json($convertedItems),
+                    content_type: 'product',
+                    value: {{ $convertedTotal }},
+                    currency: '{{ $currencyCode }}',
+                    num_items: {{ $cart->count() }}
+                });
+                console.log('✅ InitiateCheckout tracked', { value: {{ $convertedTotal }}, currency: '{{ $currencyCode }}' });
+            }
+        @endif
+    });
+</script>
+@endpush
 

@@ -361,7 +361,46 @@ document.addEventListener('DOMContentLoaded', function() {
         // Trigger the Livewire method to refresh currency
         @this.call('handleCurrencyChange', e.detail);
     });
+
+    // Listen for Facebook Pixel AddToCart event
+    Livewire.on('fbPixelAddToCart', (data) => {
+        console.log('Facebook Pixel - AddToCart Event:', data);
+        if (typeof fbq !== 'undefined') {
+            fbq('track', 'AddToCart', {
+                content_name: data[0].content_name,
+                content_ids: data[0].content_ids,
+                content_type: data[0].content_type,
+                value: data[0].value,
+                currency: data[0].currency,
+                content_category: data[0].content_category,
+                num_items: data[0].quantity
+            });
+        }
+    });
 });
 </script>
 
+<script>
+@php
+    // Use same price calculation as display (line 159)
+    $fbPrice = $convertAmount($selectedVariant->price ?? $product->price) ?? 0;
+    $fbPrice = is_numeric($fbPrice) ? (float)$fbPrice : 0;
+@endphp
+
+// Track ViewContent event
+fbq('track', 'ViewContent', {
+    content_ids: ['{{ $product->id }}'],
+    content_type: 'product',
+    content_name: '{{ addslashes($product->name ?? "") }}',
+    value: {{ number_format($fbPrice, 2, '.', '') }},
+    currency: '{{ $displayCurrency ?? "EGP" }}',
+    content_category: '{{ addslashes($product->category->name ?? "") }}'
+});
+
+console.log('✅ Facebook Pixel: ViewContent', {
+    id: '{{ $product->id }}',
+    value: {{ number_format($fbPrice, 2, '.', '') }},
+    currency: '{{ $displayCurrency ?? "EGP" }}'
+});
+</script>
 

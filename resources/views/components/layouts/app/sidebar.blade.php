@@ -69,6 +69,7 @@
             {{ $slot }}
         </div>
 
+        @livewireScripts
         @fluxScripts
     </body>
 </html>

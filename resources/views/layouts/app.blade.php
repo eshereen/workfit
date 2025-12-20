@@ -9,14 +9,15 @@
     <!-- Performance optimizations -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="{{ config('app.url') }}">
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
 
     <!-- Resource hints for critical resources -->
-    <link rel="preload" href="/videos/workfit-lg.mp4" as="video" type="video/mp4" media="(min-width: 768px)">
-    <link rel="preload" href="/videos/workfit-mobile.mp4" as="video" type="video/mp4" media="(max-width: 767px)">
+    <!-- Resource hints for critical resources -->
+    {{-- Video preloads removed: We now lazy-load the hero video to improve LCP --}}
     <!-- Preload hero image variants (safeguard for FCP/LCP on image heroes) -->
-    <link rel="preload" as="image" href="/imgs/workfit.png" imagesrcset="/imgs/workfit.png" imagesizes="100vw">
+    {{-- Preload removed: workfit.png is not used as the main hero. Dynamic banner preloading is handled in home.blade.php --}}
 
     <!-- Livewire Styles -->
     @livewireStyles
@@ -144,6 +145,8 @@ p,a,span,li,ul,ol,button{
 }
     </style>
 
+    
+    @stack('head')
 </head>
 <body class="overflow-x-hidden antialiased bg-white text-gray-950">
         <!-- Loader Overlay -->
@@ -577,5 +580,7 @@ style="background: rgba(255,255,255,0.95); pointer-events: none;"
             });
         });
     </script>
+    
+    @stack('scripts')
 </body>
 </html>

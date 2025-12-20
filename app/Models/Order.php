@@ -63,6 +63,20 @@ class Order extends Model
         'status' => OrderStatus::class,
     ];
 
+    /**
+     * Model boot logic.
+     *
+     * When an order is deleted from the control panel (or anywhere),
+     * also delete all related order items to avoid foreign key errors.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Order $order): void {
+            // Delete related order items first
+            $order->items()->delete();
+        });
+    }
+
 
     public function user()
     {

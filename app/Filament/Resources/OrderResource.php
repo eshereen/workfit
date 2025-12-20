@@ -62,7 +62,9 @@ class OrderResource extends Resource
                     ->maxLength(255),
                 TextInput::make('last_name')
                     ->maxLength(255),
-                Select::make('country.name')
+                // Store the selected country on the order using the country_id FK,
+                // while displaying the related country's name as the label.
+                Select::make('country_id')
                     ->relationship('country', 'name'),
                 TextInput::make('state')
                     ->maxLength(255),
@@ -110,8 +112,13 @@ class OrderResource extends Resource
                     ->placeholder('Building number (optional)')
                     ->visible(fn ($get) => !$get('use_billing_for_shipping'))
                     ->default(fn ($record) => $record?->shipping_building_number ?? ''),
+                // Select the shipping method; use the Shipping record as the option
+                // and show the related country's name (and optionally price) as the label.
                 Select::make('shipping_id')
-                    ->relationship('shipping', 'country.name')
+                    ->relationship('shipping', 'id')
+                    ->getOptionLabelFromRecordUsing(
+                        fn (\App\Models\Shipping $record) => $record->country?->name ?? 'Unknown country'
+                    )
                     ->label('Shipping')
                     ->searchable()
                     ->preload()
