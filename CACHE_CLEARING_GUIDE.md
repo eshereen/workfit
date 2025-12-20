@@ -38,17 +38,20 @@ php artisan optimize:clear
 
 ### **Step 4: Regenerate WebP Images**
 
-You have custom commands for this! Run:
+You have custom commands for this! Run these in order:
 
 ```bash
-# Option A: Regenerate all WebP safely
-php artisan webp:regenerate-safely
+# First, check what's happening (diagnostic)
+php artisan debug:webp-urls --limit=5
 
-# Option B: Regenerate synchronously (if option A doesn't exist)
-php artisan webp:regenerate-sync
+# Then test with a small batch (10 images)
+php artisan media:regenerate-webp-sync --limit=10
 
-# Option C: Run the general regeneration
-php artisan webp:regenerate
+# If successful, regenerate all in batches
+php artisan media:regenerate-all-webp --batch=50
+
+# Finally, optimize banner images
+php artisan banners:optimize-images --force
 ```
 
 ### **Step 5: Clear OPcache (PHP Cache)**
@@ -228,7 +231,7 @@ php artisan list | grep webp
 
 **One-liner to clear everything:**
 ```bash
-php artisan optimize:clear && php artisan webp:regenerate-safely && php artisan config:cache && php artisan route:cache
+php artisan optimize:clear && php artisan media:regenerate-all-webp --batch=50 && php artisan banners:optimize-images --force && php artisan config:cache && php artisan route:cache
 ```
 
 **Check if it's working:**
