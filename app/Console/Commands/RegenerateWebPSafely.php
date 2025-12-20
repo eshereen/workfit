@@ -48,26 +48,14 @@ class RegenerateWebPSafely extends Command
                 if (!$forceOption && $media->hasGeneratedConversion($conversionName)) {
                     $skipped++;
                 } else {
-                    // Trigger regeneration of all manipulations (required by Spatie)
-                    $media->manipulations = $media->manipulations;
-                    $media->save();
-
-                    // Regenerate ONLY the requested conversion
-                 app(\Spatie\MediaLibrary\Conversions\ConversionCollection::class)
-    ->getConversions($media->model->getMediaConversionActions($media))
-    ->filter(fn($c) => $c->getName() === $conversionName)
-    ->each(function ($c) use ($media) {
-        try {
-            (new \Spatie\MediaLibrary\Conversions\FileManipulator())
-                ->createDerivedFiles($media, [$c]);
-        } catch (\Exception $e) {
-            Log::warning(
-                "Failed conversion {$c->getName()} for media ID {$media->id}: {$e->getMessage()}"
-            );
-        }
-    });
-
-                    $success++;
+                    // Use Spatie's FileManipulator to regenerate the specific conversion
+                    try {
+                        $fileManipulator = app(\Spatie\MediaLibrary\Conversions\FileManipulator::class);
+                        $fileManipulator->createDerivedFiles($media, [$conversionName]);
+                        $success++;
+                    } catch (\Exception $e) {
+                        throw $e; // Re-throw to be caught by outer catch block
+                    }
                 }
             } catch (\Exception $e) {
                 $failed[] = [
