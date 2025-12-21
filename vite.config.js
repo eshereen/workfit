@@ -15,4 +15,32 @@ export default defineConfig({
     server: {
         cors: true,
     },
+    build: {
+        // Enhanced minification
+        minify: 'terser',
+        terserOptions: {
+            compress: {
+                drop_console: true, // Remove console.logs in production
+                drop_debugger: true,
+                pure_funcs: ['console.log', 'console.info', 'console.debug'],
+            },
+        },
+        // Generate source maps for debugging (set to false for smaller builds)
+        sourcemap: false,
+        // Chunk size warnings
+        chunkSizeWarningLimit: 1000,
+        // Code splitting optimization
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Split vendor code
+                    'vendor': ['alpinejs', 'axios'],
+                },
+            },
+        },
+    },
+    // CSS optimization
+    css: {
+        devSourcemap: false,
+    },
 });
