@@ -50,7 +50,7 @@
 </style>
 <div class="min-h-screen bg-gray-50 py-10">
     <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto">
             @php
                 $currencyService = app(\App\Services\CountryCurrencyService::class);
                 $currencyInfo = $currencyService->getCurrentCurrencyInfo();
@@ -116,8 +116,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                 </div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">Thank You for Your Order!</h1>
-                <p class="text-lg text-gray-600">
+                <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Thank You for Your Order!</h1>
+                <p class="text-lg md:text-xl lg:text-2xl text-gray-600">
                     Your order has been successfully placed. We've sent a confirmation email to <strong>{{ $order->email }}</strong>
                 </p>
             </div>
@@ -348,13 +348,36 @@
             </div>
 
             @if($currencyInfo['currency_code'] !== 'USD')
-            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg no-print">
-                <div class="text-sm text-blue-800 text-center">
-                    @if($currencyInfo['is_auto_detected'])
-                        Prices automatically converted to {{ $currencyInfo['currency_code'] }} ({{ $currencyInfo['currency_symbol'] }}) based on your location
-                    @else
-                        Prices converted to {{ $currencyInfo['currency_code'] }} ({{ $currencyInfo['currency_symbol'] }})
-                    @endif
+            <!-- Currency Toast Notification -->
+            <div x-data="{ show: true }" 
+                 x-init="setTimeout(() => show = false, 3000)"
+                 x-show="show"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-300"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-4"
+                 class="fixed bottom-4 right-4 z-50 p-4 bg-green-50 rounded-lg border border-green-200 shadow-lg max-w-sm no-print"
+                 style="display: none;">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 text-green-500">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3 text-sm font-medium text-green-800">
+                        @if($currencyInfo['is_auto_detected'])
+                            Prices automatically converted to {{ $currencyInfo['currency_code'] }} ({{ $currencyInfo['currency_symbol'] }}) based on your location
+                        @else
+                            Prices converted to {{ $currencyInfo['currency_code'] }} ({{ $currencyInfo['currency_symbol'] }})
+                        @endif
+                    </div>
+                    <button @click="show = false" class="ml-auto pl-3 text-green-500 hover:text-green-600">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
             </div>
             @endif
