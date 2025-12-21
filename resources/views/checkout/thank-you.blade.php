@@ -50,7 +50,7 @@
 </style>
 <div class="min-h-screen bg-gray-50 py-10">
     <div class="container mx-auto px-4">
-        <div class="max-w-3xl md:max-w-4xl lg:max-w-5xl mx-auto">
+        <div class="max-w-4xl mx-auto">
             @php
                 $currencyService = app(\App\Services\CountryCurrencyService::class);
                 $currencyInfo = $currencyService->getCurrentCurrencyInfo();
@@ -204,12 +204,12 @@
                     </div>
 
                     <!-- Right: Customer Details -->
-                    <div>
+                    <div class="overflow-hidden" style="word-wrap: break-word; overflow-wrap: break-word;">
                         <div class="mb-1"><strong>Customer Name:</strong> {{ $order->first_name }} {{ $order->last_name }}</div>
                         <div class="mb-1"><strong>Phone Number:</strong> {{ $order->phone_number ?? 'N/A' }}</div>
-                        <div class="mb-1"><strong>Address:</strong> {{ $order->billing_address }}{{ $order->billing_building_number ? ', ' . $order->billing_building_number : '' }}</div>
+                        <div class="mb-1 break-words"><strong>Address:</strong> {{ $order->billing_address }}{{ $order->billing_building_number ? ', ' . $order->billing_building_number : '' }}</div>
                         <div class="mb-1"><strong>Country:</strong> {{ $order->country->name ?? 'N/A' }}</div>
-                        <div><strong>Email:</strong> {{ $order->email }}</div>
+                        <div class="break-all" style="word-break: break-all; overflow-wrap: anywhere;"><strong>Email:</strong> {{ $order->email }}</div>
                     </div>
                 </div>
 
