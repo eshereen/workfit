@@ -1,17 +1,21 @@
 {
+  "_vendor-l0sNRNKZ.js": {
+    "file": "assets/vendor-l0sNRNKZ.js",
+    "name": "vendor"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-DNAEGPbu.css",
+    "file": "assets/app-mowin-CE.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-ClIFg0Up.js",
+    "file": "assets/app-B55tTbuA.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
   },
   "resources/js/checkout.js": {
-    "file": "assets/checkout-iU2ozBCE.js",
+    "file": "assets/checkout-DFdQ-Nku.js",
     "name": "checkout",
     "src": "resources/js/checkout.js",
     "isEntry": true

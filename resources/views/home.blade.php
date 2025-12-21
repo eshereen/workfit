@@ -103,23 +103,24 @@
 </section>
 @endif
 
-    <!-- Men Products -->
-    <section class="py-16  px-4">
-        <h1 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">Men's Collection</h1>
-        <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
+    <!-- First Category Products -->
+    @php
+        $firstCategory = $categories->get(0);
+    @endphp
+    @if($firstCategory && $firstCategory->directProducts && $firstCategory->directProducts->isNotEmpty())
+    <section class="py-2 px-4">
+        <h1 class="text-center font-bold text-2xl md:text-3xl lg:text-4xl mb-2 animate-on-scroll uppercase">{{ $firstCategory->name }}'S COLLECTION</h1>
+        <p class="text-center text-gray-600 mb-3 max-w-xl md:max-w-2xl lg:max-w-2xl mx-auto animate-on-scroll">Discover our latest collection of products</p>
 
-        @if($men && $men->directProducts && $men->directProducts->isNotEmpty())
-       @livewire('product-index',['products'=>$men->directProducts->take(4), 'useBestSellerLogic' => true, 'category' => $men->id])
-       @endif
-       @if($men)
-       <div class="text-center mb-12 animate-on-scroll">
-        <a href="{{ route('categories.index', $men->slug) }}" class="border-2 border-gray-900 hover:bg-gray-900 hover:text-white font-bold py-3 px-8 transition-colors">
-            VIEW ALL {{ $men->name }}'S
+        @livewire('product-index',['products'=>$firstCategory->directProducts->take(4), 'useBestSellerLogic' => true, 'category' => $firstCategory->id])
+       
+       <div class="text-center mb-4 animate-on-scroll">
+        <a href="{{ route('categories.index', $firstCategory->slug) }}" class="border-2 border-gray-900 hover:bg-gray-900 hover:text-white font-bold py-2 px-6 transition-colors">
+            VIEW ALL {{ $firstCategory->name }}'S
         </a>
-    </div>
+       </div>
+    </section>
     @endif
-
-   </section>
     <!-- Full-width Lifestyle Banner -->
      @if($women_banner)
     <section class="relative h-[1100px] bg-cover overflow-hidden animate-on-scroll my-8">
@@ -153,23 +154,26 @@
         </div>
         @endif
     </section>
-    <!-- Product Grid - First Category Collection -->
-    <section class="py-8  px-4">
-        @if($women && $women->directProducts && $women->directProducts->isNotEmpty())
+    <!-- Second Category Products -->
+    @php
+        $secondCategory = $categories->get(1);
+    @endphp
+    @if($secondCategory && $secondCategory->directProducts && $secondCategory->directProducts->isNotEmpty())
+    <section class="py-8 px-4">
         <div class="container mx-auto">
-            <h2 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">{{ $women->name }}'S COLLECTION</h2>
+            <h2 class="text-center font-bold text-2xl md:text-3xl lg:text-4xl mb-2 animate-on-scroll uppercase">{{ $secondCategory->name }}'S COLLECTION</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll">{{ $women->description }}</p>
+            <p class="text-center text-gray-600 mb-6 max-w-xl lg:max-w-2xl mx-auto animate-on-scroll">{{ $secondCategory->description ?? 'Discover our latest collection of products' }}</p>
 
-           @livewire('product-index',['products'=>$women->directProducts->take(4), 'useBestSellerLogic' => true, 'category' => $women->id, 'disableEagerLoading' => true])
-            <div class="text-center mt-12 animate-on-scroll">
-                <a href="{{ route('categories.index', $women->slug) }}" class="border-2 border-gray-900 hover:bg-gray-900 hover:text-white font-bold py-3 px-8 transition-colors">
-                    VIEW ALL {{ $women->name }}'S
+           @livewire('product-index',['products'=>$secondCategory->directProducts->take(4), 'useBestSellerLogic' => true, 'category' => $secondCategory->id, 'disableEagerLoading' => true])
+            <div class="text-center mb-8 animate-on-scroll">
+                <a href="{{ route('categories.index', $secondCategory->slug) }}" class="border-2 border-gray-900 hover:bg-gray-900 hover:text-white font-bold py-2 px-6 transition-colors">
+                    VIEW ALL {{ $secondCategory->name }}'S
                 </a>
             </div>
         </div>
-        @endif
     </section>
+    @endif
 
     <!-- Three Image Block Section -->
     <section class="py-16  px-4 bg-gray-100">
@@ -266,9 +270,9 @@
      <section class="py-8  px-4">
         @if($featured && $featured->isNotEmpty())
         <div class="container mx-auto">
-            <h2 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">FEATURED PRODUCTS</h2>
+            <h2 class="text-center font-bold text-2xl md:text-3xl lg:text-4xl mb-2 animate-on-scroll uppercase">FEATURED PRODUCTS</h2>
 
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-on-scroll px-8">Discover our handpicked selection of premium products</p>
+            <p class="text-center text-gray-600 mb-12 max-w-xl md:max-w-2xl lg:max-w-2xl mx-auto animate-on-scroll px-8">Discover our handpicked selection of premium products</p>
 
            @livewire('product-index',['products'=>$featured->take(4), 'disableEagerLoading' => true])
 
@@ -315,8 +319,8 @@
 
     <!-- Just Arrived Products -->
     <section class="py-16  px-4">
-        <h1 class="text-center font-bold text-3xl md:text-4xl lg:text-5xl mb-2 animate-on-scroll uppercase">Just Arrived</h1>
-        <p class="text-center text-gray-600 mb-4 max-w-2xl mx-auto animate-on-scroll px-8">Discover our latest collection of products</p>
+        <h1 class="text-center font-bold text-2xl md:text-3xl lg:text-4xl mb-2 animate-on-scroll uppercase">Just Arrived</h1>
+        <p class="text-center text-gray-600 mb-4 max-w-xl md:max-w-2xl lg:max-w-2xl mx-auto animate-on-scroll px-8">Discover our latest collection of products</p>
         @if($recent && $recent->isNotEmpty())
        @livewire('product-index',['products'=>$recent, 'disableEagerLoading' => true])
        @endif

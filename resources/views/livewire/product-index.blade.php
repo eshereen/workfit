@@ -14,11 +14,11 @@
     @endif
     @if(!request()->routeIs('home') && (request()->routeIs('products.index') || request()->routeIs('categories.index') || $category || $categoryModel))
     <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-950">
+        <h1 class="text-lg md:text-xl lg:text-2xl  font-bold text-gray-950">
             @if(request()->routeIs('products.index'))
                 WorkfitStore
             @elseif($subcategoryModel && $categoryModel)
-                 {{ $categoryModel->name }} <span class="text-gray-400 mx-2 text-2xl font-normal">/</span> {{ $subcategoryModel->name }}
+                 {{ $categoryModel->name }} <span class="text-gray-400 mx-1 font-normal">/</span> {{ $subcategoryModel->name }}
             @elseif($categoryModel)
                 {{ $categoryModel->name }}
             @else
@@ -26,13 +26,13 @@
             @endif
         </h1>
 
-        <div class="flex items-center gap-3" x-data="{ showSearch: false }">
+        <div class="flex items-center gap-2" x-data="{ showSearch: false }">
             <!-- Search Icon & Input -->
             <div class="relative">
                 <!-- Search Icon Button -->
                 <button
                     @click="showSearch = !showSearch"
-                    class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    class="p-1 rounded-lg hover:bg-gray-100 transition-colors"
                     type="button"
                 >
                     <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +59,7 @@
                             wire:model.live.debounce.300ms="search"
                             type="text"
                             placeholder="Search products..."
-                            class="px-4 py-2 pl-10 w-full rounded-lg border border-gray-300 shadow-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            class="px-1 py-2 pl-10 w-full rounded-lg border border-gray-300 shadow-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             x-ref="searchInput"
                         >
                         <svg class="absolute top-2.5 left-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@
                 <!-- Filter Icon Button -->
                 <button
                     @click="showSort = !showSort"
-                    class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    class="p-1 rounded-lg hover:bg-gray-100 transition-colors"
                     type="button"
                 >
                     <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,11 +96,11 @@
                     class="absolute right-0 top-12 z-50 w-80 min-w-max bg-white rounded-lg shadow-lg border border-gray-200"
                     @click.away="showSort = false"
                 >
-                    <div class="p-3">
+                    <div class="p-1">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Sort by:</label>
                         <select
                             wire:model.live="sortBy"
-                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            class="w-full px-2 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             @change="showSort = false"
                         >
                             <option value="newest">Newest</option>
