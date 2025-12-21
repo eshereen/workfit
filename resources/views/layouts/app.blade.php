@@ -148,7 +148,7 @@ p,a,span,li,ul,ol,button{
     
     @stack('head')
 </head>
-<body class="overflow-x-hidden antialiased bg-white text-gray-950 max-w-5xl md:max-w-6xl lg:max-w-7xl mx-auto">
+<body class="overflow-x-hidden antialiased bg-white text-gray-950">
         <!-- Loader Overlay -->
 <div
 id="page-loader"
