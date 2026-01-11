@@ -184,17 +184,17 @@
                 @endphp
                 @if($product->compare_price > 0)
                 <span class="mr-3 text-2xl font-bold text-red-600">
-                    {{ $displaySymbol }}{{ number_format($primaryPrice, 2) }}
+                    {{ $displaySymbol }}{{ \App\Models\Product::formatPrice($primaryPrice) }}
                 </span>
                 <span class="text-lg text-gray-500 line-through">
-                    {{ $displaySymbol }}{{ number_format($comparePrice, 2) }}
+                    {{ $displaySymbol }}{{ \App\Models\Product::formatPrice($comparePrice) }}
                 </span>
                 <span class="px-2 py-1 ml-3 text-sm text-red-800 bg-red-100 rounded">
                     Save {{ $product->discount_percentage }}%
                 </span>
                 @else
                 <span class="text-2xl font-bold text-red-600">
-                    {{ $displaySymbol }}{{ number_format($primaryPrice, 2) }}
+                    {{ $displaySymbol }}{{ \App\Models\Product::formatPrice($primaryPrice) }}
                 </span>
                 @endif
             </div>
@@ -302,7 +302,7 @@
                         @php
                             $selectedPriceDisplay = $convertAmount($selectedVariant->price ?? $product->price);
                         @endphp
-                        <span class="text-lg font-bold">{{ $displaySymbol }}{{ number_format($selectedPriceDisplay, 2) }}</span>
+                        <span class="text-lg font-bold">{{ $displaySymbol }}{{ \App\Models\Product::formatPrice($selectedPriceDisplay) }}</span>
                     </div>
                   {{--    <div class="mt-1 text-sm text-gray-600">
                         Stock: {{ $selectedVariant->stock }} available
@@ -367,7 +367,7 @@
                     @php
                         $relatedPrice = $convertAmount($relatedProduct->price);
                     @endphp
-                    <span class="text-xs font-bold">{{ $displaySymbol }}{{ number_format($relatedPrice, 2) }}</span>
+                    <span class="text-xs font-bold">{{ $displaySymbol }}{{ \App\Models\Product::formatPrice($relatedPrice) }}</span>
                 </div>
             </div>
             @endforeach

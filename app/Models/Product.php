@@ -173,6 +173,25 @@ class Product extends Model implements HasMedia
     }
 
     /**
+     * Format price to remove .00 for whole numbers
+     * 
+     * 
+     * @param float|null $price
+     * @return string
+     */
+    public static function formatPrice($price)
+    {
+        if ($price === null) {
+            return '0';
+        }
+        
+        // Check if price is a whole number
+        return (floor($price) == $price) 
+            ? number_format($price, 0) 
+            : number_format($price, 2);
+    }
+
+    /**
      * Safely get media URL with error handling
      */
     public function getSafeMediaUrl($collectionName = 'main_image', $conversionName = '')

@@ -135,9 +135,9 @@
             </div>
             <div class="ml-3 text-sm font-medium text-gray-800">
                 @if($isAutoDetected)
-                    Prices converted to {{ $currencyCode }} ({{ $currencySymbol }})
+                    Prices converted to ({{ $currencySymbol }})
                 @else
-                    Currency set to {{ $currencyCode }} ({{ $currencySymbol }})
+                    Currency set to ({{ $currencySymbol }})
                 @endif
             </div>
             <button @click="show = false" class="ml-auto pl-3 text-gray-400 hover:text-gray-500">
@@ -294,32 +294,31 @@
                 @endauth
             </div>
             <div>
-                <div class="text-center p-2">
+                <div class="text-center pt-2">
                     <a href="{{ route('product.show', $product->slug) }}"
-                       class="text-[11px] md:text-xs lg:text-sm text-gray-600 font-semibold hover:text-red-600 block leading-tight">
+                       class="text-[11px] md:text-xs lg:text-sm text-black font-bold hover:text-gray-700 block leading-tight">
                         {{ $product->name }}
                     </a>
                 </div>
-                <div class="flex justify-between text-xs items-center mx-2">
+                <div class="flex justify-center text-red-600 font-bold text-xs items-center mx-2">
                     <div>
                         @php
                             $displayPrice = $product->converted_price ?? $product->price ?? 0;
                         @endphp
-                        <span class="text-xs font-bold">{{ number_format($displayPrice, 2) }} {{ $currencySymbol }}</span>
+                        <span class="text-xs font-bold">{{ \App\Models\Product::formatPrice($displayPrice) }}{{ $currencySymbol }}</span>
                     </div>
                     @if($product->compare_price > 0)
-                    <div class="flex gap-2 items-center">
+                    <div class="flex gap-2 items-center px-2">
                         @php
                             $displayComparePrice = $product->converted_compare_price ?? $product->compare_price ?? 0;
                         @endphp
                         <span class="text-xs text-gray-500 line-through">
-                            {{ number_format($displayComparePrice, 2) }} {{ $currencySymbol }}
+                            {{ \App\Models\Product::formatPrice($displayComparePrice) }} {{ $currencySymbol }}
                         </span>
 
-                      {{-- -  <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">
+                      {{--<span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">
                             -{{ $product->discount_percentage }}%
-                        </span>
---}}
+                        </span>--}}
                     </div>
                     @endif
                 </div>

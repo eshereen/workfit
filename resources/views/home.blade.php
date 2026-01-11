@@ -17,8 +17,8 @@
         @endpush
     @endif
 
-    {{-- Promotional Modal --}}
-@livewire('promo-modal')
+    {{-- Promotional Modal 
+@livewire('promo-modal')--}}
 
 @if($heroBanner)
   <section class="relative -top-28 h-screen overflow-hidden">
@@ -79,7 +79,7 @@
             @endif
             
             @if($heroBanner->description)
-            <p class="text-center lg:text-left  text-xl md:text-2xl pr-8 md:pr-0 mb-8 max-w-xl fade-in !capitalize">
+            <p class="text-center md:text-left  text-lg md:text-xl  mb-8 max-w-xl fade-in !capitalize px-4">
                 {{ $heroBanner->description }}
             </p>
             @endif
@@ -87,13 +87,13 @@
             @if($heroBanner->getLink())
              
            
-                    <a href="{{ $heroBanner->getLink() }}" class="bg-white hover:bg-gray-700 text-gray-950 hover:text-white font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
+                    <a href="{{ $heroBanner->getLink() }}" class="bg-transparent hover:bg-white text-white border-2 border-white hover:border-white transition-all duration-300 ease-in-out hover:text-gray-950 font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
                         {{ $heroBanner->button_text ?? 'Shop Now' }}
                     </a>
                   
             @endif
               @if($heroBanner->getLink2())
-                     <a href="{{ $heroBanner->getLink2() }}" class="bg-white hover:bg-gray-700 text-gray-950 hover:text-white font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
+                     <a href="{{ $heroBanner->getLink2() }}" class="bg-transparent hover:bg-white text-white border-2 border-white hover:border-white transition-all duration-300 ease-in-out hover:text-gray-950 font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto mx-auto lg:mx-0 ">
                         {{ $heroBanner->button_text_2 ?? 'Shop Now' }}
                     </a>
                   @endif
@@ -135,17 +135,17 @@
         <div class="absolute inset-0 bg-black/50 z-0 flex flex-col justify-center items-center lg:justify-end lg:items-start lg:pb-16 lg:pl-12">
             <div class="text-center lg:text-left text-white px-4 md:px-12 lg:px-0 w-full lg:w-auto">
                 <h2 class="text-4xl md:text-6xl font-bold mb-4 slide-in">{{ $women_banner->title }}</h2>
-                <p class="text-xl md:text-2xl mb-8 max-w-xl mx-auto lg:mx-0 fade-in">
+                <p class="text-center md:text-left px-4 text-lg md:text-xl lg:text-2xl mb-8 max-w-xl mx-auto lg:mx-0 fade-in">
                     {{ $women_banner->description }}
                 </p>
                 <div class="flex flex-col lg:flex-row justify-center lg:justify-start items-center lg:items-center gap-4 fade-in">
                     @if($women_banner->getLink())
-                    <a href="{{ $women_banner->getLink() }}" class="bg-white hover:bg-gray-700 text-gray-950 hover:text-white font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto">
+                    <a href="{{ $women_banner->getLink() }}" class="bg-transparent hover:bg-white text-white border-2 border-white hover:border-white transition-all duration-300 ease-in-out hover:text-gray-950 font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto">
                         {{ $women_banner->button_text }}
                     </a>
                     @endif
                     @if($women_banner->getLink2())
-                    <a href="{{ $women_banner->getLink2() }}" class="bg-white hover:bg-gray-400 text-black font-bold py-3 px-6 transition-colors text-center w-2/3 lg:w-auto">
+                    <a href="{{ $women_banner->getLink2() }}" class="bg-transparent hover:bg-white text-white border-2 border-white hover:border-white transition-all duration-300 ease-in-out hover:text-gray-950 font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto">
                         {{ $women_banner->button_text_2 }}
                     </a>
                     @endif
@@ -193,7 +193,7 @@
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">{{$run->title}}</h3>
                         @endif
                         @if($run->description)
-                        <p class="text-white text-center px-4 mb-4">{{$run->description}}</p>
+                        <p class="text-white text-center md:text-left px-4 text-lg md:text-xl lg:text-2xl mb-4">{{$run->description}}</p>
                         @endif
                         <div class="flex flex-col gap-4 md:flex-row">
                          
@@ -220,7 +220,7 @@
                         <h3 class="text-white text-3xl lg:text-6xl font-bold mb-2">{{$train->title}}</h3>
                         @endif
                         @if($train->description)
-                        <p class="text-white text-center px-4 mb-4">{{$train->description}}</p>
+                        <p class="text-white text-center md:text-left px-4 text-lg md:text-xl lg:text-2xl mb-4">{{$train->description}}</p>
                         @endif
                         <div class="flex flex-col gap-4 md:flex-row">
                           @if($train->getLink())
@@ -298,16 +298,16 @@
                 <h1 class="text-4xl md:text-6xl font-bold mb-4 slide-in">{{ $group_banner->title }}</h1>
                 @endif
                 @if($group_banner->description)
-                <p class="text-xl md:text-2xl mb-8 max-w-xl mx-auto lg:mx-0 fade-in">{{ $group_banner->description }}</p>
+                <p class="text-center md:text-left text-lg md:text-xl lg:text-2xl mb-8 max-w-xl mx-auto lg:mx-0 fade-in">{{ $group_banner->description }}</p>
                 @endif
                 <div class="flex flex-col lg:flex-row justify-center lg:justify-start items-center lg:items-center gap-4 fade-in">
                     @if($group_banner->getLink())
-                    <a href="{{ $group_banner->getLink() }}" class="bg-white hover:bg-gray-700 text-gray-950 hover:text-white font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto">
+                    <a href="{{ $group_banner->getLink() }}" class="bg-transparent hover:bg-white text-white border-2 border-white hover:border-white transition-all duration-300 ease-in-out hover:text-gray-950 font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto">
                         {{ $group_banner->button_text }}
                     </a>
                     @endif
                     @if($group_banner->getLink2())
-                    <a href="{{ $group_banner->getLink2() }}" class="bg-white hover:bg-gray-400 text-black font-bold py-3 px-6 transition-colors text-center w-2/3 lg:w-auto">
+                    <a href="{{ $group_banner->getLink2() }}" class="bg-transparent hover:bg-white text-white border-2 border-white hover:border-white transition-all duration-300 ease-in-out hover:text-gray-950 font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto">
                         {{ $group_banner->button_text_2 }}
                     </a>
                     @endif
@@ -320,7 +320,7 @@
     <!-- Just Arrived Products -->
     <section class="py-16  px-4">
         <h1 class="text-center font-bold text-2xl md:text-3xl lg:text-4xl mb-2 animate-on-scroll uppercase">Just Arrived</h1>
-        <p class="text-center text-gray-600 mb-4 max-w-xl md:max-w-2xl lg:max-w-2xl mx-auto animate-on-scroll px-8">Discover our latest collection of products</p>
+        <p class="text-center md:text-left text-lg md:text-xl lg:text-2xl text-gray-600 mb-4 max-w-xl md:max-w-2xl lg:max-w-2xl mx-auto animate-on-scroll px-8">Discover our latest collection of products</p>
         @if($recent && $recent->isNotEmpty())
        @livewire('product-index',['products'=>$recent, 'disableEagerLoading' => true])
        @endif
@@ -345,16 +345,16 @@
             <h1 class="text-4xl md:text-6xl font-bold mb-4 slide-in">{{$featured_banner->title}}</h1>
             @endif
             @if($featured_banner->description)
-            <p class="text-xl md:text-2xl mb-8 max-w-xl mx-auto lg:mx-0 fade-in">{{$featured_banner->description}}</p>
+            <p class="text-center md:text-left text-lg md:text-xl lg:text-2xl mb-8 max-w-xl mx-auto lg:mx-0 fade-in">{{$featured_banner->description}}</p>
             @endif
              <div class="flex flex-col lg:flex-row justify-center lg:justify-start items-center lg:items-center gap-4 fade-in">
                     @if($featured_banner->getLink())
-                    <a href="{{ $featured_banner->getLink() }}" class="bg-white hover:bg-gray-700 text-gray-950 hover:text-white font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto">
+                    <a href="{{ $featured_banner->getLink() }}" class="bg-transparent hover:bg-white text-white border-2 border-white hover:border-white transition-all duration-300 ease-in-out hover:text-gray-950 font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto">
                         {{ $featured_banner->button_text }}
                     </a>
                     @endif
                     @if($featured_banner->getLink2())
-                    <a href="{{ $featured_banner->getLink2() }}" class="bg-white hover:bg-gray-400 text-black font-bold py-3 px-6 transition-colors text-center w-2/3 lg:w-auto">
+                    <a href="{{ $featured_banner->getLink2() }}" class="bg-transparent hover:bg-white text-white border-2 border-white hover:border-white transition-all duration-300 ease-in-out hover:text-gray-950 font-bold py-3 px-6 transition-colors uppercase text-center w-2/3 lg:w-auto">
                         {{ $featured_banner->button_text_2 }}
                     </a>
                     @endif

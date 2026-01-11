@@ -29,6 +29,14 @@ class ItemsRelationManager extends RelationManager
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['product', 'variant']))
             ->columns([
+                \Filament\Tables\Columns\ImageColumn::make('product.main_image')
+                    ->label('Image')
+                    ->getStateUsing(fn ($record) => $record->product?->getFirstMediaUrl('main_image', 'thumb_webp') 
+                        ?: $record->product?->getFirstMediaUrl('main_image'))
+                    ->defaultImageUrl(url('https://via.placeholder.com/150x150?text=No+Image'))
+                    ->size(50)
+                    ->circular(false)
+                    ->extraImgAttributes(['class' => 'object-cover rounded']),
                 TextColumn::make('product.name')
                     ->label('Product')
                     ->searchable()

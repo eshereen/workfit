@@ -89,7 +89,7 @@ class OrderResource extends Resource
                     ->maxLength(255)
                     ->label('Building Number')
                     ->placeholder('Building number (optional)')
-                    ->default(fn ($record) => $record?->billing_building_number ?? ''),
+                    ->default(fn ($record) => $record?->billing_building_number ?? null),
                 ])->columns(3)->columnSpanFull(),
 
                 Section::make('Shipping Address')
@@ -111,7 +111,7 @@ class OrderResource extends Resource
                     ->label('Building Number')
                     ->placeholder('Building number (optional)')
                     ->visible(fn ($get) => !$get('use_billing_for_shipping'))
-                    ->default(fn ($record) => $record?->shipping_building_number ?? ''),
+                    ->default(fn ($record) => $record?->shipping_building_number ?? null),
                 // Select the shipping method; use the Shipping record as the option
                 // and show the related country's name (and optionally price) as the label.
                 Select::make('shipping_id')
@@ -211,11 +211,12 @@ class OrderResource extends Resource
                     ->sortable(),
                 TextColumn::make('discount_amount')
                     ->numeric()
-                    ->sortable(),
-                TextColumn::make('total_amount')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable(), 
                 TextColumn::make('currency')
+                    ->label('Currency & Total')
+                    ->formatStateUsing(fn (Order $record) => 
+                        $record->currency . ' ' . \App\Models\Product::formatPrice($record->total_amount)
+                    )
                     ->searchable(),
                 TextColumn::make('billing_address')
                     ->searchable(),
@@ -256,6 +257,7 @@ class OrderResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])

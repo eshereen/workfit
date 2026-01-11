@@ -20,7 +20,8 @@ class OrderShipped extends Mailable implements ShouldQueue
      */
     public function __construct(public Order $order)
     {
-        $this->order = $order;
+        // Ensure relationships are loaded for the email
+        $this->order->loadMissing(['items.product', 'items.variant', 'country', 'customer']);
     }
 
     /**
@@ -28,8 +29,10 @@ class OrderShipped extends Mailable implements ShouldQueue
      */
     public function envelope(): Envelope
     {
+        $status = $this->order->status->value ?? 'Updated';
+        
         return new Envelope(
-            subject: 'Order Shipped',
+            subject: "Order {$status} - #{$this->order->order_number}",
         );
     }
 
