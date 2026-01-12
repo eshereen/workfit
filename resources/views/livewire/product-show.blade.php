@@ -17,22 +17,27 @@
         <div class="lg:w-1/2"
         x-data="{
            currentImage: '{{ $product->getFirstMediaUrl('main_image') }}',
-           currentZoomImage: '{{ $product->getFirstMediaUrl('main_image', 'zoom_webp') }}',
+           currentZoomImage: '{{ $product->getFirstMediaUrl('main_image', 'zoom_webp') ?: $product->getFirstMediaUrl('main_image') }}',
            images: [
+               @php
+                   $mainMedia = $product->getFirstMedia('main_image');
+                   $mainUrl = $product->getFirstMediaUrl('main_image');
+               @endphp
                {
-                   large: '{{ $product->getFirstMediaUrl('main_image') }}',
-                   zoom: '{{ $product->getFirstMediaUrl('main_image', 'zoom_webp') }}',
-                   medium: '{{ $product->getFirstMediaUrl('main_image', 'medium_webp') }}',
-                   thumb: '{{ $product->getFirstMediaUrl('main_image', 'thumb_webp') }}',
-                   avif: '{{ $product->getFirstMediaUrl('main_image', 'medium_avif') }}',
+                   large: '{{ $mainUrl }}',
+                   zoom: '{{ $mainMedia && $mainMedia->hasGeneratedConversion('zoom_webp') ? $mainMedia->getUrl('zoom_webp') : $mainUrl }}',
+                   medium: '{{ $mainMedia && $mainMedia->hasGeneratedConversion('medium_webp') ? $mainMedia->getUrl('medium_webp') : $mainUrl }}',
+                   thumb: '{{ $mainMedia && $mainMedia->hasGeneratedConversion('thumb_webp') ? $mainMedia->getUrl('thumb_webp') : $mainUrl }}',
                },
                @foreach($product->getMedia('product_images') as $image)
+               @php
+                   $originalUrl = $image->getUrl();
+               @endphp
                {
-                   large: '{{ $image->getUrl() }}',
-                   zoom: '{{ $image->getUrl('zoom_webp') }}',
-                   medium: '{{ $image->getUrl('medium_webp') }}',
-                   thumb: '{{ $image->getUrl('thumb_webp') }}',
-                   avif: '{{ $image->getUrl('medium_avif') }}',
+                   large: '{{ $originalUrl }}',
+                   zoom: '{{ $image->hasGeneratedConversion('zoom_webp') ? $image->getUrl('zoom_webp') : $originalUrl }}',
+                   medium: '{{ $image->hasGeneratedConversion('medium_webp') ? $image->getUrl('medium_webp') : $originalUrl }}',
+                   thumb: '{{ $image->hasGeneratedConversion('thumb_webp') ? $image->getUrl('thumb_webp') : $originalUrl }}',
                },
                @endforeach
            ]
@@ -89,7 +94,6 @@
                     @click="magnifierEnabled = false; currentImage = image.large; currentZoomImage = image.zoom">
 
                    <picture class="object-cover w-full h-24 transition-opacity hover:opacity-80">
-                       <source :srcset="image.avif" type="image/avif">
                        <source :srcset="image.medium" type="image/webp">
                        <img :src="image.thumb"
                             alt="{{ $product->name }}"
@@ -346,7 +350,6 @@
                 <a href="{{ route('product.show', $relatedProduct->slug) }}">
                     <picture class="w-full h-80">
                         {{-- Modern formats first --}}
-                        <source srcset="{{ $relatedProduct->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
                         <source srcset="{{ $relatedProduct->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
                         {{-- Fallback for older browsers --}}
                         <img src="{{ $relatedProduct->getFirstMediaUrl('main_image') }}"

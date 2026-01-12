@@ -700,6 +700,7 @@ class CheckoutController extends Controller
     {
         Log::info('Creating order items', [
             'order_id' => $order->id,
+            'order_currency' => $order->currency,
             'cart_count' => $cart->count()
         ]);
 
@@ -729,12 +730,24 @@ class CheckoutController extends Controller
                 throw new Exception("Invalid product ID extracted from cart item: {$item['id']}");
             }
 
+            // Convert cart item price from USD to order's currency
+            $priceInUSD = $item['price']; // Cart stores prices in USD
+            $priceInOrderCurrency = $this->currencyService->convertFromUSD($priceInUSD, $order->currency);
+
             try {
                 $order->items()->create([
                     'product_id' => $productId,
                     'product_variant_id' => $item['attributes']['variant_id'] ?? null,
                     'quantity' => $item['quantity'],
-                    'price' => $item['price'],
+                    'price' => $priceInOrderCurrency, // Store price in order's currency
+                ]);
+
+                Log::info('Order item created', [
+                    'order_id' => $order->id,
+                    'product_id' => $productId,
+                    'price_usd' => $priceInUSD,
+                    'price_converted' => $priceInOrderCurrency,
+                    'currency' => $order->currency
                 ]);
             } catch (Exception $e) {
                 Log::error('Failed to create order item', [
@@ -742,7 +755,9 @@ class CheckoutController extends Controller
                     'product_id' => $productId,
                     'variant_id' => $item['attributes']['variant_id'] ?? null,
                     'quantity' => $item['quantity'],
-                    'price' => $item['price'],
+                    'price_usd' => $priceInUSD,
+                    'price_converted' => $priceInOrderCurrency,
+                    'currency' => $order->currency,
                     'error' => $e->getMessage()
                 ]);
                 throw $e;

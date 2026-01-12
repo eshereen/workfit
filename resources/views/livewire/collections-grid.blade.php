@@ -22,7 +22,6 @@
                         @if($collection->media->count() > 0)
                             <picture class="w-full h-64">
                                 {{-- Modern formats first --}}
-                                <source srcset="{{ $collection->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
                                 <source srcset="{{ $collection->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
                                 {{-- Fallback for older browsers --}}
                                 <img src="{{ $collection->getFirstMediaUrl('main_image') }}"

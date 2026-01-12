@@ -27,7 +27,7 @@ class ItemsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['product', 'variant']))
+            ->modifyQueryUsing(fn ($query) => $query->with(['product', 'variant', 'order']))
             ->columns([
                 \Filament\Tables\Columns\ImageColumn::make('product.main_image')
                     ->label('Image')
@@ -65,7 +65,27 @@ class ItemsRelationManager extends RelationManager
                 TextColumn::make('quantity')
                     ->sortable(),
                 TextColumn::make('price')
-                    ->money('USD')
+                    ->formatStateUsing(function ($record) {
+                        $order = $record->order;
+                        $currency = $order->currency ?? 'USD';
+                        
+                        // Cutoff date: Orders created before this date have prices in USD
+                        // Set this to the deployment date/time of the fix (today)
+                        $cutoffDate = \Carbon\Carbon::parse('2026-01-11 22:00:00');
+                        
+                        // Determine if this is an old order (price stored in USD)
+                        $isOldOrder = $order->created_at->lt($cutoffDate);
+                        
+                        if ($isOldOrder && $currency !== 'USD') {
+                            // Old order with non-USD currency: price is in USD, convert for display
+                            $currencyService = app(\App\Services\CountryCurrencyService::class);
+                            $convertedPrice = $currencyService->convertFromUSD($record->price, $currency);
+                            return $currency . ' ' . \App\Models\Product::formatPrice($convertedPrice);
+                        } else {
+                            // New order OR USD order: price is already correct
+                            return $currency . ' ' . \App\Models\Product::formatPrice($record->price);
+                        }
+                    })
                     ->sortable(),
             ])
             ->headerActions([

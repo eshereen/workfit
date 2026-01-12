@@ -261,7 +261,9 @@ public function registerMediaCollections(?Media $media = null): void
 
                 ->queued();
 
-            // AVIF (optional — smaller but more CPU heavy)
+
+            // AVIF conversions disabled - server doesn't support AVIF
+            /*
             $this->addMediaConversion('thumb_avif')
                 ->format('avif')
                 ->width(150)
@@ -285,6 +287,7 @@ public function registerMediaCollections(?Media $media = null): void
 
 
                 ->queued();
+            */
         });
 
     // Product gallery (multiple images)
@@ -316,7 +319,9 @@ public function registerMediaCollections(?Media $media = null): void
                 ->height(1200)
                 ->queued();
 
-            // AVIF versions (optional)
+
+            // AVIF conversions disabled - server doesn't support AVIF
+            /*
             $this->addMediaConversion('thumb_avif')
                 ->format('avif')
                 ->width(150)
@@ -334,6 +339,7 @@ public function registerMediaCollections(?Media $media = null): void
                 ->width(1200)
                 ->height(1200)
                 ->queued();
+            */
         });
 }
 

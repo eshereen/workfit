@@ -213,7 +213,7 @@ class CountryCurrencyService
     {
         $symbols = [
             'USD' => '$',
-            'EGP' => 'E£',
+            'EGP' => 'EGP',
             'GBP' => '£',
             'EUR' => '€',
             'AED' => 'د.إ',

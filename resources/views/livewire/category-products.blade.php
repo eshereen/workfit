@@ -84,7 +84,6 @@
                                     <picture class="w-full h-full transition-opacity duration-500"
                                              :class="hover ? 'opacity-0' : 'opacity-100'">
                                         {{-- Modern formats first --}}
-                                        <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_avif') }}" type="image/avif">
                                         <source srcset="{{ $product->getFirstMediaUrl('main_image', 'large_webp') }}" type="image/webp">
                                         {{-- Fallback for older browsers --}}
                                         <img src="{{ $product->getFirstMediaUrl('main_image') }}"
@@ -106,7 +105,6 @@
                                         <picture class="absolute top-0 left-0 w-full h-full transition-opacity duration-500"
                                                  :class="hover ? 'opacity-100' : 'opacity-0'">
                                             {{-- Modern formats first --}}
-                                            <source srcset="{{ $product->getFirstMediaUrl('product_images', 'zoom_avif') }}" type="image/avif">
                                             <source srcset="{{ $product->getFirstMediaUrl('product_images', 'zoom_webp') }}" type="image/webp">
                                             {{-- Fallback for older browsers --}}
                                             <img src="{{ $galleryImage }}"
